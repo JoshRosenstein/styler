@@ -108,7 +108,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
       }
 
       if (isPatternMatch) {
-        const { default: defaultValue, opt, ...matchers } = value
+        const { default: defaultValue, options:opt, ...matchers } = value
         const options = merge(globalOptions, opt)
         const DF = valueAsFunction(defaultValue)(props)
         const allPropNames = Object.keys(props)
