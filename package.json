@@ -1,0 +1,108 @@
+{
+  "name": "@rosey/styler",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "main": "dist/styler.common.js",
+  "module": "dist/styler.es.js",
+  "jsnext:main": "dist/styler.es.js",
+  "browser": "dist/styler.umd.js",
+  "moduleName": "roseyStyler",
+  "dependencies": {
+    "ramda": "0.25.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.0.0-beta.42",
+    "@babel/plugin-external-helpers": "7.0.0-beta.42",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.42",
+    "@babel/preset-env": "7.0.0-beta.42",
+    "@babel/preset-stage-0": "7.0.0-beta.42",
+    "@babel/register": "7.0.0-beta.42",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^8.2.2",
+    "babel-jest": "^22.4.3",
+    "bundlesize": "^0.17.0",
+    "codecov": "^3.0.0",
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard-react": "^6.0.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-react": "^7.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "jest": "^22.4.3",
+    "jest-cli": "^22.4.3",
+    "mkdirp": "^0.5.1",
+    "path": "^0.12.7",
+    "prettier": "^1.11.1",
+    "rimraf": "^2.6.1",
+    "rollup": "0.56.5",
+    "rollup-plugin-babel": "4.0.0-beta.2",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "3.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf node_modules && rimraf dist",
+    "build": "rollup -c",
+    "test": "jest",
+    "test:watch": "jest --watch --no-cache",
+    "reinstall": "pnpm run clean && pnpm install"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "modules": false
+        }
+      ],
+      "@babel/preset-stage-0"
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          "@babel/plugin-transform-modules-commonjs"
+        ]
+      }
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "standard",
+      "standard-react",
+      "prettier",
+      "prettier/react"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "parser": "babel-eslint",
+    "rules": {
+      "prettier/prettier": "error",
+      "react/prop-types": 0,
+      "react/no-unused-prop-types": 0,
+      "standard/computed-property-even-spacing": 0,
+      "no-template-curly-in-string": 0,
+      "camelcase": 0
+    },
+    "env": {
+      "browser": true
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.test.js"
+        ],
+        "env": {
+          "jest": true
+        }
+      }
+    ]
+  }
+}
