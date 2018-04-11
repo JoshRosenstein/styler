@@ -57,8 +57,7 @@ export const fontFamily = {
 }
 
 export const textAlign = {
-  textAlign: returnAsIs,
-  align: returnAsIs
+  textAlign: returnAsIs
 }
 
 export const lineHeight = {
@@ -159,8 +158,7 @@ export const ratio_c = {
 }
 
 export const alignItems = {
-  alignItems: returnAsIs,
-  align: returnAsIs
+  alignItems: returnAsIs
 }
 
 export const alignContent = {
@@ -174,7 +172,16 @@ export const justifyContent = {
 
 export const flexWrap = {
   flexWrap: returnAsIs,
-  wrap: 'wrap'
+  wrap: 'wrap',
+  nowrap: 'nowrap',
+  wrapReverse: 'wrapReverse'
+}
+
+export const flexDirection = {
+  flexDirection: returnAsIs,
+  column: 'column',
+  rowReverse: 'rowReverse',
+  columnReverse: 'columnReverse'
 }
 
 export const flexBasis = {
@@ -202,6 +209,7 @@ export const order = {
 
 export const gridGap = {
   gridGap: returnAsIs,
+  gap: returnAsIs,
   options: {
     getter: px,
     key: 'space'
@@ -215,6 +223,25 @@ export const gridColumnGap = {
   }
 }
 
+export const gridArea = {
+  gridArea: returnAsIs
+}
+
+export const gridColumnStart = {
+  gridColumnStart: returnAsIs
+}
+export const gridColumnEnd = {
+  gridColumnEnd: returnAsIs
+}
+
+export const gridRowStart = {
+  gridRowStart: returnAsIs
+}
+
+export const gridRowEnd = {
+  gridRowEnd: returnAsIs
+}
+
 export const gridColumn = {
   gridColumn: returnAsIs
 }
@@ -224,22 +251,39 @@ export const gridRow = {
 }
 
 export const gridAutoFlow = {
-  gridAutoFlow: returnAsIs
+  gridAutoFlow: returnAsIs,
+  row: 'row',
+  column: 'column',
+  dense: 'dense'
 }
 
 export const gridAutoColumns = {
-  gridAutoColumns: returnAsIs
+  gridAutoColumns: returnAsIs,
+  autoColumns: returnAsIs
 }
 
 export const gridAutoRows = {
-  gridAutoRows: returnAsIs
+  gridAutoRows: returnAsIs,
+  autoRows: returnAsIs
+}
+
+export const gridTemplate = {
+  gridTemplate: returnAsIs,
+  template: returnAsIs
+}
+
+export const gridTemplateAreas = {
+  gridTemplateAreas: returnAsIs,
+  areas: returnAsIs
 }
 
 export const gridTemplateColumns = {
-  gridTemplateColumns: returnAsIs
+  gridTemplateColumns: returnAsIs,
+  columns: returnAsIs
 }
 export const gridTemplateRows = {
-  gridTemplateRows: returnAsIs
+  gridTemplateRows: returnAsIs,
+  rows: returnAsIs
 }
 
 export const border = {
@@ -340,7 +384,12 @@ export const backgroundRepeat = {
 }
 
 export const position = {
-  position: returnAsIs
+  position: returnAsIs,
+  static: 'static',
+  absolute: 'absolute',
+  fixed: 'fixed',
+  relative: 'relative',
+  sticky: 'sticky'
 }
 
 export const zIndex = {

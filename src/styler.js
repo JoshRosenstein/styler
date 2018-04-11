@@ -38,11 +38,11 @@ import {
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
 // inspired by https://github.com/jxnblk/styled-system
-const isSelector = startsWithAny('.', '#', '>')
+const isSelector = startsWithAny('.', '#', '>', '&', '*')
 
 const isAtRule = startsWith('@')
 
-const isPseudoSelector = startsWith(':')
+const isPseudoSelector = startsWithAny(':')
 
 const isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector])
 
@@ -52,12 +52,13 @@ const createStyleRule = (key, value) => {
 }
 
 const createNestedSelector = (parent, child) => {
+  return child
   const selectorPair = [parent, child]
   if (isPseudoSelector(child)) {
-    return selectorPair.join('')
+    //  return selectorPair.join('')
   }
-
-  return selectorPair.join(' ')
+  return child
+  // return selectorPair.join(' ')
 }
 
 const ruleParser = curry((parentSelector, props, obj) => {

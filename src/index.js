@@ -1,7 +1,7 @@
-export styler from './styler'
-
+import * as styler from './styler'
 export { returnAsIs } from './utils'
-
+export styler from './styler'
+export * as styleDefs from './styleDefs'
 export {
   alignContent,
   alignItems,
@@ -26,12 +26,18 @@ export {
   colors,
   display,
   flex,
+  flexDirection,
   flexBasis,
   flexWrap,
   fontFamily,
   fontSize,
   fontWeight,
   getters,
+  gridArea,
+  gridColumnStart,
+  gridColumnEnd,
+  gridRowStart,
+  gridRowEnd,
   gridAutoColumns,
   gridAutoFlow,
   gridAutoRows,
@@ -39,6 +45,8 @@ export {
   gridColumnGap,
   gridGap,
   gridRow,
+  gridTemplate,
+  gridTemplateAreas,
   gridTemplateColumns,
   gridTemplateRows,
   height,
@@ -74,3 +82,5 @@ export {
   width,
   zIndex
 } from './styleDefs'
+
+export default styler

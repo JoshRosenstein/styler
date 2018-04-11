@@ -50,6 +50,7 @@
   "scripts": {
     "clean": "rimraf node_modules && rimraf dist",
     "build": "rollup -c",
+      "watch": "rollup -c --watch",
     "test": "jest",
     "test:watch": "jest --watch --no-cache",
     "reinstall": "pnpm run clean && pnpm install"
