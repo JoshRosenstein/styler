@@ -35,6 +35,9 @@ import {
   objOf,
   isEmpty
 } from 'ramda'
+
+// Mostly from the Shades library: https://github.com/bupa-digital/shades/
+// inspired by https://github.com/jxnblk/styled-system
 const isSelector = startsWithAny('.', '#', '>')
 
 const isAtRule = startsWith('@')
@@ -108,7 +111,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
       }
 
       if (isPatternMatch) {
-        const { default: defaultValue, options:opt, ...matchers } = value
+        const { default: defaultValue, options: opt, ...matchers } = value
         const options = merge(globalOptions, opt)
         const DF = valueAsFunction(defaultValue)(props)
         const allPropNames = Object.keys(props)
@@ -137,7 +140,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
           return val
         }
 
-        ///responisive PropVal
+        /// responisive PropVal
         if (isObjectLiteral(computedValue) || isArray(computedValue)) {
           let breakpoints = computedValue
           let themeBPs = getThemeAttr('breakpoints')(props)

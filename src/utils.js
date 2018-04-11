@@ -31,7 +31,7 @@ import {
   flip
 } from 'ramda'
 import defaultTheme from './defaultTheme'
-
+// Mostly from the Shades library: https://github.com/bupa-digital/shades/
 export const isArray = is(Array)
 export const isString = is(String)
 export const isFunction = is(Function)
