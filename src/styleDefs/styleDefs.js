@@ -24,7 +24,8 @@ export const fontSize = {
   fontSize: returnAsIs,
   f: returnAsIs,
   options: {
-    getter: px
+    getter: px,
+    key: 'fontSizes'
   }
 }
 
