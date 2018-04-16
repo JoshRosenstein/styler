@@ -49,7 +49,8 @@
   },
   "scripts": {
     "clean": "rimraf node_modules && rimraf dist",
-    "build": "rollup -c",
+    "build:prod":"SET NODE_ENV=production && rollup -c",
+    "build:dev": "rollup -c",
     "watch": "rollup -c --watch",
     "test": "jest",
     "test:watch": "jest --watch --no-cache",

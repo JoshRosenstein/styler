@@ -1,7 +1,7 @@
-import * as styler from './styler'
+export { default as styler } from './styler'
 export { returnAsIs } from './utils'
-export styler from './styler'
 export * as styleDefs from './styleDefs'
+
 export {
   alignContent,
   alignItems,
@@ -82,5 +82,3 @@ export {
   width,
   zIndex
 } from './styleDefs'
-
-export default styler

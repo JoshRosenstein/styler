@@ -1,9 +1,11 @@
 // inspired by https://github.com/jxnblk/styled-system
-import { isNumber, isNotNumber } from '@roseys/ramda'
+
 import { pxToRem, px, returnAsIs } from '../utils'
 
+const isNumber = n => typeof n === 'number' && !isNaN(n)
+
 export const getters = {
-  getWidth: n => (isNotNumber(n) || n > 1 ? pxToRem(n) : n * 100 + '%'),
+  getWidth: n => (!isNumber(n) || n > 1 ? pxToRem(n) : n * 100 + '%'),
   getBorder: n => (isNumber(n) && n > 0 ? n + 'px solid' : n),
   backgroundImage: (val, rawValue, p) => `url(${rawValue})`,
   flexWrapShim: n => (n === true ? 'wrap' : null),

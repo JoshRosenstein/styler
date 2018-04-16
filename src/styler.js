@@ -126,6 +126,10 @@ const ruleParser = curry((parentSelector, props, obj) => {
           matchingProps
         )
         let computedValue = pipe(falseToNull, defaultTo(DF))(reducer)
+        /// If prop passed is a function, execute it
+        computedValue = isFunction(computedValue)
+          ? computedValue(props)
+          : computedValue
 
         const computeOptions = v => {
           let val = v

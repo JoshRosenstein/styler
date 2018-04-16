@@ -1,20 +1,22 @@
-import R from 'ramda';
+import * as F from 'ramda'
 
-import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import replace from 'rollup-plugin-replace';
+import babel from 'rollup-plugin-babel'
+import uglify from 'rollup-plugin-uglify'
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import replace from 'rollup-plugin-replace'
 
-import pkg from './package.json';
+import pkg from './package.json'
 
 const plugins = [
   resolve({
-    preferBuiltins: true,
+    jsnext: true,
+    main: true,
+    browser: true
   }),
   commonjs({
-    ignoreGlobal: true,
     include: 'node_modules/**',
+    extensions: ['.js']
   }),
   babel({
     babelrc: false,
@@ -22,13 +24,10 @@ const plugins = [
       [
         '@babel/preset-env',
         {
-          'targets': {
-            'browsers': [
-              'last 2 versions',
-              'ie >= 9'
-            ]
+          targets: {
+            browsers: ['last 2 versions', 'ie >= 9']
           },
-          'modules': false
+          modules: false
         }
       ],
       '@babel/preset-stage-0'
@@ -37,29 +36,38 @@ const plugins = [
     runtimeHelpers: true
   }),
   replace({
-    __DEV__: JSON.stringify(false),
+    exclude: 'node_modules/**',
+    ENV: JSON.stringify(process.env.NODE_ENV || 'development')
   }),
-];
+  process.env.NODE_ENV === 'production' && uglify()
+]
+const external = F.keys(F.omit(['ramda'], pkg.dependencies))
 
 const configBase = {
   input: 'src/index.js',
-  external: R.concat(R.keys(pkg.peerDependencies), R.keys(pkg.dependencies)),
+  external,
+  legacy: false,
+  treeshake: true,
   output: [
     { file: pkg.module, format: 'es', sourcemap: true },
     { file: pkg.main, format: 'cjs', sourcemap: true },
+    { file: pkg.browser, format: 'umd', name: pkg.moduleName, sourcemap: true }
   ],
-  plugins,
-};
+  plugins
+}
 
-const UMDBase = {
-  input: 'src/index.js',
-  external: R.concat(R.keys(pkg.peerDependencies), R.keys(pkg.dependencies)),
-  output: [
-    { file: pkg.browser, format: 'umd', name: pkg.moduleName, globals: { ramda: `R` } },
-  ],
+// const UMDBase = {
+//   input: 'src/index.js',
+//   external,
+//   output: [
+//     {
+//       file: pkg.browser,
+//       format: 'umd',
+//       name: pkg.moduleName
+//     }
+//   ],
+//
+//   plugins
+// }
 
-  plugins:[...plugins,uglify()]
-
-};
-
-export default [configBase,UMDBase]
+export default configBase
