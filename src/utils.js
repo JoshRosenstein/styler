@@ -28,7 +28,10 @@ import {
   mergeAll,
   mergeDeepLeft,
   filter,
-  flip
+  flip,
+  defaultTo,
+  curryN,
+  identity
 } from 'ramda'
 import defaultTheme from './defaultTheme'
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -37,22 +40,29 @@ export const isString = is(String)
 export const isFunction = is(Function)
 export const isNumber = is(Number)
 export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
-const isNumberAndNotZero = both(is(Number), complement(equals(0)))
 
+export const isNonZeroNumber = both(is(Number), complement(equals(0)))
 export const appendString = flip(concat)
 
-export const whenIsNumberAndNotZero = fn => R_when(isNumberAndNotZero, fn)
+export const whenisNonZeroNumber = curryN(2, (fn, input) =>
+  R_when(isNonZeroNumber, defaultTo(identity, fn))(input)
+)
 
 export const appendUnit = unit =>
-  whenIsNumberAndNotZero(toString, appendString(unit))
+  whenisNonZeroNumber(pipe(toString, appendString(unit)))
 
-export const pxTo = (divisor, unit) =>
-  whenIsNumberAndNotZero(
-    pipe(divide(__, divisor), toString, appendString(unit))
+const divideBy = flip(divide)
+
+export const pxTo = curry((divisor, unit, num) =>
+  whenisNonZeroNumber(
+    pipe(divideBy(defaultTo(16, divisor)), toString, appendString(unit)),
+    num
   )
+)
 
 export const pxToRem = pxTo(16, 'rem')
 export const pxToEm = pxTo(16, 'em')
+export const pxToPct = pxTo(16 / 100, '%')
 export const px = pxTo(1, 'px')
 export const rem = appendUnit('rem')
 export const em = appendUnit('em')

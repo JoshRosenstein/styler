@@ -33,6 +33,7 @@ import {
   reduceWhile,
   mergeDeepLeft,
   objOf,
+  map,
   isEmpty
 } from 'ramda'
 
@@ -51,18 +52,37 @@ const createStyleRule = (key, value) => {
   return { [key]: ruleValue }
 }
 
-const createNestedSelector = (parent, child) => {
-  return child
-  const selectorPair = [parent, child]
-  if (isPseudoSelector(child)) {
-    //  return selectorPair.join('')
-  }
-  return child
-  // return selectorPair.join(' ')
+const DEFAULT_RULE_KEY_LOOKUP = {
+  margin: 'space',
+  marginTop: 'space',
+  marginBottom: 'space',
+  marginLeft: 'space',
+  marginRight: 'space',
+  padding: 'space',
+  paddingTop: 'space',
+  paddingBottom: 'space',
+  paddingLeft: 'space',
+  paddingRight: 'space',
+  color: 'colors',
+  fontSize: 'fontSizes',
+  fontFamily: 'fonts',
+  lineHeight: 'lineHeights',
+  fontWeight: 'fontWeights',
+  letterspace: 'letterspaces',
+  maxWidth: 'maxWidths',
+  minWidths: 'minWidths',
+  height: 'heights',
+  gridGap: 'space',
+  gridColumnGap: 'space',
+  gridRowGap: 'space',
+  border: 'borders',
+  borderColor: 'colors',
+  backgroundColor: 'colors',
+  boxShadow: 'shadows'
 }
-
 const ruleParser = curry((parentSelector, props, obj) => {
   if (isFunction(obj)) return ruleParser(parentSelector, props, obj(props))
+
   const { options: globalOptions, ...rules } = obj
   return Object.entries(rules).reduce(
     (result, [key, value]) => {
@@ -90,11 +110,9 @@ const ruleParser = curry((parentSelector, props, obj) => {
       }
 
       if (shouldBeCombinedSelector) {
-        const mergedSelector = createNestedSelector(parentSelector, key)
-
         const additionalRules = pipe(
           when(isFunction).onlyThen(fn => fn(props)),
-          ruleParser(mergedSelector, props)
+          ruleParser(key, props)
         )(value)
 
         return {
@@ -114,6 +132,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
 
       if (isPatternMatch) {
         const { default: defaultValue, options: opt, ...matchers } = value
+
         const options = merge(globalOptions, opt)
         const DF = valueAsFunction(defaultValue)(props)
         const allPropNames = Object.keys(props)
@@ -135,7 +154,9 @@ const ruleParser = curry((parentSelector, props, obj) => {
         const computeOptions = v => {
           let val = v
           if (options && val) {
-            const { key: themeKey, getter } = options
+            let { key: themeKey, getter } = options
+            /// If options was not provided, check default lookUp
+            themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP[key]
             if (themeKey && isString(val)) {
               val = getThemeAttr(`${themeKey}.${val}`, val)(props)
             }
@@ -238,6 +259,15 @@ const ruleCleaner = rules => {
   }, {})
 }
 
-const styler = rules => props => ruleCleaner(ruleParser('', props, rules))
+// const styler = rules => props => ruleCleaner(ruleParser('', props, rules))
 
+const styler = rules => props => {
+  if (isArray(rules))
+    return pipe(
+      map(pipe(ruleParser('', props), ruleCleaner)),
+      mergeAllDeepLeft
+    )(rules)
+
+  return ruleCleaner(ruleParser('', props, rules))
+}
 export default styler
