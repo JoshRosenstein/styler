@@ -1,6 +1,6 @@
 {
   "name": "@roseys/styler",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "keywords": [],
   "main": "dist/styler.common.js",
@@ -54,7 +54,7 @@
     "watch": "rollup -c --watch",
     "test": "jest",
     "test:watch": "jest --watch --no-cache",
-    "reinstall": "pnpm run clean && pnpm install"
+    "reinstall": "yarn run clean && yarn"
   },
   "babel": {
     "presets": [

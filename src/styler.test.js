@@ -1,7 +1,11 @@
+/**
+ * @jest-environment node
+ */
+
 import styler from './styler'
 import { pxToRem, returnAsIs, getThemeAttr } from './utils'
 import defaultTheme from './defaultTheme'
-import { space } from './styles'
+import { space } from './styleDefs'
 const themeForTesting = {
   breakpoints: {
     mobile: 'mobile',

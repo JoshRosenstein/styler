@@ -62,6 +62,7 @@ const createNestedSelector = (parent, child) => {
 }
 
 const ruleParser = curry((parentSelector, props, obj) => {
+  if (isFunction(obj)) return ruleParser(parentSelector, props, obj(props))
   const { options: globalOptions, ...rules } = obj
   return Object.entries(rules).reduce(
     (result, [key, value]) => {
