@@ -3,6 +3,23 @@
   "version": "0.0.10",
   "description": "WIP- My css-in-js Utility functions",
   "keywords": [],
+  "author": "Joshua Rosenstein",
+"license": "MIT",
+"scripts": {
+  "clean": "rimraf node_modules && rimraf dist",
+  "build:prod":"SET NODE_ENV=production && rollup -c",
+  "build:dev": "rollup -c",
+  "watch": "rollup -c --watch",
+  "size": "bundlesize",
+  "test": "jest",
+    "cover": "jest --coverage ",
+  "test:watch": "jest --watch --no-cache",
+  "reinstall": "yarn run clean && yarn"
+},
+"repository": {
+  "type": "git",
+  "url": "git+https://github.com/JoshRosenstein/styler.git"
+},
   "main": "dist/styler.common.js",
   "module": "dist/styler.es.js",
   "jsnext:main": "dist/styler.es.js",
@@ -47,15 +64,11 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "3.0.0"
   },
-  "scripts": {
-    "clean": "rimraf node_modules && rimraf dist",
-    "build:prod":"SET NODE_ENV=production && rollup -c",
-    "build:dev": "rollup -c",
-    "watch": "rollup -c --watch",
-    "test": "jest",
-    "test:watch": "jest --watch --no-cache",
-    "reinstall": "yarn run clean && yarn"
-  },
+  "bundlesize": [
+    {
+      "path": "dist/*.js"
+    }
+  ],
   "babel": {
     "presets": [
       [
