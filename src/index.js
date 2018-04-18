@@ -1,6 +1,18 @@
 export { default as styler } from './styler'
-export { returnAsIs } from './utils'
+export {
+  returnAsIs,
+  pxTo,
+  pxToRem,
+  pxToEm,
+  pxToPct,
+  px,
+  rem,
+  em,
+  pct
+} from './utils'
 export * as styleDefs from './styleDefs'
+
+export * as util from './utils'
 
 export {
   alignContent,

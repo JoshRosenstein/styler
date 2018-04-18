@@ -1,7 +1,7 @@
 {
   "name": "@roseys/styler",
-  "version": "0.0.4",
-  "description": "",
+  "version": "0.0.6",
+  "description": "WIP- My css-in-js Utility functions",
   "keywords": [],
   "main": "dist/styler.common.js",
   "module": "dist/styler.es.js",
