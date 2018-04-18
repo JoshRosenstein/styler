@@ -1,4 +1,4 @@
-export { default as styler } from './styler'
+export { default as styler, spaceProp } from './styler'
 export {
   returnAsIs,
   pxTo,

@@ -523,6 +523,17 @@ export const marginBottom = {
   }
 }
 
+export const overflow = {
+  overflow: returnAsIs
+}
+
+export const overflowX = {
+  overflowX: returnAsIs
+}
+export const overflowY = {
+  overflowY: returnAsIs
+}
+
 export const space = {
   padding,
   paddingLeft,
@@ -534,4 +545,19 @@ export const space = {
   marginRight,
   marginTop,
   marginBottom
+}
+
+export const sizing = {
+  minWidth,
+  width,
+  maxWidth,
+  minHeight,
+  height,
+  maxHeight
+}
+
+export const overFlows = {
+  overflow,
+  overflowX,
+  overflowY
 }

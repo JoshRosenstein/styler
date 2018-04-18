@@ -12,7 +12,8 @@ import {
   getThemeAttr,
   mapObjOf,
   mergeAllDeepLeft,
-  filterNilAndEmpty
+  filterNilAndEmpty,
+  pxToRem
 } from './utils'
 
 import {
@@ -34,7 +35,8 @@ import {
   mergeDeepLeft,
   objOf,
   map,
-  isEmpty
+  isEmpty,
+  keys
 } from 'ramda'
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -261,7 +263,7 @@ const ruleCleaner = rules => {
 
 // const styler = rules => props => ruleCleaner(ruleParser('', props, rules))
 
-const styler = rules => props => {
+const styler = curry((rules, props) => {
   if (isArray(rules))
     return pipe(
       map(pipe(ruleParser('', props), ruleCleaner)),
@@ -269,5 +271,26 @@ const styler = rules => props => {
     )(rules)
 
   return ruleCleaner(ruleParser('', props, rules))
+})
+
+/// TODO make more efficient
+export const spaceProp = (cssProp, getter = pxToRem) => props => {
+  let themeBPs = getThemeAttr('breakpoints')(props)
+
+  if (isArray(themeBPs)) {
+    console.warn('spaceProp can only be used for Object Literal BreakPoints')
+  }
+
+  return styler(
+    map(
+      pipe(
+        x => objOf(x, objOf(x)),
+        merge({ options: { key: 'space', getter: getter } }),
+        objOf(cssProp)
+      )
+    )(keys(themeBPs)),
+    props
+  )
 }
+
 export default styler
