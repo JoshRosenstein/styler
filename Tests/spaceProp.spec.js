@@ -2,10 +2,6 @@
  * @jest-environment node
  */
 
-/**
- * @jest-environment node
- */
-
 import theme from './utils/theme'
 import { spaceProp } from '../src'
 

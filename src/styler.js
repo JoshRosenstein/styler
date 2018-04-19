@@ -13,7 +13,11 @@ import {
   mapObjOf,
   mergeAllDeepLeft,
   filterNilAndEmpty,
-  isNumber
+  returnAsIs,
+  pxToRem,
+  pxToPct,
+  isNumber,
+  mapKeysAndValues
 } from './utils'
 
 import {
@@ -21,6 +25,7 @@ import {
   toPairs,
   values,
   __,
+  keys,
   prop,
   isNil,
   merge,
@@ -35,7 +40,12 @@ import {
   mergeDeepLeft,
   objOf,
   map,
-  isEmpty
+  isEmpty,
+  converge,
+  identity,
+  propOr,
+  always,
+  when as Rwhen
 } from 'ramda'
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -81,6 +91,20 @@ const DEFAULT_RULE_KEY_LOOKUP = {
   backgroundColor: 'colors',
   boxShadow: 'shadows'
 }
+
+const DEFAULT_FUNCTIONS_LOOKUP = {
+  returnAsIs: returnAsIs,
+  identity: returnAsIs,
+  propValue: returnAsIs,
+  self: returnAsIs,
+  pxToRem: pxToRem,
+  pxToEm: pxToEm,
+  pxToPct: pxToPct
+}
+
+const lookUpShortcut = dictionary => value =>
+  Rwhen(isString, converge(defaultTo, [identity, prop(__, dictionary)]), value)
+
 const ruleParser = curry((parentSelector, props, obj) => {
   if (isFunction(obj)) return ruleParser(parentSelector, props, obj(props))
 
@@ -139,15 +163,29 @@ const ruleParser = curry((parentSelector, props, obj) => {
         const allPropNames = Object.keys(props)
         const allMatchers = Object.keys(matchers)
         const matchingProps = intersection(allPropNames, allMatchers)
+
         const reducer = reduceWhile(
           isUndefinedOrFalse,
           (previous, propName) =>
-            whenFunctionCallWith(props[propName], props)(matchers[propName]),
+            pipe(
+              prop(__, matchers),
+              lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
+              whenFunctionCallWith(props[propName], props)
+            )(propName),
           false,
           matchingProps
         )
+
         let computedValue = pipe(falseToNull, defaultTo(DF))(reducer)
+
         /// If prop passed is a function, execute it
+
+        /// Rather storing returnAsIs function, check FunctionKey LookUp
+        if (key === 'debugMode') {
+          console.log(computedValue)
+        }
+
+        /// This is to check if defaultValue is a Function
         computedValue = isFunction(computedValue)
           ? computedValue(props)
           : computedValue
@@ -166,7 +204,10 @@ const ruleParser = curry((parentSelector, props, obj) => {
               val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
             }
             if (getter) {
-              val = valueAsFunction(getter)(val, props)
+              val = pipe(
+                lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
+                whenFunctionCallWith(val, props)
+              )(getter)
             }
           }
           return val
@@ -188,6 +229,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
               themeBPs = pipe(values, toPairs, fromPairs)(themeBPs)
             }
           }
+
           let getBp = prop(__, themeBPs)
 
           breakpoints = Object.keys(breakpoints)
@@ -210,7 +252,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
                   )
 
             return merge(acc, res)
-          }, '')
+          }, {})
 
           return {
             ...result,
@@ -275,5 +317,4 @@ const styler = curry((rules, props) => {
 
   return ruleCleaner(ruleParser('', props, rules))
 })
-
 export default styler

@@ -2,10 +2,6 @@
  * @jest-environment node
  */
 
-/**
- * @jest-environment node
- */
-
 import stylerWithTheme from './utils/stylerWithTheme'
 import * as Utils from '../src/utils'
 
@@ -223,6 +219,93 @@ describe('Styler', () => {
           testCSSProp: 'tabletValue',
           testCSSProp2: 'tabletValue'
         }
+      })
+    })
+  })
+
+  describe('Call built function by passing string to matcher', () => {
+    it('Should lookup key Functions using "returnAsIs" ', () => {
+      const testStyler = stylerWithTheme({
+        testCSSProp: {
+          testProp: 'returnAsIs',
+          default: 'small'
+        }
+      })
+
+      const testProps = {
+        testProp: 'thisShouldBeReturned'
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        testCSSProp: 'thisShouldBeReturned'
+      })
+    })
+
+    it('Should lookup key Functions using "identity" ', () => {
+      const testStyler = stylerWithTheme({
+        testCSSProp: {
+          testProp: 'identity',
+          default: 'small'
+        }
+      })
+
+      const testProps = {
+        testProp: 'thisShouldBeReturned'
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        testCSSProp: 'thisShouldBeReturned'
+      })
+    })
+
+    it('Should lookup key Functions using "propValue" ', () => {
+      const testStyler = stylerWithTheme({
+        testCSSProp: {
+          testProp: 'propValue',
+          default: 'small'
+        }
+      })
+
+      const testProps = {
+        testProp: 'thisShouldBeReturned'
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        testCSSProp: 'thisShouldBeReturned'
+      })
+    })
+
+    it('Should lookup key Functions using "self" ', () => {
+      const testStyler = stylerWithTheme({
+        testCSSProp: {
+          testProp: 'self',
+          default: 'small'
+        }
+      })
+
+      const testProps = {
+        testProp: 'thisShouldBeReturned'
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        testCSSProp: 'thisShouldBeReturned'
+      })
+    })
+
+    it('Should lookup key Functions using "pxToRem" ', () => {
+      const testStyler = stylerWithTheme({
+        testCSSProp: {
+          testProp: 'pxToRem',
+          default: 'small'
+        }
+      })
+
+      const testProps = {
+        testProp: 16
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        testCSSProp: '1rem'
       })
     })
   })
