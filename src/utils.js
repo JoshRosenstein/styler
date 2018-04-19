@@ -31,7 +31,9 @@ import {
   flip,
   defaultTo,
   curryN,
-  identity
+  identity,
+  toPairs,
+  reduceRight
 } from 'ramda'
 import defaultTheme from './defaultTheme'
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -88,6 +90,15 @@ export const getThemeAttr = getThemeAttrFB(defaultTheme)
 
 export const mapObjOf = curry((key, val) =>
   pipe(toArray, map(objOf(__, val)), mergeAll)(key)
+)
+
+/// For quick nested selectors
+const nester = (k, v) => reduceRight(objOf, v, split('.', k))
+
+export const UnflattenObj = pipe(
+  toPairs,
+  map(([k_, v_]) => nester(k_, v_)),
+  mergeAllDeepLeft
 )
 /// Below From https://github.com/bupa-digital/shades
 

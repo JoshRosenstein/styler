@@ -59,6 +59,15 @@ const createStyleRule = (key, value) => {
   return { [key]: ruleValue }
 }
 
+const createNestedSelector = (parent, child) => {
+  const selectorPair = [parent, child]
+  if (isPseudoSelector(child)) {
+    return selectorPair.join('').trim()
+  }
+
+  return selectorPair.join(' ').trim()
+}
+
 const DEFAULT_RULE_KEY_LOOKUP = {
   margin: 'space',
   marginTop: 'space',
@@ -121,6 +130,17 @@ const ruleParser = curry((parentSelector, props, obj) => {
         !shouldBeCombinedSelector &&
         !isFunctionRule
 
+      // console.log(
+      //   { key },
+      //   {
+      //     isFunctionRule,
+      //     hasObjectLiteral,
+      //     hasNestedRules,
+      //     hasAtRuleBlock,
+      //     shouldBeCombinedSelector,
+      //     isPatternMatch
+      //   }
+      // )
       if (hasAtRuleBlock) {
         const additionalRules = ruleParser(parentSelector, props, value)
 
@@ -131,10 +151,13 @@ const ruleParser = curry((parentSelector, props, obj) => {
       }
 
       if (shouldBeCombinedSelector) {
+        const mergedSelector = createNestedSelector(parentSelector, key)
+
         const additionalRules = pipe(
           when(isFunction).onlyThen(fn => fn(props)),
-          ruleParser(key, props)
+          ruleParser(mergedSelector, props)
         )(value)
+        // console.log({ key }, { additionalRules })
 
         return {
           ...result,
@@ -279,27 +302,30 @@ const ruleParser = curry((parentSelector, props, obj) => {
 })
 
 const ruleCleaner = rules => {
-  return Object.entries(rules).reduce((result, [key, value]) => {
-    if (isArray(value)) {
-      const joinedRules = filterNilAndEmpty(mergeAllDeepLeft(value))
+  return Object.entries(filterNilAndEmpty(rules)).reduce(
+    (result, [key, value]) => {
+      if (isArray(value)) {
+        const joinedRules = filterNilAndEmpty(mergeAllDeepLeft(value))
 
-      if (isEmpty(key)) return mergeDeepLeft(result, joinedRules)
-      const key2 = isPseudoSelector(key) ? '&' + key : key
-      return mergeDeepLeft(result, { [key2]: joinedRules })
-    }
+        if (isEmpty(key)) return mergeDeepLeft(result, joinedRules)
+        const key2 = isPseudoSelector(key) ? '&' + key : key
+        return mergeDeepLeft(result, { [key2]: joinedRules })
+      }
 
-    if (isObjectLiteral(value) && isAtRule(key)) {
-      const innerRuleStrings = ruleCleaner(value)
-      return mergeDeepLeft(result, { [key]: innerRuleStrings })
-    }
+      if (isObjectLiteral(value) && isAtRule(key)) {
+        const innerRuleStrings = ruleCleaner(value)
+        return mergeDeepLeft(result, { [key]: innerRuleStrings })
+      }
 
-    console.error('Styler had an abnormal Rule Set:', {
-      key,
-      value
-    })
+      console.error('Styler had an abnormal Rule Set:', {
+        key,
+        value
+      })
 
-    return filterNilAndEmpty(result)
-  }, {})
+      return filterNilAndEmpty(result)
+    },
+    {}
+  )
 }
 
 // const styler = rules => props => ruleCleaner(ruleParser('', props, rules))
