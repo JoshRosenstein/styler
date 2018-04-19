@@ -108,7 +108,8 @@ export const minWidth = {
 export const height = {
   height: returnAsIs,
   options: {
-    key: 'heights'
+    key: 'heights',
+    getter: pxToRem
   }
 }
 
@@ -173,18 +174,43 @@ export const justifyContent = {
   justify: returnAsIs
 }
 
+export const flexDisplay = {
+  display: {
+    display: returnAsIs,
+    inline: 'inline-flex',
+    fxInline: 'inline-flex',
+    default: 'flex'
+  }
+}
+
 export const flexWrap = {
   flexWrap: returnAsIs,
+  fxWrap: returnAsIs,
   wrap: 'wrap',
   nowrap: 'nowrap',
   wrapReverse: 'wrapReverse'
 }
 
+export const flexGrow = {
+  flexGrow: returnAsIs,
+  fxGrow: returnAsIs,
+  grow: returnAsIs
+}
+
 export const flexDirection = {
   flexDirection: returnAsIs,
+  direction: returnAsIs,
+  fxdirection: returnAsIs,
+  row: 'row',
   column: 'column',
   rowReverse: 'rowReverse',
   columnReverse: 'columnReverse'
+}
+
+export const flexFlow = {
+  flexFlow: returnAsIs,
+  fxFlow: returnAsIs,
+  flow: returnAsIs
 }
 
 export const flexBasis = {

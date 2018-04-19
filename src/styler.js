@@ -12,7 +12,8 @@ import {
   getThemeAttr,
   mapObjOf,
   mergeAllDeepLeft,
-  filterNilAndEmpty
+  filterNilAndEmpty,
+  isNumber
 } from './utils'
 
 import {
@@ -151,14 +152,18 @@ const ruleParser = curry((parentSelector, props, obj) => {
           ? computedValue(props)
           : computedValue
 
-        const computeOptions = v => {
-          let val = v
+        const computeOptions = val => {
           if (options && val) {
             let { key: themeKey, getter } = options
             /// If options was not provided, check default lookUp
             themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP[key]
             if (themeKey && isString(val)) {
-              val = getThemeAttr(`${themeKey}.${val}`, val)(props)
+              /// Check Strip Negative Before lookingUp
+              const isNeg = /^-.+/.test(val)
+              const absN = isNeg ? val.slice(1) : val
+
+              val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+              val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
             }
             if (getter) {
               val = valueAsFunction(getter)(val, props)
