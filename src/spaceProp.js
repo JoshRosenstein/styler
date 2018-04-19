@@ -3,30 +3,29 @@ import {
   getThemeAttr,
   pxToRem,
   valueAsFunction,
-  mapObjOf
+  mapObjOf,
+  isNotNilOrEmpty
 } from './utils'
-import { merge, pipe, objOf, map, keys } from 'ramda'
+import { when, always, merge, pipe, objOf, map, keys, pick } from 'ramda'
 import styler from './styler'
 
-/// TODO make more efficient
-const spaceProp = (cssProp, getter = pxToRem) => props => {
-  let themeBPs = getThemeAttr('breakpoints')(props)
-  cssProp = valueAsFunction(cssProp)(props)
-
-  if (isArray(themeBPs)) {
-    console.warn('spaceProp can only be used for Object Literal BreakPoints')
-  }
-
+const BPProp = (cssProp = '', options = {}) => p => {
+  let themeBPs = getThemeAttr('breakpoints')(p)
+  cssProp = valueAsFunction(cssProp)(p)
   return styler(
-    map(
-      pipe(
-        x => objOf(x, objOf(x)),
-        mapObjOf(cssProp),
-        merge({ options: { key: 'space', getter: getter } })
-      )
-    )(keys(themeBPs)),
-    props
+    pipe(
+      pick(keys(themeBPs)),
+      objOf('default'),
+      when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)),
+      when(always(isNotNilOrEmpty(options)), merge(objOf('options', options)))
+    )(p),
+    p
   )
 }
+
+/// TODO make more efficient
+
+const spaceProp = (cssProp = '', getter = 'pxToRem') => p =>
+  BPProp(cssProp, { key: 'space', getter: getter })(p)
 
 export default spaceProp

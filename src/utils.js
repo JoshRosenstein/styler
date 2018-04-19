@@ -69,6 +69,7 @@ export const em = appendUnit('em')
 export const pct = appendUnit('%')
 
 export const isNilOrEmpty = either(isNil, isEmpty)
+export const isNotNilOrEmpty = complement(isNilOrEmpty)
 export const toArray = unless(anyPass([isArray, isNilOrEmpty]), of)
 export const filterNilAndEmpty = filter(complement(isNilOrEmpty))
 export const startsWithAny = (...searchStrs) =>
