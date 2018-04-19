@@ -16,8 +16,7 @@ import {
   returnAsIs,
   pxToRem,
   pxToPct,
-  isNumber,
-  mapKeysAndValues
+  isNumber
 } from './utils'
 
 import {
@@ -25,7 +24,6 @@ import {
   toPairs,
   values,
   __,
-  keys,
   prop,
   isNil,
   merge,
@@ -43,8 +41,6 @@ import {
   isEmpty,
   converge,
   identity,
-  propOr,
-  always,
   when as Rwhen
 } from 'ramda'
 

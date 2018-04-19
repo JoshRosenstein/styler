@@ -1,27 +1,27 @@
 {
   "name": "@roseys/styler",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "WIP- My css-in-js Utility functions",
   "keywords": [],
   "author": "Joshua Rosenstein",
-"license": "MIT",
-"scripts": {
-  "clean": "rimraf node_modules && rimraf dist",
-  "build:prod":"SET NODE_ENV=production && rollup -c",
-  "build:dev": "rollup -c",
-  "watch": "rollup -c --watch",
-  "size": "bundlesize",
-  "test": "yarn run coverage && yarn run test:size && yarn run test:prod ",
-  "test:size": "yarn run clean &&  rollup  && yarn run size",
-     "test:prod": "yarn run build:prod && jest  --no-cache --ci --runInBand",
-   "coverage": "jest --coverage --no-cache --ci --runInBand",
-  "test:watch": "jest --watch --no-cache",
-  "reinstall": "yarn run clean && yarn"
-},
-"repository": {
-  "type": "git",
-  "url": "git+https://github.com/JoshRosenstein/styler.git"
-},
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf node_modules && rimraf dist",
+    "build:prod": "SET NODE_ENV=production && rollup -c",
+    "build:dev": "rollup -c",
+    "watch": "rollup -c --watch",
+    "size": "bundlesize",
+    "test": "yarn run coverage && yarn run test:size && yarn run test:prod ",
+    "test:size": "yarn run clean &&  rollup  && yarn run size",
+    "test:prod": "yarn run build:prod && jest  --no-cache --ci --runInBand",
+    "coverage": "jest --coverage --no-cache --ci --runInBand",
+    "test:watch": "jest --watch --no-cache",
+    "reinstall": "yarn run clean && yarn"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshRosenstein/styler.git"
+  },
   "main": "dist/styler.common.js",
   "module": "dist/styler.es.js",
   "jsnext:main": "dist/styler.es.js",

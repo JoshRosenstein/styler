@@ -1,12 +1,10 @@
 import {
-  isArray,
   getThemeAttr,
-  pxToRem,
   valueAsFunction,
   mapObjOf,
   isNotNilOrEmpty
 } from './utils'
-import { when, always, merge, pipe, objOf, map, keys, pick } from 'ramda'
+import { when, always, merge, pipe, objOf, keys, pick } from 'ramda'
 import styler from './styler'
 
 const BPProp = (cssProp = '', options = {}) => p => {
