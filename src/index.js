@@ -1,6 +1,8 @@
 export { default as styler } from './styler'
 
-export { default as spaceProp, BPProp } from './spaceProp'
+export spaceProp from './spaceProp'
+
+export { BPProp } from './spaceProp'
 
 export {
   returnAsIs,

@@ -5985,10 +5985,10 @@ var index = Object.freeze({
 	zIndex: zIndex
 });
 
+exports.spaceProp = spaceProp;
 exports.styleDefs = index;
 exports.util = utils;
 exports.styler = styler;
-exports.spaceProp = spaceProp;
 exports.BPProp = BPProp;
 exports.returnAsIs = returnAsIs;
 exports.pxTo = pxTo;
