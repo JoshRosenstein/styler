@@ -16,7 +16,8 @@ import {
   returnAsIs,
   pxToRem,
   pxToPct,
-  isNumber
+  isNumber,
+  isNilOrEmptyOrFalse
 } from './utils'
 
 import {
@@ -27,7 +28,6 @@ import {
   prop,
   isNil,
   merge,
-  mergeAll,
   curry,
   startsWith,
   anyPass,
@@ -54,9 +54,11 @@ const isPseudoSelector = startsWithAny(':')
 
 const isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector])
 
+// filterNilAndEmpty(mergeAllDeepLeft(value))
 const createStyleRule = (key, value) => {
-  const ruleValue = when(isArray).onlyThen(mergeAll)(value)
-  return { [key]: ruleValue }
+  const ruleValue = when(isArray).onlyThen(mergeAllDeepLeft)(value)
+  return isNilOrEmptyOrFalse(ruleValue) ? {} : { [key]: ruleValue }
+  // return { [key]: ruleValue }
 }
 
 const createNestedSelector = (parent, child) => {
@@ -107,8 +109,9 @@ const DEFAULT_FUNCTIONS_LOOKUP = {
   pxToPct: pxToPct
 }
 
-const lookUpShortcut = dictionary => value =>
+const lookUpShortcut = curry((dictionary, value) =>
   Rwhen(isString, converge(defaultTo, [identity, prop(__, dictionary)]), value)
+)
 
 const ruleParser = curry((parentSelector, props, obj) => {
   if (isFunction(obj)) return ruleParser(parentSelector, props, obj(props))
@@ -116,14 +119,14 @@ const ruleParser = curry((parentSelector, props, obj) => {
   const { options: globalOptions, ...rules } = obj
   return Object.entries(rules).reduce(
     (result, [key, value]) => {
+      key = key.trim()
       const isFunctionRule = isFunction(value)
       const hasObjectLiteral = isObjectLiteral(value)
       const hasNestedRules = hasObjectLiteral || isFunctionRule
+      const isPlaceHolderSelector = isEmpty(key) && hasNestedRules
 
       const hasAtRuleBlock = isAtRule(key) && hasNestedRules
-
       const shouldBeCombinedSelector = isSelectorOrPseudo(key) && hasNestedRules
-
       const isPatternMatch =
         hasObjectLiteral &&
         !hasAtRuleBlock &&
@@ -151,6 +154,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
       }
 
       if (shouldBeCombinedSelector) {
+        // const mergedSelector = isPlaceHolderSelector?parentSelector: createNestedSelector(parentSelector, key)
         const mergedSelector = createNestedSelector(parentSelector, key)
 
         const additionalRules = pipe(
@@ -197,6 +201,11 @@ const ruleParser = curry((parentSelector, props, obj) => {
 
         let computedValue = pipe(falseToNull, defaultTo(DF))(reducer)
 
+        // if (isUndefinedOrFalse(computedValue)) {
+        //   // logger.matchNotFound({ ruleName: key });
+        //   return result
+        // }
+
         /// If prop passed is a function, execute it
 
         /// Rather storing returnAsIs function, check FunctionKey LookUp
@@ -208,6 +217,11 @@ const ruleParser = curry((parentSelector, props, obj) => {
         computedValue = isFunction(computedValue)
           ? computedValue(props)
           : computedValue
+
+        // if (isUndefinedOrFalse(computedValue)) {
+        //   // logger.matchNotFound({ ruleName: key });
+        //   return result
+        // }
 
         const computeOptions = val => {
           if (options && val) {
@@ -222,6 +236,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
               val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
               val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
             }
+            // console.log(key, val,getter)
             if (getter) {
               val = pipe(
                 lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
@@ -289,6 +304,24 @@ const ruleParser = curry((parentSelector, props, obj) => {
         }
       }
 
+      if (isPlaceHolderSelector) {
+        // console.log(result, [parentSelector, key, value])
+        if (key === parentSelector) {
+          // console.log({result,value})
+        }
+
+        // console.log({ result, parentSelector, existingRules: filterNilAndEmpty(existingRules), f: whenFunctionCallWith(props)(value)})
+        // console.log(aaa)
+        return {
+          ...result,
+          [parentSelector]: [
+            ...existingRules,
+            whenFunctionCallWith(props)(value)
+          ]
+        }
+        // return add
+      }
+
       return {
         ...result,
         [parentSelector]: [
@@ -302,16 +335,20 @@ const ruleParser = curry((parentSelector, props, obj) => {
 })
 
 const ruleCleaner = rules => {
-  return Object.entries(filterNilAndEmpty(rules)).reduce(
-    (result, [key, value]) => {
+  return filterNilAndEmpty(
+    Object.entries(filterNilAndEmpty(rules)).reduce((result, [key, value]) => {
       if (isArray(value)) {
         const joinedRules = filterNilAndEmpty(mergeAllDeepLeft(value))
 
-        if (isEmpty(key)) return mergeDeepLeft(result, joinedRules)
+        if (isEmpty(key.trim())) return mergeDeepLeft(result, joinedRules)
         const key2 = isPseudoSelector(key) ? '&' + key : key
         return mergeDeepLeft(result, { [key2]: joinedRules })
       }
 
+      if (isEmpty(value)) {
+        console.log('empty Vale')
+        return result
+      }
       if (isObjectLiteral(value) && isAtRule(key)) {
         const innerRuleStrings = ruleCleaner(value)
         return mergeDeepLeft(result, { [key]: innerRuleStrings })
@@ -323,8 +360,7 @@ const ruleCleaner = rules => {
       })
 
       return filterNilAndEmpty(result)
-    },
-    {}
+    }, {})
   )
 }
 
@@ -336,7 +372,10 @@ const styler = curry((rules, props) => {
       map(pipe(ruleParser('', props), ruleCleaner)),
       mergeAllDeepLeft
     )(rules)
-
-  return ruleCleaner(ruleParser('', props, rules))
+  // console.log(
+  //   pipe(ruleParser('', props), ruleCleaner, filterNilAndEmpty)(rules)
+  // )
+  return pipe(ruleParser('', props), ruleCleaner)(rules)
 })
+
 export default styler

@@ -5,7 +5,6 @@
 import stylerWithTheme from './utils/stylerWithTheme'
 import * as Utils from '../src/utils'
 import { styler, space, returnAsIs } from '../src'
-const spaceStyle = stylerWithTheme(space)
 
 describe('Styler', () => {
   describe('Simple Match Boolean Execution', () => {
