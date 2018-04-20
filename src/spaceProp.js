@@ -8,7 +8,7 @@ import {
 import { when, always, merge, pipe, objOf, keys, pick } from 'ramda'
 import styler from './styler'
 
-const BPProp = (cssProp = '', options = {}) => p => {
+export const BPProp = (cssProp = '', options = {}) => p => {
   let themeBPs = getThemeAttr('breakpoints')(p)
   cssProp = valueAsFunction(cssProp)(p)
   return styler(

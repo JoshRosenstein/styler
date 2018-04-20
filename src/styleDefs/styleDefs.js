@@ -1,30 +1,25 @@
 // inspired by https://github.com/jxnblk/styled-system
 
-import { pxToRem, px, returnAsIs } from '../utils'
-
-const isNumber = n => typeof n === 'number' && !isNaN(n)
+import { pxToRem, px, isNumber } from '../utils'
 
 export const getters = {
   getWidth: n => (!isNumber(n) || n > 1 ? pxToRem(n) : n * 100 + '%'),
   getBorder: n => (isNumber(n) && n > 0 ? n + 'px solid' : n),
   backgroundImage: (val, rawValue, p) => `url(${rawValue})`,
-  flexWrapShim: n => (n === true ? 'wrap' : null),
-  flexColumnShim: n => (n === true ? 'column' : null),
-  flexInlineShim: n => (n === true ? 'inline-flex' : null),
   ratio: n => n * 100 + '%'
 }
 
 export const width = {
-  width: returnAsIs,
-  w: returnAsIs,
+  width: 'returnAsIs',
+  w: 'returnAsIs',
   options: {
     getter: getters.getWidth
   }
 }
 
 export const fontSize = {
-  fontSize: returnAsIs,
-  f: returnAsIs,
+  fontSize: 'returnAsIs',
+  f: 'returnAsIs',
   options: {
     getter: px,
     key: 'fontSizes'
@@ -32,15 +27,15 @@ export const fontSize = {
 }
 
 export const color = {
-  color: returnAsIs,
+  color: 'returnAsIs',
   options: {
     key: 'colors'
   }
 }
 
 export const backgroundColor = {
-  backgroundColor: returnAsIs,
-  bgColor: returnAsIs,
+  backgroundColor: 'returnAsIs',
+  bgColor: 'returnAsIs',
   options: {
     key: 'colors'
   }
@@ -52,33 +47,33 @@ export const colors = {
 }
 
 export const fontFamily = {
-  fontFamily: returnAsIs,
-  font: returnAsIs,
+  fontFamily: 'returnAsIs',
+  font: 'returnAsIs',
   options: {
     key: 'fonts'
   }
 }
 
 export const textAlign = {
-  textAlign: returnAsIs
+  textAlign: 'returnAsIs'
 }
 
 export const lineHeight = {
-  lineHeight: returnAsIs,
+  lineHeight: 'returnAsIs',
   options: {
     key: 'lineHeights'
   }
 }
 
 export const fontWeight = {
-  fontWeight: returnAsIs,
+  fontWeight: 'returnAsIs',
   options: {
     key: 'fontWeights'
   }
 }
 
 export const letterSpacing = {
-  letterSpacing: returnAsIs,
+  letterSpacing: 'returnAsIs',
   options: {
     key: 'letterSpacings',
     getter: px
@@ -86,11 +81,11 @@ export const letterSpacing = {
 }
 
 export const display = {
-  display: returnAsIs
+  display: 'returnAsIs'
 }
 
 export const maxWidth = {
-  maxWidth: returnAsIs,
+  maxWidth: 'returnAsIs',
   options: {
     key: 'maxWidths',
     getter: px
@@ -98,7 +93,7 @@ export const maxWidth = {
 }
 
 export const minWidth = {
-  minWidth: returnAsIs,
+  minWidth: 'returnAsIs',
   options: {
     key: 'minWidths',
     getter: px
@@ -106,7 +101,7 @@ export const minWidth = {
 }
 
 export const height = {
-  height: returnAsIs,
+  height: 'returnAsIs',
   options: {
     key: 'heights',
     getter: pxToRem
@@ -114,14 +109,14 @@ export const height = {
 }
 
 export const maxHeight = {
-  maxHeight: returnAsIs,
+  maxHeight: 'returnAsIs',
   options: {
     key: 'maxHeights',
     getter: px
   }
 }
 export const minHeight = {
-  minHeight: returnAsIs,
+  minHeight: 'returnAsIs',
   options: {
     key: 'minHeights',
     getter: px
@@ -130,7 +125,7 @@ export const minHeight = {
 
 export const size_width_c = {
   width: {
-    size: returnAsIs,
+    size: 'returnAsIs',
     options: {
       getter: px
     }
@@ -139,7 +134,7 @@ export const size_width_c = {
 
 export const size_height_c = {
   height: {
-    size: returnAsIs,
+    size: 'returnAsIs',
     options: {
       getter: px
     }
@@ -154,7 +149,7 @@ export const size_c = {
 export const ratio_c = {
   height: 0,
   paddingBottom: {
-    ratio: returnAsIs,
+    ratio: 'returnAsIs',
     options: {
       getter: n => n * 100 + '%'
     }
@@ -162,21 +157,21 @@ export const ratio_c = {
 }
 
 export const alignItems = {
-  alignItems: returnAsIs
+  alignItems: 'returnAsIs'
 }
 
 export const alignContent = {
-  alignContent: returnAsIs
+  alignContent: 'returnAsIs'
 }
 
 export const justifyContent = {
-  justifyContent: returnAsIs,
-  justify: returnAsIs
+  justifyContent: 'returnAsIs',
+  justify: 'returnAsIs'
 }
 
 export const flexDisplay = {
   display: {
-    display: returnAsIs,
+    display: 'returnAsIs',
     inline: 'inline-flex',
     fxInline: 'inline-flex',
     default: 'flex'
@@ -184,23 +179,23 @@ export const flexDisplay = {
 }
 
 export const flexWrap = {
-  flexWrap: returnAsIs,
-  fxWrap: returnAsIs,
+  flexWrap: 'returnAsIs',
+  fxWrap: 'returnAsIs',
   wrap: 'wrap',
   nowrap: 'nowrap',
   wrapReverse: 'wrapReverse'
 }
 
 export const flexGrow = {
-  flexGrow: returnAsIs,
-  fxGrow: returnAsIs,
-  grow: returnAsIs
+  flexGrow: 'returnAsIs',
+  fxGrow: 'returnAsIs',
+  grow: 'returnAsIs'
 }
 
 export const flexDirection = {
-  flexDirection: returnAsIs,
-  direction: returnAsIs,
-  fxdirection: returnAsIs,
+  flexDirection: 'returnAsIs',
+  direction: 'returnAsIs',
+  fxdirection: 'returnAsIs',
   row: 'row',
   column: 'column',
   rowReverse: 'rowReverse',
@@ -208,44 +203,44 @@ export const flexDirection = {
 }
 
 export const flexFlow = {
-  flexFlow: returnAsIs,
-  fxFlow: returnAsIs,
-  flow: returnAsIs
+  flexFlow: 'returnAsIs',
+  fxFlow: 'returnAsIs',
+  flow: 'returnAsIs'
 }
 
 export const flexBasis = {
-  flexBasis: returnAsIs,
+  flexBasis: 'returnAsIs',
   options: {
     getter: getters.getWidth
   }
 }
 
 export const flex = {
-  flex: returnAsIs
+  flex: 'returnAsIs'
 }
 
 export const justifySelf = {
-  justifySelf: returnAsIs
+  justifySelf: 'returnAsIs'
 }
 
 export const alignSelf = {
-  alignSelf: returnAsIs
+  alignSelf: 'returnAsIs'
 }
 
 export const order = {
-  order: returnAsIs
+  order: 'returnAsIs'
 }
 
 export const gridGap = {
-  gridGap: returnAsIs,
-  gap: returnAsIs,
+  gridGap: 'returnAsIs',
+  gap: 'returnAsIs',
   options: {
     getter: px,
     key: 'space'
   }
 }
 export const gridColumnGap = {
-  gridColumnGap: returnAsIs,
+  gridColumnGap: 'returnAsIs',
   options: {
     getter: px,
     key: 'space'
@@ -253,71 +248,71 @@ export const gridColumnGap = {
 }
 
 export const gridArea = {
-  gridArea: returnAsIs
+  gridArea: 'returnAsIs'
 }
 
 export const gridColumnStart = {
-  gridColumnStart: returnAsIs
+  gridColumnStart: 'returnAsIs'
 }
 export const gridColumnEnd = {
-  gridColumnEnd: returnAsIs
+  gridColumnEnd: 'returnAsIs'
 }
 
 export const gridRowStart = {
-  gridRowStart: returnAsIs
+  gridRowStart: 'returnAsIs'
 }
 
 export const gridRowEnd = {
-  gridRowEnd: returnAsIs
+  gridRowEnd: 'returnAsIs'
 }
 
 export const gridColumn = {
-  gridColumn: returnAsIs
+  gridColumn: 'returnAsIs'
 }
 
 export const gridRow = {
-  gridRow: returnAsIs
+  gridRow: 'returnAsIs'
 }
 
 export const gridAutoFlow = {
-  gridAutoFlow: returnAsIs,
+  gridAutoFlow: 'returnAsIs',
   row: 'row',
   column: 'column',
   dense: 'dense'
 }
 
 export const gridAutoColumns = {
-  gridAutoColumns: returnAsIs,
-  autoColumns: returnAsIs
+  gridAutoColumns: 'returnAsIs',
+  autoColumns: 'returnAsIs'
 }
 
 export const gridAutoRows = {
-  gridAutoRows: returnAsIs,
-  autoRows: returnAsIs
+  gridAutoRows: 'returnAsIs',
+  autoRows: 'returnAsIs'
 }
 
 export const gridTemplate = {
-  gridTemplate: returnAsIs,
-  template: returnAsIs
+  gridTemplate: 'returnAsIs',
+  template: 'returnAsIs'
 }
 
 export const gridTemplateAreas = {
-  gridTemplateAreas: returnAsIs,
-  areas: returnAsIs
+  gridTemplateAreas: 'returnAsIs',
+  areas: 'returnAsIs'
 }
 
 export const gridTemplateColumns = {
-  gridTemplateColumns: returnAsIs,
-  columns: returnAsIs
+  gridTemplateColumns: 'returnAsIs',
+  columns: 'returnAsIs'
 }
 export const gridTemplateRows = {
-  gridTemplateRows: returnAsIs,
-  rows: returnAsIs
+  gridTemplateRows: 'returnAsIs',
+  rows: 'returnAsIs'
 }
 
 export const border = {
-  border: returnAsIs,
-  bd: returnAsIs,
+  border: 'returnAsIs',
+  bd: 'returnAsIs',
   options: {
     key: 'borders',
     getter: getters.getBorder
@@ -325,8 +320,8 @@ export const border = {
 }
 
 export const borderTop = {
-  borderTop: returnAsIs,
-  bdT: returnAsIs,
+  borderTop: 'returnAsIs',
+  bdT: 'returnAsIs',
   options: {
     key: 'borders',
     getter: getters.getBorder
@@ -334,8 +329,8 @@ export const borderTop = {
 }
 
 export const borderRight = {
-  borderRight: returnAsIs,
-  bdR: returnAsIs,
+  borderRight: 'returnAsIs',
+  bdR: 'returnAsIs',
   options: {
     key: 'borders',
     getter: getters.getBorder
@@ -343,8 +338,8 @@ export const borderRight = {
 }
 
 export const borderBottom = {
-  borderBottom: returnAsIs,
-  bdB: returnAsIs,
+  borderBottom: 'returnAsIs',
+  bdB: 'returnAsIs',
   options: {
     key: 'borders',
     getter: getters.getBorder
@@ -352,8 +347,8 @@ export const borderBottom = {
 }
 
 export const borderLeft = {
-  borderLeft: returnAsIs,
-  bdL: returnAsIs,
+  borderLeft: 'returnAsIs',
+  bdL: 'returnAsIs',
   options: {
     key: 'borders',
     getter: getters.getBorder
@@ -369,16 +364,16 @@ export const borders_c = {
 }
 
 export const borderColor = {
-  borderColor: returnAsIs,
-  bdC: returnAsIs,
+  borderColor: 'returnAsIs',
+  bdC: 'returnAsIs',
   options: {
     key: 'colors'
   }
 }
 
 export const borderRadius = {
-  borderRadius: returnAsIs,
-  bdRs: returnAsIs,
+  borderRadius: 'returnAsIs',
+  bdRs: 'returnAsIs',
   options: {
     key: 'radii',
     getter: px
@@ -386,34 +381,34 @@ export const borderRadius = {
 }
 
 export const background = {
-  background: returnAsIs,
-  bg: returnAsIs
+  background: 'returnAsIs',
+  bg: 'returnAsIs'
 }
 
 export const backgroundImage = {
-  backgroundImage: returnAsIs,
-  bgImage: returnAsIs,
+  backgroundImage: 'returnAsIs',
+  bgImage: 'returnAsIs',
   options: {
     getter: v => `url(${v})`
   }
 }
 
 export const backgroundSize = {
-  backgroundSize: returnAsIs,
-  bgSize: returnAsIs
+  backgroundSize: 'returnAsIs',
+  bgSize: 'returnAsIs'
 }
 
 export const backgroundPosition = {
-  backgroundPosition: returnAsIs,
-  bgPosition: returnAsIs
+  backgroundPosition: 'returnAsIs',
+  bgPosition: 'returnAsIs'
 }
 export const backgroundRepeat = {
-  backgroundRepeat: returnAsIs,
-  bgRepeat: returnAsIs
+  backgroundRepeat: 'returnAsIs',
+  bgRepeat: 'returnAsIs'
 }
 
 export const position = {
-  position: returnAsIs,
+  position: 'returnAsIs',
   static: 'static',
   absolute: 'absolute',
   fixed: 'fixed',
@@ -422,127 +417,127 @@ export const position = {
 }
 
 export const zIndex = {
-  zIndex: returnAsIs
+  zIndex: 'returnAsIs'
 }
 export const top = {
-  top: returnAsIs,
+  top: 'returnAsIs',
   options: {
     getter: px
   }
 }
 
 export const right = {
-  right: returnAsIs,
+  right: 'returnAsIs',
   options: {
     getter: px
   }
 }
 
 export const bottom = {
-  bottom: returnAsIs,
+  bottom: 'returnAsIs',
   options: {
     getter: px
   }
 }
 
 export const left = {
-  left: returnAsIs,
+  left: 'returnAsIs',
   options: {
     getter: px
   }
 }
 
 export const boxShadow = {
-  boxShadow: returnAsIs,
-  bxSh: returnAsIs,
+  boxShadow: 'returnAsIs',
+  bxSh: 'returnAsIs',
   options: {
     key: 'shadows'
   }
 }
 
 export const padding = {
-  padding: returnAsIs,
-  p: returnAsIs,
+  padding: 'returnAsIs',
+  p: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const paddingLeft = {
-  paddingLeft: returnAsIs,
-  pl: returnAsIs,
-  px: returnAsIs,
+  paddingLeft: 'returnAsIs',
+  pl: 'returnAsIs',
+  px: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const paddingRight = {
-  paddingRight: returnAsIs,
-  pr: returnAsIs,
-  px: returnAsIs,
+  paddingRight: 'returnAsIs',
+  pr: 'returnAsIs',
+  px: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const paddingTop = {
-  paddingTop: returnAsIs,
-  pt: returnAsIs,
-  py: returnAsIs,
+  paddingTop: 'returnAsIs',
+  pt: 'returnAsIs',
+  py: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const paddingBottom = {
-  paddingBottom: returnAsIs,
-  pb: returnAsIs,
-  py: returnAsIs,
+  paddingBottom: 'returnAsIs',
+  pb: 'returnAsIs',
+  py: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const margin = {
-  margin: returnAsIs,
-  m: returnAsIs,
+  margin: 'returnAsIs',
+  m: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const marginLeft = {
-  marginLeft: returnAsIs,
-  ml: returnAsIs,
-  mx: returnAsIs,
+  marginLeft: 'returnAsIs',
+  ml: 'returnAsIs',
+  mx: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const marginRight = {
-  marginRight: returnAsIs,
-  mr: returnAsIs,
-  mx: returnAsIs,
+  marginRight: 'returnAsIs',
+  mr: 'returnAsIs',
+  mx: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const marginTop = {
-  marginTop: returnAsIs,
-  mt: returnAsIs,
-  my: returnAsIs,
+  marginTop: 'returnAsIs',
+  mt: 'returnAsIs',
+  my: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
   }
 }
 export const marginBottom = {
-  marginBottom: returnAsIs,
-  mb: returnAsIs,
-  my: returnAsIs,
+  marginBottom: 'returnAsIs',
+  mb: 'returnAsIs',
+  my: 'returnAsIs',
   options: {
     key: 'space',
     getter: pxToRem
@@ -550,14 +545,14 @@ export const marginBottom = {
 }
 
 export const overflow = {
-  overflow: returnAsIs
+  overflow: 'returnAsIs'
 }
 
 export const overflowX = {
-  overflowX: returnAsIs
+  overflowX: 'returnAsIs'
 }
 export const overflowY = {
-  overflowY: returnAsIs
+  overflowY: 'returnAsIs'
 }
 
 export const space = {

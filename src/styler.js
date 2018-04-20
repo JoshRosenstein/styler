@@ -17,7 +17,8 @@ import {
   pxToRem,
   pxToPct,
   isNumber,
-  isNilOrEmptyOrFalse
+  isNilOrEmptyOrFalse,
+  px
 } from './utils'
 
 import {
@@ -106,7 +107,8 @@ const DEFAULT_FUNCTIONS_LOOKUP = {
   self: returnAsIs,
   pxToRem: pxToRem,
   pxToEm: pxToEm,
-  pxToPct: pxToPct
+  pxToPct: pxToPct,
+  px: px
 }
 
 const lookUpShortcut = curry((dictionary, value) =>
