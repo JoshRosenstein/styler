@@ -5,7 +5,7 @@
 import theme from './utils/theme'
 import { spaceProp } from '../src'
 import { UnflattenObj } from '../src/utils'
-
+import * as R from 'ramda'
 describe('SpaceProp', () => {
   it('Should return multiple MQs', () => {
     const testProps = { desktop: 'md', tablet: 'md', theme }
@@ -71,8 +71,8 @@ describe('SpaceProp', () => {
       // {">*": {"margin": 1}, ">:first-child": {}}
       expect(a).toEqual({
         '>:first-child >*': {
-          '@media screen and (min-width:desktop)': { margin: 16 },
-          '@media screen and (min-width:tablet)': { margin: 16 }
+          '@media screen and (min-width:desktop)': { margin: '1rem' },
+          '@media screen and (min-width:tablet)': { margin: '1rem' }
         }
       })
     }),

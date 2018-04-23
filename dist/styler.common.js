@@ -1646,6 +1646,10 @@ _dispatchable(['fantasy-land/chain', 'chain'], _xchain, function chain(fn, monad
   return _makeFlat(false)(map(fn, monad));
 }));
 
+function _cloneRegExp(pattern) {
+  return new RegExp(pattern.source, (pattern.global ? 'g' : '') + (pattern.ignoreCase ? 'i' : '') + (pattern.multiline ? 'm' : '') + (pattern.sticky ? 'y' : '') + (pattern.unicode ? 'u' : ''));
+}
+
 /**
  * Gives a single-word string description of the (native) type of a value,
  * returning such answers as 'Object', 'Number', 'Array', or 'Null'. Does not
@@ -4633,6 +4637,38 @@ _curry2(function (prefix, list) {
   return equals(take(prefix.length, list), prefix);
 });
 
+function _isRegExp(x) {
+  return Object.prototype.toString.call(x) === '[object RegExp]';
+}
+
+/**
+ * Determines whether a given string matches a given regular expression.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.12.0
+ * @category String
+ * @sig RegExp -> String -> Boolean
+ * @param {RegExp} pattern
+ * @param {String} str
+ * @return {Boolean}
+ * @see R.match
+ * @example
+ *
+ *      R.test(/^x/, 'xyz'); //=> true
+ *      R.test(/^y/, 'xyz'); //=> false
+ */
+
+var test =
+/*#__PURE__*/
+_curry2(function test(pattern, str) {
+  if (!_isRegExp(pattern)) {
+    throw new TypeError('‘test’ requires a value of type RegExp as its first argument; received ' + toString$1(pattern));
+  }
+
+  return _cloneRegExp(pattern).test(str);
+});
+
 /**
  * The lower case version of a string.
  *
@@ -4985,6 +5021,15 @@ var getThemeAttrFB = function getThemeAttrFB(fallBackObj) {
 };
 
 var getThemeAttr = getThemeAttrFB(defaultTheme);
+var isNegative = test(/^-.+/);
+var lookUpValue = curryN(3, function (themeKey, val, props$$1) {
+  /// Check Strip Negative Before lookingUp
+  if (!isString(val)) return val;
+  var isNeg = /^-.+/.test(val);
+  var absN = isNeg ? val.slice(1) : val;
+  val = getThemeAttr("".concat(themeKey, ".").concat(absN), val)(props$$1);
+  return isNeg ? isNumber(val) ? val * -1 : '-' + val : val;
+});
 var mapObjOf = curry(function (key, val) {
   return pipe(toArray, map(objOf(__, val)), mergeAll)(key);
 }); /// For quick nested selectors
@@ -5124,6 +5169,8 @@ var utils = Object.freeze({
 	filterNilOrEmptyOrFalse: filterNilOrEmptyOrFalse,
 	startsWithAny: startsWithAny,
 	getThemeAttr: getThemeAttr,
+	isNegative: isNegative,
+	lookUpValue: lookUpValue,
 	mapObjOf: mapObjOf,
 	UnflattenObj: UnflattenObj,
 	isType: isType,
@@ -5406,7 +5453,7 @@ var BPProp = function BPProp() {
   return function (p) {
     var themeBPs = getThemeAttr('breakpoints')(p);
     cssProp = valueAsFunction(cssProp)(p);
-    return styler(pipe(pick(keys(themeBPs)), objOf('default'), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))), UnflattenObj)(p), p);
+    return styler(pipe(pick(keys(themeBPs)), objOf('default'), when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), UnflattenObj)(p), p);
   };
 }; /// TODO make more efficient
 
