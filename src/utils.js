@@ -42,6 +42,10 @@ export const isArray = is(Array)
 export const isString = is(String)
 export const isFunction = is(Function)
 export const isNumber = is(Number)
+export const isBool = is(Boolean)
+export const isTruthy = either(Boolean, equals(0))
+export const isTrueBool = both(isBool, isTruthy)
+
 export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
 
 export const isNonZeroNumber = both(is(Number), complement(equals(0)))

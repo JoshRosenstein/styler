@@ -3328,6 +3328,40 @@ var identity =
 _curry1(_identity);
 
 /**
+ * Creates a function that will process either the `onTrue` or the `onFalse`
+ * function depending upon the result of the `condition` predicate.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.8.0
+ * @category Logic
+ * @sig (*... -> Boolean) -> (*... -> *) -> (*... -> *) -> (*... -> *)
+ * @param {Function} condition A predicate function
+ * @param {Function} onTrue A function to invoke when the `condition` evaluates to a truthy value.
+ * @param {Function} onFalse A function to invoke when the `condition` evaluates to a falsy value.
+ * @return {Function} A new unary function that will process either the `onTrue` or the `onFalse`
+ *                    function depending upon the result of the `condition` predicate.
+ * @see R.unless, R.when
+ * @example
+ *
+ *      var incCount = R.ifElse(
+ *        R.has('count'),
+ *        R.over(R.lensProp('count'), R.inc),
+ *        R.assoc('count', 1)
+ *      );
+ *      incCount({});           //=> { count: 1 }
+ *      incCount({ count: 1 }); //=> { count: 2 }
+ */
+
+var ifElse =
+/*#__PURE__*/
+_curry3(function ifElse(condition, onTrue, onFalse) {
+  return curryN(Math.max(condition.length, onTrue.length, onFalse.length), function _ifElse() {
+    return condition.apply(this, arguments) ? onTrue.apply(this, arguments) : onFalse.apply(this, arguments);
+  });
+});
+
+/**
  * Increments its argument.
  *
  * @func
@@ -4968,6 +5002,9 @@ var isArray = is(Array);
 var isString = is(String);
 var isFunction = is(Function);
 var isNumber = is(Number);
+var isBool = is(Boolean);
+var isTruthy = either(Boolean, equals(0));
+var isTrueBool = both(isBool, isTruthy);
 var mergeAllDeepLeft = reduce(mergeDeepLeft, {});
 var isNonZeroNumber = both(is(Number), complement(equals(0)));
 var appendString = flip(concat);
@@ -5144,6 +5181,9 @@ var utils = Object.freeze({
 	isString: isString,
 	isFunction: isFunction,
 	isNumber: isNumber,
+	isBool: isBool,
+	isTruthy: isTruthy,
+	isTrueBool: isTrueBool,
 	mergeAllDeepLeft: mergeAllDeepLeft,
 	isNonZeroNumber: isNonZeroNumber,
 	appendString: appendString,
@@ -5310,15 +5350,32 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
       var allPropNames = Object.keys(props$$1);
       var allMatchers = Object.keys(matchers);
       var matchingProps = intersection(allPropNames, allMatchers);
+      var matchedPropName;
       var reducer = reduceWhile(isUndefinedOrFalse, function (previous, propName) {
+        matchedPropName = propName;
         return pipe(prop(__, matchers), lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(props$$1[propName], props$$1))(propName);
       }, false, matchingProps);
-      var computedValue = pipe(falseToNull, defaultTo(DF))(reducer); // if (isUndefinedOrFalse(computedValue)) {
+      var matchedMatcher = prop(matchedPropName, matchers);
+      var matchedProp = prop(matchedPropName, props$$1);
+      var computedValue = pipe(falseToNull, defaultTo(DF))(reducer);
+      var nonResponisiveComputedValue = computedValue;
+      var isResponsiveBoolean = isString(computedValue) && is(Object, matchedProp);
+
+      if (isResponsiveBoolean) {
+        computedValue = matchedProp;
+      } // if (matchedMatcher && matchedProp){
+      //   const isMatchedMatcherString = isString(matchedMatcher)
+      //   const matchedPropNotAString = !is(Object)
+      //   const isResponsiveBoolean = isString(matchedMatcher) && is(Object, matchedProp)
+      //   console.log({ isResponsiveBoolean})
+      // }
+      // if (isUndefinedOrFalse(computedValue)) {
       //   // logger.matchNotFound({ ruleName: key });
       //   return result
       // }
       /// If prop passed is a function, execute it
       /// Rather storing returnAsIs function, check FunctionKey LookUp
+
 
       if (key === 'debugMode') {
         console.log(computedValue);
@@ -5380,7 +5437,7 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
         }, {});
         var CSSObj = Object.keys(breakpoints).reduce(function (acc, bpKey) {
           var minWidth = pxToEm(getBp(bpKey));
-          var currentVal = breakpoints[bpKey];
+          var currentVal = when(both(always(isResponsiveBoolean), isBool), ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null)))(breakpoints[bpKey]);
           var res = isNil(computeOptions(currentVal)) ? {} : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1 ? objOf(key, computeOptions(currentVal)) : mapObjOf("@media screen and (min-width:".concat(minWidth, ")"), objOf(key, computeOptions(currentVal)));
           return merge(acc, res);
         }, {});
@@ -5449,7 +5506,7 @@ var BPProp = function BPProp() {
   return function (p) {
     var themeBPs = getThemeAttr('breakpoints')(p);
     cssProp = valueAsFunction(cssProp)(p);
-    return styler(pipe(pick(keys(themeBPs)), objOf('default'), when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), UnflattenObj)(p), p);
+    return cssProp ? styler(pipe(pick(keys(themeBPs)), objOf('default'), when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), UnflattenObj)(p), p) : {};
   };
 }; /// TODO make more efficient
 

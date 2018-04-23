@@ -18,7 +18,9 @@ import {
   pxToPct,
   isNumber,
   isNilOrEmptyOrFalse,
-  px
+  px,
+  isBool,
+  isTrueBool
 } from './utils'
 
 import {
@@ -42,6 +44,10 @@ import {
   isEmpty,
   converge,
   identity,
+  always,
+  ifElse,
+  both,
+  is,
   when as Rwhen
 } from 'ramda'
 
@@ -188,20 +194,39 @@ const ruleParser = curry((parentSelector, props, obj) => {
         const allPropNames = Object.keys(props)
         const allMatchers = Object.keys(matchers)
         const matchingProps = intersection(allPropNames, allMatchers)
-
+        let matchedPropName
         const reducer = reduceWhile(
           isUndefinedOrFalse,
-          (previous, propName) =>
-            pipe(
+          (previous, propName) => {
+            matchedPropName = propName
+            return pipe(
               prop(__, matchers),
               lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
               whenFunctionCallWith(props[propName], props)
-            )(propName),
+            )(propName)
+          },
           false,
           matchingProps
         )
 
+        const matchedMatcher = prop(matchedPropName, matchers)
+        const matchedProp = prop(matchedPropName, props)
         let computedValue = pipe(falseToNull, defaultTo(DF))(reducer)
+
+        let nonResponisiveComputedValue = computedValue
+        let isResponsiveBoolean =
+          isString(computedValue) && is(Object, matchedProp)
+
+        if (isResponsiveBoolean) {
+          computedValue = matchedProp
+        }
+
+        // if (matchedMatcher && matchedProp){
+        //   const isMatchedMatcherString = isString(matchedMatcher)
+        //   const matchedPropNotAString = !is(Object)
+        //   const isResponsiveBoolean = isString(matchedMatcher) && is(Object, matchedProp)
+        //   console.log({ isResponsiveBoolean})
+        // }
 
         // if (isUndefinedOrFalse(computedValue)) {
         //   // logger.matchNotFound({ ruleName: key });
@@ -277,7 +302,14 @@ const ruleParser = curry((parentSelector, props, obj) => {
 
           const CSSObj = Object.keys(breakpoints).reduce((acc, bpKey) => {
             const minWidth = pxToEm(getBp(bpKey))
-            const currentVal = breakpoints[bpKey]
+            const currentVal = Rwhen(
+              both(always(isResponsiveBoolean), isBool),
+              ifElse(
+                isTrueBool,
+                always(nonResponisiveComputedValue),
+                always(null)
+              )
+            )(breakpoints[bpKey])
             const res = isNil(computeOptions(currentVal))
               ? {}
               : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1

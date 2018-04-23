@@ -323,4 +323,54 @@ describe('Styler', () => {
         })
       })
   })
+
+  describe('Strings on Matchers are responsive', () => {
+    it('Should lookup key Functions using "returnAsIs" ', () => {
+      // column: isObject ? 'returnAsIs' : 'column',
+      const testStyler = stylerWithTheme({
+        flexDirection: {
+          flexDirection: 'returnAsIs',
+          direction: 'returnAsIs',
+          fxdirection: 'returnAsIs',
+          row: 'row',
+          column: 'column',
+          rowReverse: 'row-reverse',
+          columnReverse: 'column-reverse'
+        }
+      })
+
+      const testProps = {
+        column: { mobile: true, tablet: true },
+        row: { mobile: true }
+      }
+
+      expect(testStyler(testProps)).toEqual({
+        '@media screen and (min-width:tablet)': { flexDirection: 'column' },
+        flexDirection: 'column'
+      })
+    }),
+      it('Should Works With Arrays', () => {
+        // column: isObject ? 'returnAsIs' : 'column',
+        const testStyler = stylerWithTheme({
+          flexDirection: {
+            flexDirection: 'returnAsIs',
+            direction: 'returnAsIs',
+            fxdirection: 'returnAsIs',
+            row: 'row',
+            column: 'column',
+            rowReverse: 'row-reverse',
+            columnReverse: 'column-reverse'
+          }
+        })
+
+        const testProps = {
+          column: [true, true]
+        }
+
+        expect(testStyler(testProps)).toEqual({
+          '@media screen and (min-width:tablet)': { flexDirection: 'column' },
+          flexDirection: 'column'
+        })
+      })
+  })
 })
