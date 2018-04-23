@@ -33,7 +33,8 @@ import {
   curryN,
   identity,
   toPairs,
-  reduceRight
+  reduceRight,
+  test
 } from 'ramda'
 import defaultTheme from './defaultTheme'
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -90,6 +91,17 @@ const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
   )
 
 export const getThemeAttr = getThemeAttrFB(defaultTheme)
+export const isNegative = test(/^-.+/)
+
+export const lookUpValue = curryN(3, (themeKey, val, props) => {
+  /// Check Strip Negative Before lookingUp
+  if (!isString(val)) return val
+  const isNeg = /^-.+/.test(val)
+  const absN = isNeg ? val.slice(1) : val
+
+  val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+  return isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
+})
 
 export const mapObjOf = curry((key, val) =>
   pipe(toArray, map(objOf(__, val)), mergeAll)(key)
