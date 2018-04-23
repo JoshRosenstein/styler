@@ -13,17 +13,22 @@ import styler from './styler'
 export const BPProp = (cssProp = '', options = {}) => p => {
   let themeBPs = getThemeAttr('breakpoints')(p)
   cssProp = valueAsFunction(cssProp)(p)
-  return styler(
-    pipe(
-      pick(keys(themeBPs)),
-      objOf('default'),
-      when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))),
-      when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)),
+  return cssProp
+    ? styler(
+        pipe(
+          pick(keys(themeBPs)),
+          objOf('default'),
+          when(
+            always(isNotNilOrEmpty(options)),
+            merge(objOf('options', options))
+          ),
+          when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)),
 
-      UnflattenObj
-    )(p),
-    p
-  )
+          UnflattenObj
+        )(p),
+        p
+      )
+    : {}
 }
 
 /// TODO make more efficient
