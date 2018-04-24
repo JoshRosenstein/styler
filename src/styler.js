@@ -106,6 +106,19 @@ const DEFAULT_RULE_KEY_LOOKUP = {
   boxShadow: 'shadows'
 }
 
+const DEFAULT_RULE_GETTER_LOOKUP = {
+  margin: 'pxToRem',
+  marginTop: 'pxToRem',
+  marginBottom: 'pxToRem',
+  marginLeft: 'pxToRem',
+  marginRight: 'pxToRem',
+  padding: 'pxToRem',
+  paddingTop: 'pxToRem',
+  paddingBottom: 'pxToRem',
+  paddingLeft: 'pxToRem',
+  paddingRight: 'pxToRem'
+}
+
 const DEFAULT_FUNCTIONS_LOOKUP = {
   returnAsIs: returnAsIs,
   identity: returnAsIs,
@@ -264,6 +277,7 @@ const ruleParser = curry((parentSelector, props, obj) => {
               val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
             }
             // console.log(key, val,getter)
+            getter = getter || DEFAULT_RULE_GETTER_LOOKUP[key]
             if (getter) {
               val = pipe(
                 lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
