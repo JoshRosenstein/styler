@@ -30,6 +30,33 @@ describe('Styler', () => {
     it('It Should return default when no matches', () => {
       expect(testStyler({})).toEqual({ TestCSSProp: 'white' })
     })
+    it('Should not depend on prop order', () => {
+      const topSelector = '#meow'
+      const props1 = { mode: 'dark', nextOne: 'hello' }
+      const props2 = { nextOne: 'hello', mode: 'dark' }
+      const rules1 = {
+        color: {
+          mode: value => value === 'dark' && 'navy',
+          nextOne: 'purple',
+          default: 'green'
+        }
+      }
+      const rules2 = {
+        color: {
+          nextOne: 'purple',
+          mode: value => value === 'dark' && 'navy',
+          default: 'green'
+        }
+      }
+
+      const result1 = styler(rules1, props1)
+      const result2 = styler(rules1, props2)
+      const result3 = styler(rules2, props1)
+      const result4 = styler(rules2, props2)
+      expect(result1).toEqual(result2)
+      expect(result3).toEqual(result4)
+      expect(result1).not.toEqual(result3)
+    })
   })
 
   describe('Functional Matches Execution', () => {
@@ -43,6 +70,24 @@ describe('Styler', () => {
         default: 'white'
       }
     })
+
+    it('will render a block of styles for a block pattern', () => {
+      const testBlock = styler({
+        __match: {
+          mode: {
+            fontWeight: 'bold',
+            color: 'purple'
+          },
+          nextOne: value => ({
+            color: value,
+            border: '1px solid #ccc'
+          })
+        }
+      })
+      const result = testBlock({ mode: 'hi there', nextOne: 'dodgerblue' })
+      expect(result).toEqual({ border: '1px solid #ccc', color: 'dodgerblue' })
+    })
+
     it('Can return propValue using Custom', () => {
       const testProps = {
         returnPropValue: 'ThisWillBeReturned'
@@ -197,16 +242,16 @@ describe('Styler', () => {
 
     it('Should Properly Merge Nested Selectors', () => {
       const testStyler = stylerWithTheme([
-        styler({
+        {
           testCSSProp: {
-            contollerProp: returnAsIs
+            contollerProp: 'returnAsIs'
           }
-        }),
-        styler({
+        },
+        {
           testCSSProp2: {
             contollerProp: returnAsIs
           }
-        })
+        }
       ])
 
       const testProps = { contollerProp: { tablet: 'tabletValue' } }
@@ -344,10 +389,7 @@ describe('Styler', () => {
         row: { mobile: true }
       }
 
-      expect(testStyler(testProps)).toEqual({
-        '@media screen and (min-width:tablet)': { flexDirection: 'column' },
-        flexDirection: 'column'
-      })
+      expect(testStyler(testProps)).toEqual({ flexDirection: 'row' })
     }),
       it('Should Works With Arrays', () => {
         // column: isObject ? 'returnAsIs' : 'column',

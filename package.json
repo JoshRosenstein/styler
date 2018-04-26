@@ -15,7 +15,7 @@
     "test:size": "yarn run clean &&  rollup  && yarn run size",
     "test:prod": "yarn run build:prod && jest  --no-cache --ci --runInBand",
     "coverage": "jest --coverage --no-cache --ci --runInBand",
-    "test:watch": "jest --watch --no-cache",
+    "test:watch": "jest --watchAll",
     "reinstall": "yarn run clean && yarn"
   },
   "repository": {

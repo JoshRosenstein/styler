@@ -181,3 +181,5 @@ export const when = predicate => ({
 
 export const whenFunctionCallWith = (...argsToGive) => value =>
   valueAsFunction(value)(...argsToGive)
+
+export const flow = (value, ...argsToGive) => pipe(...argsToGive)(value)
