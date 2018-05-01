@@ -88,7 +88,7 @@ export const startsWithAny = (...searchStrs) =>
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(split('.', attr))(fallBackObj)
 
-const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
+export const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
   pathOr(
     getThemeFallback(fallBackObj)(attr, defaultTo),
     split('.', concat('theme.', attr))

@@ -19,6 +19,8 @@ export * as styleDefs from './styleDefs'
 
 export * as util from './utils'
 
+export { getThemeAttrFB } from './utils'
+
 export {
   alignContent,
   alignItems,
