@@ -11,7 +11,7 @@ import {
   whenFunctionCallWith,
   getThemeAttr,
   mapObjOf,
-  mergeAllDeepLeft,
+  mergeAllDeepRight,
   filterNilAndEmpty,
   returnAsIs,
   pxToRem,
@@ -54,7 +54,9 @@ import {
   filter,
   contains,
   equals,
-  reduce
+  reduce,
+  mergeWith,
+  concat
 } from 'ramda'
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -71,7 +73,7 @@ const isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector])
 const createStyleRule = (key, value) => {
   const ruleValue = flow(
     value,
-    when(isArray).onlyThen(mergeAllDeepLeft),
+    when(isArray).onlyThen(mergeAllDeepRight),
     wrapContentString(key)
   )
   return isNilOrEmptyOrFalse(ruleValue) ? [] : { [key]: ruleValue }
@@ -152,7 +154,7 @@ const mapMerge = curry((handlerFn, original) => {
     original,
     toPairs,
     reduce((result, [key, value]) => {
-      const combiner = mergeDeepRight(result)
+      const combiner = mergeWith(concat(__), result)
       const handlerOutput = handlerFn(key, value)
       const newResult = handlerOutput && combiner(handlerOutput)
       return newResult || result
@@ -236,7 +238,10 @@ export const ruleParser = curry((parentSelector, props, obj) => {
           })
         )
 
-        return mergeDeepRight(result, matchedRules)
+        return {
+          ...result,
+          [parentSelector]: [...existingRules, ...matchedRules[parentSelector]]
+        }
       }
 
       if (isPatternMatch) {
@@ -399,7 +404,7 @@ const ruleCleaner = rules => {
   return filterNilAndEmpty(
     Object.entries(filterNilAndEmpty(rules)).reduce((result, [key, value]) => {
       if (isArray(value)) {
-        const joinedRules = filterNilAndEmpty(mergeAllDeepLeft(value))
+        const joinedRules = filterNilAndEmpty(mergeAllDeepRight(value))
 
         if (isEmpty(key.trim())) return mergeDeepRight(result, joinedRules)
         const key2 = isPseudoSelector(key) ? '&' + key : key
@@ -425,7 +430,7 @@ const styler = curry((rules, props) => {
   if (isArray(rules))
     return pipe(
       map(pipe(ruleParser('', props), ruleCleaner)),
-      mergeAllDeepLeft
+      mergeAllDeepRight
     )(rules)
 
   return pipe(ruleParser('', props), ruleCleaner)(rules)
