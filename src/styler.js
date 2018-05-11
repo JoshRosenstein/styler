@@ -77,7 +77,7 @@ const createStyleRule = (key, value) => {
     when(isArray).onlyThen(mergeAllDeepRight),
     wrapContentString(key)
   )
-  return isNilOrEmptyOrFalse(ruleValue) ? [] : { [key]: ruleValue }
+  return isNilOrEmptyOrFalse(ruleValue) ? {} : { [key]: ruleValue }
   // return { [key]: ruleValue }
 }
 
@@ -243,9 +243,9 @@ export const ruleParser = curry((parentSelector, props, obj) => {
           ...result,
           [parentSelector]: [
             ...existingRules,
-            ...propOr({}, parentSelector, matchedRules)
+            ...propOr([], parentSelector, matchedRules)
           ]
-        }
+        };
       }
 
       if (isPatternMatch) {

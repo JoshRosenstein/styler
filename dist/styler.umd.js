@@ -5362,7 +5362,7 @@ var isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector]); // filterNilAn
 
 var createStyleRule = function createStyleRule(key, value) {
   var ruleValue = flow(value, when$1(isArray).onlyThen(mergeAllDeepRight), wrapContentString(key));
-  return isNilOrEmptyOrFalse(ruleValue) ? [] : _defineProperty({}, key, ruleValue); // return { [key]: ruleValue }
+  return isNilOrEmptyOrFalse(ruleValue) ? {} : _defineProperty({}, key, ruleValue); // return { [key]: ruleValue }
 };
 
 var wrapContentString = function wrapContentString(key) {
@@ -5498,7 +5498,7 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
           return flow(outputValue, whenFunctionCallWith(props$$1[targetProp]), parseNested(parentSelector));
         }
       }));
-      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(propOr({}, parentSelector, matchedRules)))));
+      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(propOr([], parentSelector, matchedRules)))));
     }
 
     if (isPatternMatch) {
