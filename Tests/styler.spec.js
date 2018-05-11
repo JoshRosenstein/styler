@@ -449,4 +449,46 @@ describe('Styler', () => {
         })
       })
   })
+
+  describe('Match Block with Puesdo', () => {
+  it('Should Overide default', () => {
+    // column: isObject ? 'returnAsIs' : 'column',
+    const testStyler = styler({
+      backgroundColor: 'defaultBgColor',
+      '&:hover': {
+        backgroundColor: 'defaultHoverBgColor',
+      },
+      __match: {
+        active: {
+          backgroundColor: 'activeBgColor',
+          '&:hover': {
+            backgroundColor: 'activeHoverBgColor',
+          },
+        },
+        disabled: {
+          backgroundColor: 'disabledBgColor',
+          '&:hover': {
+            backgroundColor: 'disabledHoverBgColor',
+          },
+        },
+      },
+    })
+    const a = testStyler({})
+    const b = testStyler({ active: true })
+    const c = testStyler({ disabled: true })
+    expect(a).toEqual({
+      '&:hover': { backgroundColor: 'defaultHoverBgColor' },
+      backgroundColor: 'defaultBgColor',
+    })
+    expect(b).toEqual({
+      '&:hover': { backgroundColor: 'activeHoverBgColor' },
+      backgroundColor: 'activeBgColor',
+    })
+    expect(c).toEqual({
+      '&:hover': { backgroundColor: 'disabledHoverBgColor' },
+      backgroundColor: 'disabledBgColor',
+    })
+  })
+})
+
 })

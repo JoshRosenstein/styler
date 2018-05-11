@@ -21,7 +21,7 @@ import {
   px,
   isBool,
   isTrueBool,
-  flow
+  flow,
 } from './utils'
 
 import {
@@ -57,7 +57,8 @@ import {
   reduce,
   mergeWith,
   concat,
-  propOr
+  mergeDeepLeft,
+  propOr,
 } from 'ramda'
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -75,7 +76,7 @@ const createStyleRule = (key, value) => {
   const ruleValue = flow(
     value,
     when(isArray).onlyThen(mergeAllDeepRight),
-    wrapContentString(key)
+    wrapContentString(key),
   )
   return isNilOrEmptyOrFalse(ruleValue) ? {} : { [key]: ruleValue }
   // return { [key]: ruleValue }
@@ -119,7 +120,7 @@ const DEFAULT_RULE_KEY_LOOKUP = {
   border: 'borders',
   borderColor: 'colors',
   backgroundColor: 'colors',
-  boxShadow: 'shadows'
+  boxShadow: 'shadows',
 }
 
 const DEFAULT_RULE_GETTER_LOOKUP = {
@@ -132,7 +133,7 @@ const DEFAULT_RULE_GETTER_LOOKUP = {
   paddingTop: 'pxToRem',
   paddingBottom: 'pxToRem',
   paddingLeft: 'pxToRem',
-  paddingRight: 'pxToRem'
+  paddingRight: 'pxToRem',
 }
 
 const DEFAULT_FUNCTIONS_LOOKUP = {
@@ -143,11 +144,11 @@ const DEFAULT_FUNCTIONS_LOOKUP = {
   pxToRem: pxToRem,
   pxToEm: pxToEm,
   pxToPct: pxToPct,
-  px: px
+  px: px,
 }
 
 const lookUpShortcut = curry((dictionary, value) =>
-  Rwhen(isString, converge(defaultTo, [identity, prop(__, dictionary)]), value)
+  Rwhen(isString, converge(defaultTo, [identity, prop(__, dictionary)]), value),
 )
 
 const mapMerge = curry((handlerFn, original) => {
@@ -159,13 +160,13 @@ const mapMerge = curry((handlerFn, original) => {
       const handlerOutput = handlerFn(key, value)
       const newResult = handlerOutput && combiner(handlerOutput)
       return newResult || result
-    }, {})
+    }, {}),
   )
 })
 
 export const ruleParser = curry((parentSelector, props, obj) => {
   const parseNested = curry((newSelector, nestedRule) =>
-    ruleParser(newSelector, props, nestedRule)
+    ruleParser(newSelector, props, nestedRule),
   )
 
   if (isFunction(obj))
@@ -175,8 +176,7 @@ export const ruleParser = curry((parentSelector, props, obj) => {
   return Object.entries(rules).reduce(
     (result, [key, value]) => {
       key = key.trim()
-      // const addRuleBlock = (original = result, givenRules) =>
-      //   mergeWith(concat, original, givenRules)
+      const addRuleBlock = mergeWith(concat, result)
 
       const isFunctionRule = isFunction(value)
       const hasObjectLiteral = isObjectLiteral(value)
@@ -196,26 +196,21 @@ export const ruleParser = curry((parentSelector, props, obj) => {
 
       if (hasAtRuleBlock) {
         const additionalRules = parseNested(parentSelector, value)
-
-        return {
-          ...result,
-          [key]: additionalRules
-        }
+        return addRuleBlock({
+          [key]: parseNested(parentSelector, value),
+        })
       }
 
       if (shouldBeCombinedSelector) {
         const mergedSelector = createNestedSelector(parentSelector, key)
 
-        const additionalRules = flow(
-          value,
-          when(isFunction).onlyThen(fn => fn(props)),
-          parseNested(mergedSelector)
+        return addRuleBlock(
+          flow(
+            value,
+            when(isFunction).onlyThen(fn => fn(props)),
+            parseNested(mergedSelector),
+          ),
         )
-
-        return {
-          ...result,
-          ...additionalRules
-        }
       }
 
       const existingRules = result[parentSelector] || []
@@ -229,23 +224,16 @@ export const ruleParser = curry((parentSelector, props, obj) => {
         const matchedRules = flow(
           value,
           mapMerge((targetProp, outputValue) => {
-            if (has(targetProp)(props)) {
+            if (has(targetProp, props)) {
               return flow(
                 outputValue,
                 whenFunctionCallWith(props[targetProp]),
-                parseNested(parentSelector)
+                parseNested(parentSelector),
               )
             }
-          })
+          }),
         )
-
-        return {
-          ...result,
-          [parentSelector]: [
-            ...existingRules,
-            ...propOr([], parentSelector, matchedRules)
-          ]
-        };
+        return addRuleBlock(matchedRules)
       }
 
       if (isPatternMatch) {
@@ -256,7 +244,7 @@ export const ruleParser = curry((parentSelector, props, obj) => {
 
         const intersectedMatchers = filter(
           contains(__, keys(props)),
-          keys(matchers)
+          keys(matchers),
         ) /// Maintains Order of matcher Keys
 
         let matchedPropName
@@ -270,11 +258,11 @@ export const ruleParser = curry((parentSelector, props, obj) => {
               prop(__, matchers),
               lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
               whenFunctionCallWith(props[propName], props),
-              whenFunctionCallWith(props)
+              whenFunctionCallWith(props),
             )
           },
           false,
-          intersectedMatchers
+          intersectedMatchers,
         )
 
         const matchedProp = prop(matchedPropName, props)
@@ -311,7 +299,7 @@ export const ruleParser = curry((parentSelector, props, obj) => {
             if (getter) {
               val = pipe(
                 lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
-                whenFunctionCallWith(val, props)
+                whenFunctionCallWith(val, props),
               )(getter)
             }
           }
@@ -351,8 +339,8 @@ export const ruleParser = curry((parentSelector, props, obj) => {
               ifElse(
                 isTrueBool,
                 always(nonResponisiveComputedValue),
-                always(null)
-              )
+                always(null),
+              ),
             )(breakpoints[bpKey])
             const res = isNil(computeOptions(currentVal))
               ? {}
@@ -360,7 +348,7 @@ export const ruleParser = curry((parentSelector, props, obj) => {
                 ? objOf(key, computeOptions(currentVal))
                 : mapObjOf(
                     `@media screen and (min-width:${minWidth})`,
-                    objOf(key, computeOptions(currentVal))
+                    objOf(key, computeOptions(currentVal)),
                   )
 
             return merge(acc, res)
@@ -368,7 +356,7 @@ export const ruleParser = curry((parentSelector, props, obj) => {
 
           return {
             ...result,
-            [parentSelector]: [...existingRules, CSSObj]
+            [parentSelector]: [...existingRules, CSSObj],
           }
         }
         computedValue = computeOptions(computedValue)
@@ -377,8 +365,8 @@ export const ruleParser = curry((parentSelector, props, obj) => {
           ...result,
           [parentSelector]: [
             ...existingRules,
-            createStyleRule(key, computedValue)
-          ]
+            createStyleRule(key, computedValue),
+          ],
         }
       }
 
@@ -387,8 +375,8 @@ export const ruleParser = curry((parentSelector, props, obj) => {
           ...result,
           [parentSelector]: [
             ...existingRules,
-            whenFunctionCallWith(props)(value)
-          ]
+            whenFunctionCallWith(props)(value),
+          ],
         }
       }
 
@@ -396,11 +384,11 @@ export const ruleParser = curry((parentSelector, props, obj) => {
         ...result,
         [parentSelector]: [
           ...existingRules,
-          createStyleRule(key, whenFunctionCallWith(props)(value))
-        ]
+          createStyleRule(key, whenFunctionCallWith(props)(value)),
+        ],
       }
     },
-    { [parentSelector]: [] }
+    { [parentSelector]: [] },
   )
 })
 
@@ -422,11 +410,11 @@ const ruleCleaner = rules => {
 
       console.error('Styler had an abnormal Rule Set:', {
         key,
-        value
+        value,
       })
 
       return filterNilAndEmpty(result)
-    }, {})
+    }, {}),
   )
 }
 
@@ -434,7 +422,7 @@ const styler = curry((rules, props) => {
   if (isArray(rules))
     return pipe(
       map(pipe(ruleParser('', props), ruleCleaner)),
-      mergeAllDeepRight
+      mergeAllDeepRight,
     )(rules)
 
   return pipe(ruleParser('', props), ruleCleaner)(rules)

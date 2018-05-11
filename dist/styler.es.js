@@ -4605,39 +4605,6 @@ var project =
 useWith(_map, [pickAll, identity]); // passing `identity` gives correct arity
 
 /**
- * If the given, non-null object has an own property with the specified name,
- * returns the value of that property. Otherwise returns the provided default
- * value.
- *
- * @func
- * @memberOf R
- * @since v0.6.0
- * @category Object
- * @sig a -> String -> Object -> a
- * @param {*} val The default value.
- * @param {String} p The name of the property to return.
- * @param {Object} obj The object to query.
- * @return {*} The value of given property of the supplied object or the default value.
- * @example
- *
- *      var alice = {
- *        name: 'ALICE',
- *        age: 101
- *      };
- *      var favorite = R.prop('favoriteLibrary');
- *      var favoriteWithDefault = R.propOr('Ramda', 'favoriteLibrary');
- *
- *      favorite(alice);  //=> undefined
- *      favoriteWithDefault(alice);  //=> 'Ramda'
- */
-
-var propOr =
-/*#__PURE__*/
-_curry3(function propOr(val, p, obj) {
-  return obj != null && _has(p, obj) ? obj[p] : val;
-});
-
-/**
  * Returns a single item by iterating through the list, successively calling
  * the iterator function and passing it an accumulator value and the current
  * value from the array, and then passing the result to the next call.
@@ -5452,9 +5419,8 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
         key = _ref5[0],
         value = _ref5[1];
 
-    key = key.trim(); // const addRuleBlock = (original = result, givenRules) =>
-    //   mergeWith(concat, original, givenRules)
-
+    key = key.trim();
+    var addRuleBlock = mergeWith(concat, result);
     var isFunctionRule = isFunction(value);
     var hasObjectLiteral = isObjectLiteral(value);
     var hasNestedRules = hasObjectLiteral || isFunctionRule;
@@ -5466,17 +5432,14 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
 
     if (hasAtRuleBlock) {
       var additionalRules = parseNested(parentSelector, value);
-      return _objectSpread({}, result, _defineProperty({}, key, additionalRules));
+      return addRuleBlock(_defineProperty({}, key, parseNested(parentSelector, value)));
     }
 
     if (shouldBeCombinedSelector) {
       var mergedSelector = createNestedSelector(parentSelector, key);
-
-      var _additionalRules = flow(value, when$1(isFunction).onlyThen(function (fn) {
+      return addRuleBlock(flow(value, when$1(isFunction).onlyThen(function (fn) {
         return fn(props$$1);
-      }), parseNested(mergedSelector));
-
-      return _objectSpread({}, result, _additionalRules);
+      }), parseNested(mergedSelector)));
     }
 
     var existingRules = result[parentSelector] || [];
@@ -5488,11 +5451,11 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
 
     if (isPatternBlock) {
       var matchedRules = flow(value, mapMerge(function (targetProp, outputValue) {
-        if (has(targetProp)(props$$1)) {
+        if (has(targetProp, props$$1)) {
           return flow(outputValue, whenFunctionCallWith(props$$1[targetProp]), parseNested(parentSelector));
         }
       }));
-      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(propOr([], parentSelector, matchedRules)))));
+      return addRuleBlock(matchedRules);
     }
 
     if (isPatternMatch) {
