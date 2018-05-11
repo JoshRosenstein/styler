@@ -85,7 +85,11 @@ describe('Styler', () => {
         }
       })
       const result = testBlock({ mode: 'hi there', nextOne: 'dodgerblue' })
-      expect(result).toEqual({ border: '1px solid #ccc', color: 'dodgerblue' })
+      expect(result).toEqual({
+    border: '1px solid #ccc',
+    color: 'dodgerblue',
+    fontWeight: 'bold'
+  })
     })
 
     it('will merge block of styles for a block pattern correctly', () => {
