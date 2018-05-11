@@ -2,8 +2,6 @@
 
 ## @roseys/styler
 
-![Travis](https://img.shields.io/travis/JoshRosenstein/styler.svg?style=for-the-badge)
-
 [![npm version](https://badge.fury.io/js/%40roseys%2Fstyler.svg)](https://badge.fury.io/js/%40roseys%2Fstyler)
 [![Build Status](https://travis-ci.org/JoshRosenstein/styler.svg?branch=master)](https://travis-ci.org/JoshRosenstein/styler)
 [![codecov](https://codecov.io/gh/JoshRosenstein/styler/branch/master/graph/badge.svg)](https://codecov.io/gh/JoshRosenstein/styler)
