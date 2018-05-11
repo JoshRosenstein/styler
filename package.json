@@ -11,7 +11,7 @@
     "build:dev": "rollup -c",
     "watch": "rollup -c --watch",
     "size": "bundlesize",
-    "test": "yarn run coverage && yarn run test:size && yarn run test:prod ",
+    "test": "yarn run coverage",
     "test:size": "yarn run clean &&  rollup  && yarn run size",
     "test:prod": "yarn run build:prod && jest  --no-cache --ci --runInBand",
     "coverage": "jest --coverage --no-cache --ci --runInBand",
