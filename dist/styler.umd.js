@@ -2564,6 +2564,31 @@ _curry2(function concat(a, b) {
 });
 
 /**
+ * Returns `true` if the specified value is equal, in [`R.equals`](#equals)
+ * terms, to at least one element of the given list; `false` otherwise.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.1.0
+ * @category List
+ * @sig a -> [a] -> Boolean
+ * @param {Object} a The item to compare against.
+ * @param {Array} list The array to consider.
+ * @return {Boolean} `true` if an equivalent item is in the list, `false` otherwise.
+ * @see R.any
+ * @example
+ *
+ *      R.contains(3, [1, 2, 3]); //=> true
+ *      R.contains(4, [1, 2, 3]); //=> false
+ *      R.contains({ name: 'Fred' }, [{ name: 'Fred' }]); //=> true
+ *      R.contains([42], [[42]]); //=> true
+ */
+
+var contains$1 =
+/*#__PURE__*/
+_curry2(_contains);
+
+/**
  * Accepts a converging function and a list of branching functions and returns
  * a new function. When invoked, this new function is applied to some
  * arguments, each branching function is applied to those same arguments. The
@@ -3280,6 +3305,35 @@ reduceBy(function (acc, item) {
 }, null)));
 
 /**
+ * Returns whether or not an object has an own property with the specified name
+ *
+ * @func
+ * @memberOf R
+ * @since v0.7.0
+ * @category Object
+ * @sig s -> {s: x} -> Boolean
+ * @param {String} prop The name of the property to check for.
+ * @param {Object} obj The object to query.
+ * @return {Boolean} Whether the property exists.
+ * @example
+ *
+ *      var hasName = R.has('name');
+ *      hasName({name: 'alice'});   //=> true
+ *      hasName({name: 'bob'});     //=> true
+ *      hasName({});                //=> false
+ *
+ *      var point = {x: 0, y: 0};
+ *      var pointHas = R.has(R.__, point);
+ *      pointHas('x');  //=> true
+ *      pointHas('y');  //=> true
+ *      pointHas('z');  //=> false
+ */
+
+var has =
+/*#__PURE__*/
+_curry2(_has);
+
+/**
  * Returns the first element of the given list or string. In some libraries
  * this function is named `first`.
  *
@@ -3705,40 +3759,6 @@ _curry2(function uniqBy(fn, list) {
 var uniq =
 /*#__PURE__*/
 uniqBy(identity);
-
-/**
- * Combines two lists into a set (i.e. no duplicates) composed of those
- * elements common to both lists.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category Relation
- * @sig [*] -> [*] -> [*]
- * @param {Array} list1 The first list.
- * @param {Array} list2 The second list.
- * @return {Array} The list of elements found in both `list1` and `list2`.
- * @see R.innerJoin
- * @example
- *
- *      R.intersection([1,2,3,4], [7,6,5,4,3]); //=> [4, 3]
- */
-
-var intersection =
-/*#__PURE__*/
-_curry2(function intersection(list1, list2) {
-  var lookupList, filteredList;
-
-  if (list1.length > list2.length) {
-    lookupList = list1;
-    filteredList = list2;
-  } else {
-    lookupList = list2;
-    filteredList = list1;
-  }
-
-  return uniq(_filter(flip(_contains)(lookupList), filteredList));
-});
 
 function _objectAssign(target) {
   if (target == null) {
@@ -4217,6 +4237,68 @@ _curry2(function mergeDeepLeft(lObj, rObj) {
   return mergeDeepWithKey(function (k, lVal, rVal) {
     return lVal;
   }, lObj, rObj);
+});
+
+/**
+ * Creates a new object with the own properties of the first object merged with
+ * the own properties of the second object. If a key exists in both objects:
+ * - and both values are objects, the two values will be recursively merged
+ * - otherwise the value from the second object will be used.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.24.0
+ * @category Object
+ * @sig {a} -> {a} -> {a}
+ * @param {Object} lObj
+ * @param {Object} rObj
+ * @return {Object}
+ * @see R.merge, R.mergeDeepLeft, R.mergeDeepWith, R.mergeDeepWithKey
+ * @example
+ *
+ *      R.mergeDeepRight({ name: 'fred', age: 10, contact: { email: 'moo@example.com' }},
+ *                       { age: 40, contact: { email: 'baa@example.com' }});
+ *      //=> { name: 'fred', age: 40, contact: { email: 'baa@example.com' }}
+ */
+
+var mergeDeepRight =
+/*#__PURE__*/
+_curry2(function mergeDeepRight(lObj, rObj) {
+  return mergeDeepWithKey(function (k, lVal, rVal) {
+    return rVal;
+  }, lObj, rObj);
+});
+
+/**
+ * Creates a new object with the own properties of the two provided objects. If
+ * a key exists in both objects, the provided function is applied to the values
+ * associated with the key in each object, with the result being used as the
+ * value associated with the key in the returned object.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.19.0
+ * @category Object
+ * @sig ((a, a) -> a) -> {a} -> {a} -> {a}
+ * @param {Function} fn
+ * @param {Object} l
+ * @param {Object} r
+ * @return {Object}
+ * @see R.mergeDeepWith, R.merge, R.mergeWithKey
+ * @example
+ *
+ *      R.mergeWith(R.concat,
+ *                  { a: true, values: [10, 20] },
+ *                  { b: true, values: [15, 35] });
+ *      //=> { a: true, b: true, values: [10, 20, 15, 35] }
+ */
+
+var mergeWith =
+/*#__PURE__*/
+_curry3(function mergeWith(fn, l, r) {
+  return mergeWithKey(function (_, _l, _r) {
+    return fn(_l, _r);
+  }, l, r);
 });
 
 /**
@@ -5012,6 +5094,7 @@ var isBool = is(Boolean);
 var isTruthy = either(Boolean, equals(0));
 var isTrueBool = both(isBool, isTruthy);
 var mergeAllDeepLeft = reduce(mergeDeepLeft, {});
+var mergeAllDeepRight = reduce(mergeDeepRight, {});
 var isNonZeroNumber = both(is(Number), complement(equals(0)));
 var appendString = flip(concat);
 var whenisNonZeroNumber = curryN(2, function (fn, input) {
@@ -5058,7 +5141,6 @@ var getThemeAttrFB = function getThemeAttrFB(fallBackObj) {
     return pathOr(getThemeFallback(fallBackObj)(attr, defaultTo$$1), split('.', concat('theme.', attr)));
   };
 };
-
 var getThemeAttr = getThemeAttrFB(defaultTheme);
 var isNegative = test(/^-.+/);
 var lookUpValue = curryN(3, function (themeKey, val, props$$1) {
@@ -5181,6 +5263,13 @@ var whenFunctionCallWith = function whenFunctionCallWith() {
     return valueAsFunction(value).apply(void 0, argsToGive);
   };
 };
+var flow = function flow(value) {
+  for (var _len8 = arguments.length, argsToGive = new Array(_len8 > 1 ? _len8 - 1 : 0), _key8 = 1; _key8 < _len8; _key8++) {
+    argsToGive[_key8 - 1] = arguments[_key8];
+  }
+
+  return pipe.apply(void 0, argsToGive)(value);
+};
 
 var utils = Object.freeze({
 	isArray: isArray,
@@ -5191,6 +5280,7 @@ var utils = Object.freeze({
 	isTruthy: isTruthy,
 	isTrueBool: isTrueBool,
 	mergeAllDeepLeft: mergeAllDeepLeft,
+	mergeAllDeepRight: mergeAllDeepRight,
 	isNonZeroNumber: isNonZeroNumber,
 	appendString: appendString,
 	whenisNonZeroNumber: whenisNonZeroNumber,
@@ -5210,6 +5300,7 @@ var utils = Object.freeze({
 	filterNilAndEmpty: filterNilAndEmpty,
 	filterNilOrEmptyOrFalse: filterNilOrEmptyOrFalse,
 	startsWithAny: startsWithAny,
+	getThemeAttrFB: getThemeAttrFB,
 	getThemeAttr: getThemeAttr,
 	isNegative: isNegative,
 	lookUpValue: lookUpValue,
@@ -5225,7 +5316,8 @@ var utils = Object.freeze({
 	returnAsIs: returnAsIs,
 	valueAsFunction: valueAsFunction,
 	when: when$1,
-	whenFunctionCallWith: whenFunctionCallWith
+	whenFunctionCallWith: whenFunctionCallWith,
+	flow: flow
 });
 
 // inspired by https://github.com/jxnblk/styled-system
@@ -5236,8 +5328,12 @@ var isPseudoSelector = startsWithAny(':');
 var isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector]); // filterNilAndEmpty(mergeAllDeepLeft(value))
 
 var createStyleRule = function createStyleRule(key, value) {
-  var ruleValue = when$1(isArray).onlyThen(mergeAllDeepLeft)(value);
-  return isNilOrEmptyOrFalse(ruleValue) ? {} : _defineProperty({}, key, ruleValue); // return { [key]: ruleValue }
+  var ruleValue = flow(value, when$1(isArray).onlyThen(mergeAllDeepRight), wrapContentString(key));
+  return isNilOrEmptyOrFalse(ruleValue) ? [] : _defineProperty({}, key, ruleValue); // return { [key]: ruleValue }
+};
+
+var wrapContentString = function wrapContentString(key) {
+  return when$1(equals('content', key)).onlyThen(JSON.stringify);
 };
 
 var createNestedSelector = function createNestedSelector(parent, child) {
@@ -5278,6 +5374,18 @@ var DEFAULT_RULE_KEY_LOOKUP = {
   backgroundColor: 'colors',
   boxShadow: 'shadows'
 };
+var DEFAULT_RULE_GETTER_LOOKUP = {
+  margin: 'pxToRem',
+  marginTop: 'pxToRem',
+  marginBottom: 'pxToRem',
+  marginLeft: 'pxToRem',
+  marginRight: 'pxToRem',
+  padding: 'pxToRem',
+  paddingTop: 'pxToRem',
+  paddingBottom: 'pxToRem',
+  paddingLeft: 'pxToRem',
+  paddingRight: 'pxToRem'
+};
 var DEFAULT_FUNCTIONS_LOOKUP = {
   returnAsIs: returnAsIs,
   identity: returnAsIs,
@@ -5291,53 +5399,58 @@ var DEFAULT_FUNCTIONS_LOOKUP = {
 var lookUpShortcut = curry(function (dictionary, value) {
   return when(isString, converge(defaultTo, [identity, prop(__, dictionary)]), value);
 });
-var ruleParser = curry(function (parentSelector, props$$1, obj) {
-  if (isFunction(obj)) return ruleParser(parentSelector, props$$1, obj(props$$1));
-
-  var globalOptions = obj.options,
-      rules = _objectWithoutProperties(obj, ["options"]);
-
-  return Object.entries(rules).reduce(function (result, _ref2) {
+var mapMerge = curry(function (handlerFn, original) {
+  return flow(original, toPairs, reduce(function (result, _ref2) {
     var _ref3 = _slicedToArray(_ref2, 2),
         key = _ref3[0],
         value = _ref3[1];
 
-    key = key.trim();
+    var combiner = mergeWith(concat(__), result);
+    var handlerOutput = handlerFn(key, value);
+    var newResult = handlerOutput && combiner(handlerOutput);
+    return newResult || result;
+  }, {}));
+});
+var ruleParser = curry(function (parentSelector, props$$1, obj) {
+  var parseNested = curry(function (newSelector, nestedRule) {
+    return ruleParser(newSelector, props$$1, nestedRule);
+  });
+  if (isFunction(obj)) return flow(obj, whenFunctionCallWith(props$$1), parseNested(parentSelector));
+
+  var globalOptions = obj.options,
+      rules = _objectWithoutProperties(obj, ["options"]);
+
+  return Object.entries(rules).reduce(function (result, _ref4) {
+    var _ref5 = _slicedToArray(_ref4, 2),
+        key = _ref5[0],
+        value = _ref5[1];
+
+    key = key.trim(); // const addRuleBlock = (original = result, givenRules) =>
+    //   mergeWith(concat, original, givenRules)
+
     var isFunctionRule = isFunction(value);
     var hasObjectLiteral = isObjectLiteral(value);
     var hasNestedRules = hasObjectLiteral || isFunctionRule;
     var isPlaceHolderSelector = isEmpty(key) && hasNestedRules;
+    var isPatternBlock = key === '__match' && hasNestedRules;
     var hasAtRuleBlock = isAtRule(key) && hasNestedRules;
     var shouldBeCombinedSelector = isSelectorOrPseudo(key) && hasNestedRules;
-    var isPatternMatch = hasObjectLiteral && !hasAtRuleBlock && !shouldBeCombinedSelector && !isFunctionRule; // console.log(
-    //   { key },
-    //   {
-    //     isFunctionRule,
-    //     hasObjectLiteral,
-    //     hasNestedRules,
-    //     hasAtRuleBlock,
-    //     shouldBeCombinedSelector,
-    //     isPatternMatch
-    //   }
-    // )
+    var isPatternMatch = hasObjectLiteral && !hasAtRuleBlock && !shouldBeCombinedSelector && !isFunctionRule && !isPatternBlock;
 
     if (hasAtRuleBlock) {
-      var additionalRules = ruleParser(parentSelector, props$$1, value);
+      var additionalRules = parseNested(parentSelector, value);
       return _objectSpread({}, result, _defineProperty({}, key, additionalRules));
     }
 
     if (shouldBeCombinedSelector) {
-      // const mergedSelector = isPlaceHolderSelector?parentSelector: createNestedSelector(parentSelector, key)
       var mergedSelector = createNestedSelector(parentSelector, key);
 
-      var _additionalRules = pipe(when$1(isFunction).onlyThen(function (fn) {
+      var _additionalRules = flow(value, when$1(isFunction).onlyThen(function (fn) {
         return fn(props$$1);
-      }), ruleParser(mergedSelector, props$$1))(value); // console.log({ key }, { additionalRules })
-
+      }), parseNested(mergedSelector));
 
       return _objectSpread({}, result, _additionalRules);
-    } // Rule-level stuff below
-
+    }
 
     var existingRules = result[parentSelector] || [];
 
@@ -5346,6 +5459,15 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
       return value;
     };
 
+    if (isPatternBlock) {
+      var matchedRules = flow(value, mapMerge(function (targetProp, outputValue) {
+        if (has(targetProp)(props$$1)) {
+          return flow(outputValue, whenFunctionCallWith(props$$1[targetProp]), parseNested(parentSelector));
+        }
+      }));
+      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(matchedRules[parentSelector]))));
+    }
+
     if (isPatternMatch) {
       var defaultValue = value.default,
           opt = value.options,
@@ -5353,15 +5475,13 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
 
       var options = merge(globalOptions, opt);
       var DF = valueAsFunction(defaultValue)(props$$1);
-      var allPropNames = Object.keys(props$$1);
-      var allMatchers = Object.keys(matchers);
-      var matchingProps = intersection(allPropNames, allMatchers);
+      var intersectedMatchers = filter(contains$1(__, keys(props$$1)), keys(matchers)); /// Maintains Order of matcher Keys
+
       var matchedPropName;
       var reducer = reduceWhile(isUndefinedOrFalse, function (previous, propName) {
         matchedPropName = propName;
-        return pipe(prop(__, matchers), lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(props$$1[propName], props$$1))(propName);
-      }, false, matchingProps);
-      var matchedMatcher = prop(matchedPropName, matchers);
+        return flow(propName, prop(__, matchers), lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(props$$1[propName], props$$1), whenFunctionCallWith(props$$1));
+      }, false, intersectedMatchers);
       var matchedProp = prop(matchedPropName, props$$1);
       var computedValue = pipe(falseToNull, defaultTo(DF))(reducer);
       var nonResponisiveComputedValue = computedValue;
@@ -5369,29 +5489,10 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
 
       if (isResponsiveBoolean) {
         computedValue = matchedProp;
-      } // if (matchedMatcher && matchedProp){
-      //   const isMatchedMatcherString = isString(matchedMatcher)
-      //   const matchedPropNotAString = !is(Object)
-      //   const isResponsiveBoolean = isString(matchedMatcher) && is(Object, matchedProp)
-      //   console.log({ isResponsiveBoolean})
-      // }
-      // if (isUndefinedOrFalse(computedValue)) {
-      //   // logger.matchNotFound({ ruleName: key });
-      //   return result
-      // }
-      /// If prop passed is a function, execute it
-      /// Rather storing returnAsIs function, check FunctionKey LookUp
-
-
-      if (key === 'debugMode') {
-        console.log(computedValue);
       } /// This is to check if defaultValue is a Function
 
 
-      computedValue = isFunction(computedValue) ? computedValue(props$$1) : computedValue; // if (isUndefinedOrFalse(computedValue)) {
-      //   // logger.matchNotFound({ ruleName: key });
-      //   return result
-      // }
+      computedValue = isFunction(computedValue) ? computedValue(props$$1) : computedValue;
 
       var computeOptions = function computeOptions(val) {
         if (options && val) {
@@ -5406,8 +5507,9 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
             var absN = isNeg ? val.slice(1) : val;
             val = getThemeAttr("".concat(themeKey, ".").concat(absN), val)(props$$1);
             val = isNeg ? isNumber(val) ? val * -1 : '-' + val : val;
-          } // console.log(key, val,getter)
+          }
 
+          getter = getter || DEFAULT_RULE_GETTER_LOOKUP[key];
 
           if (getter) {
             val = pipe(lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(val, props$$1))(getter);
@@ -5455,11 +5557,7 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
     }
 
     if (isPlaceHolderSelector) {
-      // console.log({ result, parentSelector, existingRules: filterNilAndEmpty(existingRules), f: whenFunctionCallWith(props)(value)})
-      // console.log(aaa)
-
-
-      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat([whenFunctionCallWith(props$$1)(value)]))); // return add
+      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat([whenFunctionCallWith(props$$1)(value)])));
     }
 
     return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat([createStyleRule(key, whenFunctionCallWith(props$$1)(value))])));
@@ -5467,26 +5565,21 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
 });
 
 var ruleCleaner = function ruleCleaner(rules) {
-  return filterNilAndEmpty(Object.entries(filterNilAndEmpty(rules)).reduce(function (result, _ref4) {
-    var _ref5 = _slicedToArray(_ref4, 2),
-        key = _ref5[0],
-        value = _ref5[1];
+  return filterNilAndEmpty(Object.entries(filterNilAndEmpty(rules)).reduce(function (result, _ref6) {
+    var _ref7 = _slicedToArray(_ref6, 2),
+        key = _ref7[0],
+        value = _ref7[1];
 
     if (isArray(value)) {
-      var joinedRules = filterNilAndEmpty(mergeAllDeepLeft(value));
-      if (isEmpty(key.trim())) return mergeDeepLeft(result, joinedRules);
+      var joinedRules = filterNilAndEmpty(mergeAllDeepRight(value));
+      if (isEmpty(key.trim())) return mergeDeepRight(result, joinedRules);
       var key2 = isPseudoSelector(key) ? '&' + key : key;
-      return mergeDeepLeft(result, _defineProperty({}, key2, joinedRules));
-    }
-
-    if (isEmpty(value)) {
-      console.log('empty Vale');
-      return result;
+      return mergeDeepRight(result, _defineProperty({}, key2, joinedRules));
     }
 
     if (isObjectLiteral(value) && isAtRule(key)) {
       var innerRuleStrings = ruleCleaner(value);
-      return mergeDeepLeft(result, _defineProperty({}, key, innerRuleStrings));
+      return mergeDeepRight(result, _defineProperty({}, key, innerRuleStrings));
     }
 
     console.error('Styler had an abnormal Rule Set:', {
@@ -5495,14 +5588,10 @@ var ruleCleaner = function ruleCleaner(rules) {
     });
     return filterNilAndEmpty(result);
   }, {}));
-}; // const styler = rules => props => ruleCleaner(ruleParser('', props, rules))
-
+};
 
 var styler = curry(function (rules, props$$1) {
-  if (isArray(rules)) return pipe(map(pipe(ruleParser('', props$$1), ruleCleaner)), mergeAllDeepLeft)(rules); // console.log(
-  //   pipe(ruleParser('', props), ruleCleaner, filterNilAndEmpty)(rules)
-  // )
-
+  if (isArray(rules)) return pipe(map(pipe(ruleParser('', props$$1), ruleCleaner)), mergeAllDeepRight)(rules);
   return pipe(ruleParser('', props$$1), ruleCleaner)(rules);
 });
 
@@ -6105,6 +6194,7 @@ exports.px = px;
 exports.rem = rem;
 exports.em = em;
 exports.pct = pct;
+exports.getThemeAttrFB = getThemeAttrFB;
 exports.alignContent = alignContent;
 exports.alignItems = alignItems;
 exports.alignSelf = alignSelf;

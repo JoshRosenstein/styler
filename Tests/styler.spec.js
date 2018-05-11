@@ -88,6 +88,36 @@ describe('Styler', () => {
       expect(result).toEqual({ border: '1px solid #ccc', color: 'dodgerblue' })
     })
 
+    it('will merge block of styles for a block pattern correctly', () => {
+      const testBlock = styler({
+        cursor: 'pointer',
+        display: 'inline-block',
+        minHeight: '1em',
+        outline: 'none',
+        border: 'none',
+        __match: {
+          mode: {
+            fontWeight: 'bold',
+            color: 'purple'
+          },
+          nextOne: value => ({
+            color: value,
+            border: '1px solid #ccc'
+          })
+        }
+      })
+      const result = testBlock({ nextOne: 'dodgerblue', mode: 'hi there' })
+      expect(result).toEqual({
+        border: '1px solid #ccc',
+        color: 'dodgerblue',
+        cursor: 'pointer',
+        display: 'inline-block',
+        fontWeight: 'bold',
+        minHeight: '1em',
+        outline: 'none'
+      })
+    })
+
     it('Can return propValue using Custom', () => {
       const testProps = {
         returnPropValue: 'ThisWillBeReturned'

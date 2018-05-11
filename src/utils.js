@@ -34,7 +34,8 @@ import {
   identity,
   toPairs,
   reduceRight,
-  test
+  test,
+  mergeDeepRight
 } from 'ramda'
 import defaultTheme from './defaultTheme'
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -47,6 +48,7 @@ export const isTruthy = either(Boolean, equals(0))
 export const isTrueBool = both(isBool, isTruthy)
 
 export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
+export const mergeAllDeepRight = reduce(mergeDeepRight, {})
 
 export const isNonZeroNumber = both(is(Number), complement(equals(0)))
 export const appendString = flip(concat)
@@ -88,7 +90,7 @@ export const startsWithAny = (...searchStrs) =>
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(split('.', attr))(fallBackObj)
 
-const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
+export const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
   pathOr(
     getThemeFallback(fallBackObj)(attr, defaultTo),
     split('.', concat('theme.', attr))
