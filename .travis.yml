@@ -3,4 +3,6 @@ node_js:
   - "8"
 script: "npm run test:coverage"
 
-after_success: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && jest"
+
+after_success:
+  - cat ./coverage/lcov.info | ./node_modules/codecov/bin/codecov
