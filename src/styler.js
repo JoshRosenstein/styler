@@ -56,7 +56,8 @@ import {
   equals,
   reduce,
   mergeWith,
-  concat
+  concat,
+  propOr
 } from 'ramda'
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
@@ -240,7 +241,10 @@ export const ruleParser = curry((parentSelector, props, obj) => {
 
         return {
           ...result,
-          [parentSelector]: [...existingRules, ...matchedRules[parentSelector]]
+          [parentSelector]: [
+            ...existingRules,
+            ...propOr({}, parentSelector, matchedRules)
+          ]
         }
       }
 

@@ -4605,6 +4605,39 @@ var project =
 useWith(_map, [pickAll, identity]); // passing `identity` gives correct arity
 
 /**
+ * If the given, non-null object has an own property with the specified name,
+ * returns the value of that property. Otherwise returns the provided default
+ * value.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.6.0
+ * @category Object
+ * @sig a -> String -> Object -> a
+ * @param {*} val The default value.
+ * @param {String} p The name of the property to return.
+ * @param {Object} obj The object to query.
+ * @return {*} The value of given property of the supplied object or the default value.
+ * @example
+ *
+ *      var alice = {
+ *        name: 'ALICE',
+ *        age: 101
+ *      };
+ *      var favorite = R.prop('favoriteLibrary');
+ *      var favoriteWithDefault = R.propOr('Ramda', 'favoriteLibrary');
+ *
+ *      favorite(alice);  //=> undefined
+ *      favoriteWithDefault(alice);  //=> 'Ramda'
+ */
+
+var propOr =
+/*#__PURE__*/
+_curry3(function propOr(val, p, obj) {
+  return obj != null && _has(p, obj) ? obj[p] : val;
+});
+
+/**
  * Returns a single item by iterating through the list, successively calling
  * the iterator function and passing it an accumulator value and the current
  * value from the array, and then passing the result to the next call.
@@ -5459,7 +5492,7 @@ var ruleParser = curry(function (parentSelector, props$$1, obj) {
           return flow(outputValue, whenFunctionCallWith(props$$1[targetProp]), parseNested(parentSelector));
         }
       }));
-      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(matchedRules[parentSelector]))));
+      return _objectSpread({}, result, _defineProperty({}, parentSelector, _toConsumableArray(existingRules).concat(_toConsumableArray(propOr({}, parentSelector, matchedRules)))));
     }
 
     if (isPatternMatch) {
