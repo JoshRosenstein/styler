@@ -2,6 +2,8 @@
 
 ## @roseys/styler
 
+![Travis](https://img.shields.io/travis/JoshRosenstein/styler.svg?style=for-the-badge)
+
 
 
 ```sh

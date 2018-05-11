@@ -11,11 +11,9 @@
     "build:dev": "rollup -c",
     "watch": "rollup -c --watch",
     "size": "bundlesize",
-    "test": "yarn run coverage",
-    "test:size": "yarn run clean &&  rollup  && yarn run size",
-    "test:prod": "yarn run build:prod && jest  --no-cache --ci --runInBand",
-    "coverage": "jest --coverage --no-cache --ci --runInBand",
-    "test:watch": "jest --watchAll",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "reinstall": "yarn run clean && yarn"
   },
   "repository": {

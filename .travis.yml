@@ -1,5 +1,6 @@
 language: node_js
 node_js:
   - "8"
-after_success:
-  - node node_modules/.bin/jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+script: "npm run test:coverage"
+
+after_success: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && jest"
