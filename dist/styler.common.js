@@ -4268,6 +4268,42 @@ _curry2(function mergeDeepRight(lObj, rObj) {
 });
 
 /**
+ * Creates a new object with the own properties of the two provided objects.
+ * If a key exists in both objects:
+ * - and both associated values are also objects then the values will be
+ *   recursively merged.
+ * - otherwise the provided function is applied to associated values using the
+ *   resulting value as the new value associated with the key.
+ * If a key only exists in one object, the value will be associated with the key
+ * of the resulting object.
+ *
+ * @func
+ * @memberOf R
+ * @since v0.24.0
+ * @category Object
+ * @sig ((a, a) -> a) -> {a} -> {a} -> {a}
+ * @param {Function} fn
+ * @param {Object} lObj
+ * @param {Object} rObj
+ * @return {Object}
+ * @see R.mergeWith, R.mergeDeep, R.mergeDeepWithKey
+ * @example
+ *
+ *      R.mergeDeepWith(R.concat,
+ *                      { a: true, c: { values: [10, 20] }},
+ *                      { b: true, c: { values: [15, 35] }});
+ *      //=> { a: true, b: true, c: { values: [10, 20, 15, 35] }}
+ */
+
+var mergeDeepWith =
+/*#__PURE__*/
+_curry3(function mergeDeepWith(fn, lObj, rObj) {
+  return mergeDeepWithKey(function (k, lVal, rVal) {
+    return fn(lVal, rVal);
+  }, lObj, rObj);
+});
+
+/**
  * Creates a new object with the own properties of the two provided objects. If
  * a key exists in both objects, the provided function is applied to the values
  * associated with the key in each object, with the result being used as the
@@ -5403,7 +5439,7 @@ var mapMerge = curry(function (handlerFn, original) {
         key = _ref3[0],
         value = _ref3[1];
 
-    var combiner = mergeWith(concat(__), result);
+    var combiner = mergeDeepWith(concat(__), result);
     var handlerOutput = handlerFn(key, value);
     var newResult = handlerOutput && combiner(handlerOutput);
     return newResult || result;
