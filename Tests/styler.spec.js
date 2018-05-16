@@ -450,7 +450,39 @@ describe('Styler', () => {
       })
   })
 
-  describe('Match Block with Puesdo', () => {
+  describe('Match Block with Puesdo/Medias', () => {
+    it('Should Merge Deep Medias ', () => {
+   // column: isObject ? 'returnAsIs' : 'column',
+   const testStyler = styler({
+     backgroundColor: 'defaultBgColor',
+     __match: {
+       flexGrow: {
+         flexGrow: '1',
+       },
+       sm_flex: {
+         '@media(min-width: 576px)': {
+           display: 'flex',
+         },
+       },
+       sm_itemsCenter: {
+         '@media(min-width: 576px)': {
+           alignItems: 'center',
+         },
+       },
+       sm_wAuto: {
+         '@media(min-width: 576px)': {
+           width: 'auto',
+         },
+       },
+     },
+   })
+   const a = testStyler({ sm_flex: true, sm_wAuto: true })
+   expect(a).toEqual({
+     '@media(min-width: 576px)': { display: 'flex', width: 'auto' },
+     backgroundColor: 'defaultBgColor',
+   })
+ })
+
   it('Should Overide default', () => {
     // column: isObject ? 'returnAsIs' : 'column',
     const testStyler = styler({

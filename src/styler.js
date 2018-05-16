@@ -56,7 +56,7 @@ import {
   equals,
   reduce,
   mergeWith,
-  concat,
+  concat,mergeDeepWith,
   mergeDeepLeft,
   propOr,
 } from 'ramda'
@@ -156,7 +156,7 @@ const mapMerge = curry((handlerFn, original) => {
     original,
     toPairs,
     reduce((result, [key, value]) => {
-      const combiner = mergeWith(concat(__), result)
+        const combiner = mergeDeepWith(concat(__), result)
       const handlerOutput = handlerFn(key, value)
       const newResult = handlerOutput && combiner(handlerOutput)
       return newResult || result
@@ -429,3 +429,8 @@ const styler = curry((rules, props) => {
 })
 
 export default styler
+
+
+
+const bgColor2=({ backgroundColors })=>pipe(toPairs,map( ([className,color])=>
+                                                        defineClass(`bg-${className}`, {'background-color': color,})))(backgroundColors)
