@@ -2,10 +2,6 @@
  * @jest-environment node
  */
 
-/**
- * @jest-environment node
- */
-
 import stylerWithTheme from './utils/stylerWithTheme'
 import * as Utils from '../src/utils'
 
@@ -53,29 +49,56 @@ describe('StylerDefs', () => {
 
     test('PaddingResponsive', () => {
       const a = spaceStyle({
-        px: { mobile: 'md', tablet: 'md', laptop: 'sm', desktop: 'sm' }
+        px: { mobile: 'md', tablet: 'md', laptop: 'sm', desktop: 'sm' },
       })
 
       const b = spaceStyle({ px: ['md', 'md', 'sm', 'sm'] })
       const result = {
         '@media screen and (min-width:desktop)': {
           paddingLeft: '0.5rem',
-          paddingRight: '0.5rem'
+          paddingRight: '0.5rem',
         },
         '@media screen and (min-width:laptop)': {
           paddingLeft: '0.5rem',
-          paddingRight: '0.5rem'
+          paddingRight: '0.5rem',
         },
         '@media screen and (min-width:tablet)': {
           paddingLeft: '1rem',
-          paddingRight: '1rem'
+          paddingRight: '1rem',
         },
         paddingLeft: '1rem',
-        paddingRight: '1rem'
+        paddingRight: '1rem',
       }
 
       expect(a).toEqual(result)
       expect(b).toEqual(result)
+    })
+
+    test('PaddingResponsive2', () => {
+      const a = spaceStyle({
+        px: { tabletSm: 'md', tablet: 'md', laptop: 'sm', desktop: 'sm' },
+      })
+
+      const result = {
+        '@media screen and (min-width:desktop)': {
+          paddingLeft: '0.5rem',
+          paddingRight: '0.5rem',
+        },
+        '@media screen and (min-width:laptop)': {
+          paddingLeft: '0.5rem',
+          paddingRight: '0.5rem',
+        },
+        '@media screen and (min-width:tablet)': {
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+        },
+        '@media screen and (min-width:tabletSm)': {
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+        },
+      }
+
+      expect(a).toEqual(result)
     })
 
     test('PaddingMarginResponsive', () => {
@@ -83,36 +106,36 @@ describe('StylerDefs', () => {
         mobile: 'md',
         tablet: 'md',
         laptop: 'sm',
-        desktop: 'sm'
+        desktop: 'sm',
       }
       const a = spaceStyle({ px: spacing, my: spacing })
       const b = spaceStyle({
         px: ['md', 'md', 'sm', 'sm'],
-        my: ['md', 'md', 'sm', 'sm']
+        my: ['md', 'md', 'sm', 'sm'],
       })
       const result = {
         '@media screen and (min-width:desktop)': {
           marginBottom: '0.5rem',
           marginTop: '0.5rem',
           paddingLeft: '0.5rem',
-          paddingRight: '0.5rem'
+          paddingRight: '0.5rem',
         },
         '@media screen and (min-width:laptop)': {
           marginBottom: '0.5rem',
           marginTop: '0.5rem',
           paddingLeft: '0.5rem',
-          paddingRight: '0.5rem'
+          paddingRight: '0.5rem',
         },
         '@media screen and (min-width:tablet)': {
           marginBottom: '1rem',
           marginTop: '1rem',
           paddingLeft: '1rem',
-          paddingRight: '1rem'
+          paddingRight: '1rem',
         },
         marginBottom: '1rem',
         marginTop: '1rem',
         paddingLeft: '1rem',
-        paddingRight: '1rem'
+        paddingRight: '1rem',
       }
 
       expect(a).toEqual(result)

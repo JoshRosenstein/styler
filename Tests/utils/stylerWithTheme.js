@@ -1,4 +1,5 @@
-import { styler } from '../../src'
+import styler from '../../src/styler'
+//import styler from '../../src/unused/SS/styler'
 
 import withTheme from './withTheme'
 

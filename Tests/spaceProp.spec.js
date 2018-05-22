@@ -12,7 +12,7 @@ describe('SpaceProp', () => {
 
     expect(spaceProp('testProp')(testProps)).toEqual({
       '@media screen and (min-width:desktop)': { testProp: '1rem' },
-      '@media screen and (min-width:tablet)': { testProp: '1rem' }
+      '@media screen and (min-width:tablet)': { testProp: '1rem' },
     })
   })
 
@@ -22,12 +22,12 @@ describe('SpaceProp', () => {
     expect(spaceProp(['testProp', 'testProp2'])(testProps)).toEqual({
       '@media screen and (min-width:desktop)': {
         testProp: '1rem',
-        testProp2: '1rem'
+        testProp2: '1rem',
       },
       '@media screen and (min-width:tablet)': {
         testProp: '1rem',
-        testProp2: '1rem'
-      }
+        testProp2: '1rem',
+      },
     })
   })
 
@@ -36,24 +36,24 @@ describe('SpaceProp', () => {
       isSwitched: true,
       desktop: 'md',
       tablet: 'md',
-      theme
+      theme,
     }
     const testProps2 = {
       desktop: 'md',
       tablet: 'md',
-      theme
+      theme,
     }
 
     const cssPropFromProp = ({ isSwitched }) =>
       isSwitched ? 'SwitchedCssProp' : 'NotSwitchedCssProp'
     expect(spaceProp(cssPropFromProp)(testProps)).toEqual({
-      '@media screen and (min-width:desktop)': { SwitchedCssProp: '1rem' },
-      '@media screen and (min-width:tablet)': { SwitchedCssProp: '1rem' }
+      '@media screen and (min-width:desktop)': { switchedCssProp: '1rem' },
+      '@media screen and (min-width:tablet)': { switchedCssProp: '1rem' },
     })
 
     expect(spaceProp(cssPropFromProp)(testProps2)).toEqual({
-      '@media screen and (min-width:desktop)': { NotSwitchedCssProp: '1rem' },
-      '@media screen and (min-width:tablet)': { NotSwitchedCssProp: '1rem' }
+      '@media screen and (min-width:desktop)': { notSwitchedCssProp: '1rem' },
+      '@media screen and (min-width:tablet)': { notSwitchedCssProp: '1rem' },
     })
   }),
     it('SpaceProp Allows CSS prop to be nested by Dot Notation" ', () => {
@@ -61,40 +61,39 @@ describe('SpaceProp', () => {
         spaceProp('>:first-child.>*.margin')({
           desktop: 'md',
           tablet: 'md',
-          theme
-        })
+          theme,
+        }),
       )
 
       const testProps = {
-        testProp: 'thisShouldBeReturned'
+        testProp: 'thisShouldBeReturned',
       }
-      // {">*": {"margin": 1}, ">:first-child": {}}
+      //{">*": {"margin": 1}, ">:first-child": {}}
       expect(a).toEqual({
-        '>:first-child >*': {
-          '@media screen and (min-width:desktop)': { margin: '1rem' },
-          '@media screen and (min-width:tablet)': { margin: '1rem' }
-        }
+        '@media screen and (min-width:desktop)': {
+          '>:first-child >*': { margin: '1rem' },
+        },
+        '@media screen and (min-width:tablet)': {
+          '>:first-child >*': { margin: '1rem' },
+        },
       })
     }),
     it('SpaceProp Allows CSS prop to be nested by Dot Notation in Arrays" ', () => {
       const a = UnflattenObj(
         spaceProp(['>:first-child.>*.cssProp1', '>:first-child.>*.cssProp2'])({
           tablet: '2',
-          theme
-        })
+          theme,
+        }),
       )
 
       const testProps = {
-        testProp: 'thisShouldBeReturned'
+        testProp: 'thisShouldBeReturned',
       }
-      // {">*": {"margin": 1}, ">:first-child": {}}
+      //{">*": {"margin": 1}, ">:first-child": {}}
       expect(a).toEqual({
-        '>:first-child >*': {
-          '@media screen and (min-width:tablet)': {
-            cssProp1: '2',
-            cssProp2: '2'
-          }
-        }
+        '@media screen and (min-width:tablet)': {
+          '>:first-child >*': { cssProp1: '2', cssProp2: '2' },
+        },
       })
     })
 })

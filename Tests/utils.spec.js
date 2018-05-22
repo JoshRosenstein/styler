@@ -1,7 +1,6 @@
 /**
  * @jest-environment node
  */
-
 import stylerWithTheme from './utils/stylerWithTheme'
 import * as Utils from '../src/utils'
 import defaultTheme from '../src/defaultTheme'
@@ -135,13 +134,13 @@ describe('Basic Utils Tests', () => {
   describe('getThemeAttr', () => {
     it('Should Return Fallback Theme', () => {
       expect(Utils.getThemeAttr('breakpoints')({})).toEqual(
-        defaultTheme['breakpoints']
+        defaultTheme['breakpoints'],
       )
     })
 
     it('Should Return Theme from Props', () => {
       expect(Utils.getThemeAttr('breakpoints')({ theme })).toEqual(
-        theme['breakpoints']
+        theme['breakpoints'],
       )
     })
 

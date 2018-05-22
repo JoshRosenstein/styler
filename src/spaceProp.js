@@ -3,11 +3,9 @@ import {
   valueAsFunction,
   mapObjOf,
   isNotNilOrEmpty,
-  UnflattenObj,
-  lookUpValue,
-  pxToEm
+  UnflattenObj
 } from './utils'
-import { when, always, merge, pipe, objOf, keys, pick, __ } from 'ramda'
+import { when, always, merge, pipe, objOf, keys, pick } from 'ramda'
 import styler from './styler'
 
 export const BPProp = (cssProp = '', options = {}) => p => {
@@ -25,9 +23,8 @@ export const BPProp = (cssProp = '', options = {}) => p => {
           when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)),
 
           UnflattenObj
-        )(p),
-        p
-      )
+        )(p)
+      )(p)
     : {}
 }
 
@@ -35,16 +32,5 @@ export const BPProp = (cssProp = '', options = {}) => p => {
 
 const spaceProp = (cssProp = '', getter = 'pxToRem') => p =>
   BPProp(cssProp, { key: 'space', getter: getter })(p)
-
-export const minmaxProp = rules => p => {
-  const BP = lookUpValue('breakpoints', __, p)
-  const minWidth = p.min ? `(min-width:${pxToEm(BP(p.min))})` : ''
-  const maxWidth = p.max ? `(max-width:${pxToEm(BP(p.max))})` : ''
-  const and = minWidth && maxWidth ? 'and' : ''
-  // console.log({ minWidth, maxWidth })
-  if (!p.min && !p.max) return rules
-
-  return styler({ [`@media ${minWidth} ${and} ${maxWidth}`]: { ...rules } })
-}
 
 export default spaceProp
