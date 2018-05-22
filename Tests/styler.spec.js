@@ -4,31 +4,31 @@
 
 import stylerWithTheme from './utils/stylerWithTheme'
 import * as Utils from '../src/utils'
-import { styler, space, returnAsIs } from '../src'
+import { styler, returnAsIs } from '../src'
 
 describe('Styler', () => {
   describe('Simple Match Boolean Execution', () => {
     const testStyler = styler({
-      TestCSSProp: {
+      testCSSProp: {
         red: 'red',
         blue: 'blue',
         default: 'white'
       }
     })
     it('It Should return result of first Match', () => {
-      expect(testStyler({ red: true })).toEqual({ TestCSSProp: 'red' })
+      expect(testStyler({ red: true })).toEqual({ testCSSProp: 'red' })
     })
     it('It Should return blue', () => {
-      expect(testStyler({ blue: true })).toEqual({ TestCSSProp: 'blue' })
+      expect(testStyler({ blue: true })).toEqual({ testCSSProp: 'blue' })
     })
 
     it('It Should return result of first Match with multiple matches', () => {
       expect(testStyler({ red: true, blue: true })).toEqual({
-        TestCSSProp: 'red'
+        testCSSProp: 'red'
       })
     })
     it('It Should return default when no matches', () => {
-      expect(testStyler({})).toEqual({ TestCSSProp: 'white' })
+      expect(testStyler({})).toEqual({ testCSSProp: 'white' })
     })
     it('Should not depend on prop order', () => {
       const topSelector = '#meow'
@@ -49,10 +49,10 @@ describe('Styler', () => {
         }
       }
 
-      const result1 = styler(rules1, props1)
-      const result2 = styler(rules1, props2)
-      const result3 = styler(rules2, props1)
-      const result4 = styler(rules2, props2)
+      const result1 = styler(rules1)(props1)
+      const result2 = styler(rules1)(props2)
+      const result3 = styler(rules2)(props1)
+      const result4 = styler(rules2)(props2)
       expect(result1).toEqual(result2)
       expect(result3).toEqual(result4)
       expect(result1).not.toEqual(result3)
@@ -61,7 +61,7 @@ describe('Styler', () => {
 
   describe('Functional Matches Execution', () => {
     const testStyler = styler({
-      TestCSSProp: {
+      testCSSProp: {
         addOne: v => v,
         returnPropValue: v => v,
         returnAsIs: returnAsIs,
@@ -84,12 +84,12 @@ describe('Styler', () => {
           })
         }
       })
-      const result = testBlock({ mode: 'hi there', nextOne: 'dodgerblue' })
+      const result = testBlock({ nextOne: 'dodgerblue', mode: 'hi there' })
       expect(result).toEqual({
-    border: '1px solid #ccc',
-    color: 'dodgerblue',
-    fontWeight: 'bold'
-  })
+        border: '1px solid #ccc',
+        color: 'dodgerblue',
+        fontWeight: 'bold'
+      })
     })
 
     it('will merge block of styles for a block pattern correctly', () => {
@@ -127,7 +127,7 @@ describe('Styler', () => {
         returnPropValue: 'ThisWillBeReturned'
       }
       const result = {
-        TestCSSProp: 'ThisWillBeReturned'
+        testCSSProp: 'ThisWillBeReturned'
       }
       expect(testStyler(testProps)).toEqual(result)
     })
@@ -137,7 +137,7 @@ describe('Styler', () => {
         returnAsIs: 'ThisWillBeReturned'
       }
       const result = {
-        TestCSSProp: 'ThisWillBeReturned'
+        testCSSProp: 'ThisWillBeReturned'
       }
       expect(testStyler(testProps)).toEqual(result)
     })
@@ -148,7 +148,7 @@ describe('Styler', () => {
         otherProp: 'blue'
       }
       const result = {
-        TestCSSProp: 'blue'
+        testCSSProp: 'blue'
       }
       expect(testStyler(testProps)).toEqual(result)
     })
@@ -160,7 +160,7 @@ describe('Styler', () => {
         }
       }
       const result = {
-        TestCSSProp: 'Themedblue'
+        testCSSProp: 'Themedblue'
       }
       expect(testStyler(testProps)).toEqual(result)
     })
@@ -168,7 +168,7 @@ describe('Styler', () => {
 
   describe('Styler accepts Functions Dependent on Props', () => {
     const ifFunction = ({ shouldExecute }) =>
-      shouldExecute ? { testCssProp: 'returned' } : {}
+      shouldExecute ? { testCSSProp: 'returned' } : {}
 
     const testStyler = stylerWithTheme(ifFunction)
 
@@ -177,7 +177,7 @@ describe('Styler', () => {
         shouldExecute: true
       })
     ).toEqual({
-      testCssProp: 'returned'
+      testCSSProp: 'returned'
     })
     expect(
       testStyler({
@@ -220,11 +220,9 @@ describe('Styler', () => {
   })
   describe('Can accept Arrays', () => {
     it('Should execute if a Single Array Objects', () => {
-      const testStyler = stylerWithTheme([
-        {
-          testCSSProp: 'returnThis'
-        }
-      ])
+      const testStyler = stylerWithTheme({
+        testCSSProp: 'returnThis'
+      })
 
       expect(testStyler({})).toEqual({
         testCSSProp: 'returnThis'
@@ -449,78 +447,4 @@ describe('Styler', () => {
         })
       })
   })
-
-  describe('Match Block with Puesdo/Medias', () => {
-    it('Should Merge Deep Medias ', () => {
-   // column: isObject ? 'returnAsIs' : 'column',
-   const testStyler = styler({
-     backgroundColor: 'defaultBgColor',
-     __match: {
-       flexGrow: {
-         flexGrow: '1',
-       },
-       sm_flex: {
-         '@media(min-width: 576px)': {
-           display: 'flex',
-         },
-       },
-       sm_itemsCenter: {
-         '@media(min-width: 576px)': {
-           alignItems: 'center',
-         },
-       },
-       sm_wAuto: {
-         '@media(min-width: 576px)': {
-           width: 'auto',
-         },
-       },
-     },
-   })
-   const a = testStyler({ sm_flex: true, sm_wAuto: true })
-   expect(a).toEqual({
-     '@media(min-width: 576px)': { display: 'flex', width: 'auto' },
-     backgroundColor: 'defaultBgColor',
-   })
- })
-
-  it('Should Overide default', () => {
-    // column: isObject ? 'returnAsIs' : 'column',
-    const testStyler = styler({
-      backgroundColor: 'defaultBgColor',
-      '&:hover': {
-        backgroundColor: 'defaultHoverBgColor',
-      },
-      __match: {
-        active: {
-          backgroundColor: 'activeBgColor',
-          '&:hover': {
-            backgroundColor: 'activeHoverBgColor',
-          },
-        },
-        disabled: {
-          backgroundColor: 'disabledBgColor',
-          '&:hover': {
-            backgroundColor: 'disabledHoverBgColor',
-          },
-        },
-      },
-    })
-    const a = testStyler({})
-    const b = testStyler({ active: true })
-    const c = testStyler({ disabled: true })
-    expect(a).toEqual({
-      '&:hover': { backgroundColor: 'defaultHoverBgColor' },
-      backgroundColor: 'defaultBgColor',
-    })
-    expect(b).toEqual({
-      '&:hover': { backgroundColor: 'activeHoverBgColor' },
-      backgroundColor: 'activeBgColor',
-    })
-    expect(c).toEqual({
-      '&:hover': { backgroundColor: 'disabledHoverBgColor' },
-      backgroundColor: 'disabledBgColor',
-    })
-  })
-})
-
 })
