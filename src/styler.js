@@ -111,7 +111,7 @@ const logError = (validTypes, givenKey) => givenValue => {
   )
 }
 
-const isSelector = startsWithAny('.', '#', '>')
+const isSelector = startsWithAny('.', '#', '>','&')
 const isAtRule = startsWith('@')
 const isPseudoSelector = startsWithAny(':', '[')
 const isPropertySelector = startsWith('!!')
