@@ -6369,7 +6369,7 @@ var style = proxyPropertyGetter(pseudoClassHandler(_objectSpread({}, pseudoCombi
 
 var formatName = function formatName(v) {
   return camelCase(v);
-}; //dasherize //camelCase
+}; // dasherize //camelCase
 
 var asPseudoElement$1 = function asPseudoElement(key) {
   return "::".concat(formatName(key));
@@ -6402,7 +6402,7 @@ var logError = function logError(validTypes, givenKey) {
   };
 };
 
-var isSelector = startsWithAny('.', '#', '>');
+var isSelector = startsWithAny('.', '#', '>', '&');
 var isAtRule = startsWith('@');
 var isPseudoSelector = startsWithAny(':', '[');
 var isPropertySelector = startsWith('!!');
@@ -6658,7 +6658,7 @@ var inlinePattern2 = function inlinePattern2(_ref13) {
         var themeKey = options.key,
             getter = options.getter; /// If options was not provided, check default lookUp
 
-        themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP(key); //console.log(DEFAULT_RULE_KEY_LOOKUP('margin'))
+        themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP(key); // console.log(DEFAULT_RULE_KEY_LOOKUP('margin'))
 
         if (themeKey && isString(val)) {
           /// Check Strip Negative Before lookingUp
@@ -6707,7 +6707,7 @@ var inlinePattern2 = function inlinePattern2(_ref13) {
         var currentVal = when(both(always(isResponsiveBoolean), isBool), ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null)))(breakpoints[bpKey]);
         var res = isNil(computeOptions(currentVal)) ? {} : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1 ? objOf(key, computeOptions(currentVal)) : mapObjOf("@media screen and (min-width:".concat(minWidth, ")"), objOf(key, computeOptions(currentVal)));
         return mergeDeepRight(acc, res);
-      }, {}); //console.log(CSSObj)
+      }, {}); // console.log(CSSObj)
 
       return parseNested(parentSelector)(CSSObj);
     }
@@ -6727,7 +6727,7 @@ var parseAllStyles = parseStyleMetaData({
         results = _ref14.results;
     return function (key, value) {
       var res = addAtRule(key, flow(value, asNewParser(parentSelector)));
-      if (isEmpty(res)) console.log('aa'); //console.log('emptty', { parentSelector, results, res })
+      if (isEmpty(res)) console.log('aa'); // console.log('emptty', { parentSelector, results, res })
 
       return addAtRule(key, flow(value, asNewParser(parentSelector)));
     };
@@ -6741,7 +6741,7 @@ var parseAllStyles = parseStyleMetaData({
     return function (extraSelector, extraRules) {
       // console.log('combinedSelector----------')
       //  const newSelectors = extendSelector(extraSelector)
-      var newSelectors = createNestedSelector(parentSelector, extraSelector); //console.log({ extraSelector, newSelectors, extraRules })
+      var newSelectors = createNestedSelector(parentSelector, extraSelector); // console.log({ extraSelector, newSelectors, extraRules })
 
       return flow(extraRules, parseNested(newSelectors));
     };
@@ -6766,10 +6766,10 @@ var parseAllStyles = parseStyleMetaData({
             propName = _ref19[0],
             rulesForProp = _ref19[1];
 
-        //console.log(parentSelector, accumulated, [propName, rulesForProp])
+        // console.log(parentSelector, accumulated, [propName, rulesForProp])
         // if (parentSelector[0] === 'debug')
         //   console.log(parentSelector, accumulated.toJS(), [propName, rulesForProp])
-        if (flow(props$$1, has(propName))) return flow(rulesForProp, whenFunctionCallWith(props$$1[propName]), parseNestedWithResult(accumulated, parentSelector));
+        if (flow(props$$1, has(propName))) return flow(rulesForProp, whenFunctionCallWith(props$$1[propName], props$$1), parseNestedWithResult(accumulated, parentSelector));
         return accumulated;
       }, results));
     };
@@ -6812,7 +6812,7 @@ var parseAllStyles = parseStyleMetaData({
           flow(chain(extendSelector)(targetAttrs), parseStyleBlockWith(props$$1))
         );
       }), _defineProperty(_handlers, KINDS.COMBINATOR_AND, function (targetAttrs) {
-        return (//flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
+        return (// flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
           flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props$$1))
         );
       }), _handlers);

@@ -20,13 +20,13 @@ import {
   mergeAllDeepRight,
   filterNilAndEmpty,
   isBool,
-  isTrueBool,
+  isTrueBool
 } from './utils'
 
 import {
   DEFAULT_RULE_KEY_LOOKUP,
   DEFAULT_RULE_GETTER_LOOKUP,
-  DEFAULT_FUNCTIONS_LOOKUP,
+  DEFAULT_FUNCTIONS_LOOKUP
 } from './stylerLookups'
 import {
   curry,
@@ -70,12 +70,12 @@ import {
   isEmpty,
   filter,
   either,
-  contains,
+  contains
 } from 'ramda'
 
 import * as R from 'ramda'
 import { getDescriptor, KINDS } from './helpers/style'
-const formatName = v => camelCase(v) //dasherize //camelCase
+const formatName = v => camelCase(v) // dasherize //camelCase
 
 const asPseudoSelector = key => `:${formatName(key)}`
 const asPseudoElement = key => `::${formatName(key)}`
@@ -97,21 +97,21 @@ const createNestedSelector = (parent, child) => {
 const logError = (validTypes, givenKey) => givenValue => {
   console.error(
     `Shades could not parse the style for ${JSON.stringify(
-      givenKey,
+      givenKey
     )} because the provided value type (${flow(
       givenValue,
       type,
-      JSON.stringify,
-    )}) does not match any valid types (${flow(validTypes, join(', '))})`,
+      JSON.stringify
+    )}) does not match any valid types (${flow(validTypes, join(', '))})`
   )
 
   throw new TypeError(
     `Could not parse the style for ${givenKey} because the provided value type (${typeof givenValue})
-    does not match any valid types (${join(', ', validTypes)})`,
+    does not match any valid types (${join(', ', validTypes)})`
   )
 }
 
-const isSelector = startsWithAny('.', '#', '>','&')
+const isSelector = startsWithAny('.', '#', '>', '&')
 const isAtRule = startsWith('@')
 const isPseudoSelector = startsWithAny(':', '[')
 const isPropertySelector = startsWith('!!')
@@ -127,7 +127,7 @@ const isPseudoElement = isOneOf(
   'grammarError',
   'placeholder',
   'selection',
-  'spellingError',
+  'spellingError'
 )
 
 // Special property selectors typically start with !!, so this removes those
@@ -152,17 +152,17 @@ const findKeyForValue = (needle, fallback) => haystack =>
     toPairs,
     find(([key, value]) => value === needle),
     defaultTo([fallback, true]),
-    firstItem,
+    firstItem
   )
 
 const iterateUntilResult = curry((computeFn, list) => {
   const reduceWhileInvalid = iterateFn =>
     reduceWhile(isUndefinedOrFalse, iterateFn, false)
   const iterateObject = reduceWhileInvalid((previous, [key, value]) =>
-    computeFn(key, value),
+    computeFn(key, value)
   )
   const iterateList = reduceWhileInvalid((previous, current) =>
-    computeFn(current),
+    computeFn(current)
   )
 
   if (flow(list, isObjectLiteral)) return flow(list, toPairs, iterateObject)
@@ -177,11 +177,11 @@ const createStyleProperty = curry((key, value) => {
   const ruleValue = flow(
     value,
     when(isArray).then(join(', ')),
-    wrapContentString(key),
+    wrapContentString(key)
   )
 
   return {
-    [ruleKey]: ruleValue,
+    [ruleKey]: ruleValue
   }
 })
 
@@ -189,7 +189,7 @@ const appendWith = lastValue => firstValue => [firstValue, lastValue].join('')
 
 const combinators = (
   parentSelector,
-  { props, ...extraCombinators },
+  { props, ...extraCombinators }
 ) => results => {
   const mergeWithResult = additionalRules => results.mergeDeep(additionalRules)
   const mergeWithParentSelector = additionalRules =>
@@ -198,22 +198,22 @@ const combinators = (
   const addToSelector = curry((targetSelector, additionalRules) =>
     flow(
       results,
-      R.over(R.lensProp(targetSelector), x => merge(x || {}, additionalRules)),
-    ),
+      R.over(R.lensProp(targetSelector), x => merge(x || {}, additionalRules))
+    )
   )
 
   return {
     addAtRule: curry((atRuleKey, nestedMap) =>
       flow(
         results,
-        R.over(R.lensProp(atRuleKey), x => mergeDeepRight(x || {}, nestedMap)),
-      ),
+        R.over(R.lensProp(atRuleKey), x => mergeDeepRight(x || {}, nestedMap))
+      )
     ),
     addRuleBlock: curry((targetSelector, givenRules) =>
-      flow(givenRules, addToSelector(targetSelector)),
+      flow(givenRules, addToSelector(targetSelector))
     ),
     addStyle: curry((key, value) =>
-      compose(addToSelector(parentSelector), createStyleProperty)(key, value),
+      compose(addToSelector(parentSelector), createStyleProperty)(key, value)
     ),
 
     extendSelector: trailingSelector => {
@@ -223,7 +223,7 @@ const combinators = (
     extendSelector2: trailingSelector => {
       return flow(
         isPseudoSelector(parentSelector) ? '&' : 'ss',
-        map(appendWith(trailingSelector)),
+        map(appendWith(trailingSelector))
       )
     },
 
@@ -232,7 +232,7 @@ const combinators = (
     propExists: targetProp => has(stripPropertyBangs(targetProp), props),
     props,
     results,
-    ...extraCombinators,
+    ...extraCombinators
   }
 }
 
@@ -241,22 +241,22 @@ const parseStyleMetaData = ruleResponder => {
     parentSelector,
     props,
     options = {},
-    initialResult = {},
+    initialResult = {}
   }) => rules => {
     const parseNestedWithResult = curry(
       (givenResult, givenSelectors, givenNestedRules) =>
         styleParser({
           parentSelector: givenSelectors,
           initialResult: givenResult,
-          props,
-        })(givenNestedRules),
+          props
+        })(givenNestedRules)
     )
 
     if (isFunction(rules))
       return flow(
         rules,
         whenFunctionCallWith(props),
-        parseNestedWithResult(initialResult, parentSelector),
+        parseNestedWithResult(initialResult, parentSelector)
       )
 
     const asNewParser = parseNestedWithResult({})
@@ -275,7 +275,7 @@ const parseStyleMetaData = ruleResponder => {
               parseNestedWithResult(accumulated, parentSelector, valueToParse)
             return handler(parseNestedReduced)(key, value) || accumulated
           }),
-        asNewParser,
+        asNewParser
       })
 
       const isStyleSymbol = isSymbol(key)
@@ -300,10 +300,10 @@ const parseStyleMetaData = ruleResponder => {
           combinedSelector: isCombiningSelector,
           pseudoElement: shouldBePseudoElement,
           blockPattern: isPatternBlock,
-          inlinePattern: isInlinePattern,
+          inlinePattern: isInlinePattern
         },
         findKeyForValue(true),
-        fallbackTo('style'),
+        fallbackTo('style')
       )
 
       const responder = flow(getCombinatorsFor(result), ruleResponder[ruleType])
@@ -313,7 +313,7 @@ const parseStyleMetaData = ruleResponder => {
 
     const symbolRules = flow(
       Object.getOwnPropertySymbols(rules),
-      map(sym => [sym, rules[sym]]),
+      map(sym => [sym, rules[sym]])
     )
 
     return flow(
@@ -322,8 +322,8 @@ const parseStyleMetaData = ruleResponder => {
       concat(symbolRules),
       reduce(
         (result, [key, value]) => evaluateRule(result)(key, value),
-        initialResult,
-      ),
+        initialResult
+      )
     )
   }
 
@@ -346,17 +346,17 @@ const inlinePattern1 = ({ addStyle, parseNested, props }) => (key, value) => {
         value,
         tap(SetlastKey(key)),
         whenFunctionCallWith(props[key], props),
-        whenFunctionCallWith(props),
-      ),
+        whenFunctionCallWith(props)
+      )
     ),
-    fallbackTo(whenFunctionCallWith(props)(defaultValue)),
+    fallbackTo(whenFunctionCallWith(props)(defaultValue))
   )
 
   return computedStyle && addStyle(key, computedStyle)
 }
 
 const lookUpShortcut = curry((dictionary, value) =>
-  R_when(isString, converge(defaultTo, [identity, dictionary]), value),
+  R_when(isString, converge(defaultTo, [identity, dictionary]), value)
 )
 
 const inlinePattern2 = ({
@@ -364,7 +364,7 @@ const inlinePattern2 = ({
   parseNested,
   props,
   parentSelector,
-  globalOptions,
+  globalOptions
 }) => (key, value) => {
   const { default: defaultValue, options: opt, ...matchers } = value
   const options = merge(globalOptions, opt)
@@ -380,11 +380,11 @@ const inlinePattern2 = ({
         prop(__, matchers),
         lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
         whenFunctionCallWith(props[propName], props),
-        whenFunctionCallWith(props),
+        whenFunctionCallWith(props)
       )
     },
     false,
-    intersectedMatchers,
+    intersectedMatchers
   )
 
   let computedValue
@@ -399,7 +399,7 @@ const inlinePattern2 = ({
   if (!isEmpty(intersectedMatchers)) {
     computedValue = pipe(
       falseToNull,
-      defaultTo(whenFunctionCallWith(props)(defaultValue)),
+      defaultTo(whenFunctionCallWith(props)(defaultValue))
     )(reducer)
   }
 
@@ -420,7 +420,7 @@ const inlinePattern2 = ({
       /// If options was not provided, check default lookUp
 
       themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP(key)
-      //console.log(DEFAULT_RULE_KEY_LOOKUP('margin'))
+      // console.log(DEFAULT_RULE_KEY_LOOKUP('margin'))
       if (themeKey && isString(val)) {
         /// Check Strip Negative Before lookingUp
         const isNeg = /^-.+/.test(val)
@@ -434,7 +434,7 @@ const inlinePattern2 = ({
       if (getter) {
         val = pipe(
           lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP),
-          whenFunctionCallWith(val, props),
+          whenFunctionCallWith(val, props)
         )(getter)
       }
     }
@@ -471,7 +471,7 @@ const inlinePattern2 = ({
       const minWidth = pxToEm(getBp(bpKey))
       const currentVal = R_when(
         both(always(isResponsiveBoolean), isBool),
-        ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null)),
+        ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null))
       )(breakpoints[bpKey])
       const res = isNil(computeOptions(currentVal))
         ? {}
@@ -479,7 +479,7 @@ const inlinePattern2 = ({
           ? objOf(key, computeOptions(currentVal))
           : mapObjOf(
               `@media screen and (min-width:${minWidth})`,
-              objOf(key, computeOptions(currentVal)),
+              objOf(key, computeOptions(currentVal))
             )
 
       const mkey =
@@ -489,7 +489,7 @@ const inlinePattern2 = ({
 
       return mergeDeepRight(acc, res)
     }, {})
-    //console.log(CSSObj)
+    // console.log(CSSObj)
     return parseNested(parentSelector)(CSSObj)
   }
 
@@ -505,11 +505,11 @@ export const parseAllStyles = parseStyleMetaData({
     parentSelector,
     addAtRule,
     asNewParser,
-    results,
+    results
   }) => (key, value) => {
     const res = addAtRule(key, flow(value, asNewParser(parentSelector)))
     if (isEmpty(res)) console.log('aa')
-    //console.log('emptty', { parentSelector, results, res })
+    // console.log('emptty', { parentSelector, results, res })
     return addAtRule(key, flow(value, asNewParser(parentSelector)))
   },
 
@@ -518,41 +518,41 @@ export const parseAllStyles = parseStyleMetaData({
     parentSelector,
     extendSelector2,
     extendSelector,
-    parseNested,
+    parseNested
   }) => (extraSelector, extraRules) => {
     // console.log('combinedSelector----------')
     //  const newSelectors = extendSelector(extraSelector)
     const newSelectors = createNestedSelector(parentSelector, extraSelector)
-    //console.log({ extraSelector, newSelectors, extraRules })
+    // console.log({ extraSelector, newSelectors, extraRules })
     return flow(extraRules, parseNested(newSelectors))
   },
   pseudoElement: ({ addRuleBlock, pseudoElementSelector, parseNested }) => (
     pseudoName,
-    nestedRules,
+    nestedRules
   ) => {
     const newSelectors = pseudoElementSelector(pseudoName)
     return flow(nestedRules, parseNested(newSelectors))
   },
   blockPattern: ({ parseNestedWithResult, props, results, parentSelector }) => (
     unneededKey,
-    propsToMatch,
+    propsToMatch
   ) =>
     flow(
       propsToMatch,
       toPairs,
       reduce((accumulated, [propName, rulesForProp]) => {
-        //console.log(parentSelector, accumulated, [propName, rulesForProp])
+        // console.log(parentSelector, accumulated, [propName, rulesForProp])
 
         // if (parentSelector[0] === 'debug')
         //   console.log(parentSelector, accumulated.toJS(), [propName, rulesForProp])
         if (flow(props, has(propName)))
           return flow(
             rulesForProp,
-            whenFunctionCallWith(props[propName]),
-            parseNestedWithResult(accumulated, parentSelector),
+            whenFunctionCallWith(props[propName], props),
+            parseNestedWithResult(accumulated, parentSelector)
           )
         return accumulated
-      }, results),
+      }, results)
     ),
   inlinePattern: inlinePattern2,
   propertyMatch: ({
@@ -560,7 +560,7 @@ export const parseAllStyles = parseStyleMetaData({
     parseNested,
     parentSelector,
     props,
-    propExists,
+    propExists
   }) => (key, value) => {
     const propName = stripPropertyBangs(key)
 
@@ -568,7 +568,7 @@ export const parseAllStyles = parseStyleMetaData({
       return flow(
         value,
         whenFunctionCallWith(props[propName]),
-        parseNested(parentSelector),
+        parseNested(parentSelector)
       )
   },
   styleSymbol: ({
@@ -578,7 +578,7 @@ export const parseAllStyles = parseStyleMetaData({
     props,
     parseNested,
     parentSelector,
-    propExists,
+    propExists
   }) => (symbolKey, styleBlock) => {
     const parseStyleBlockWith = argsToPass => selector =>
       flow(styleBlock, whenFunctionCallWith(argsToPass), parseNested(selector))
@@ -596,8 +596,8 @@ export const parseAllStyles = parseStyleMetaData({
         //      flow(chain(extendSelector)(targetAttrs), parseStyleBlockWith(props)),
         flow(chain(extendSelector)(targetAttrs), parseStyleBlockWith(props)),
       [KINDS.COMBINATOR_AND]: targetAttrs =>
-        //flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
-        flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
+        // flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
+        flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props))
     }
 
     const { kind, value } = getDescriptor(symbolKey)
@@ -606,7 +606,7 @@ export const parseAllStyles = parseStyleMetaData({
   },
   style: ({ addStyle, props, reevaluate, parentSelector }) => (
     ruleName,
-    value,
+    value
   ) =>
     flow(
       value,
@@ -622,11 +622,11 @@ export const parseAllStyles = parseStyleMetaData({
             when(either(isString, isNumber))
               .then(addStyle(ruleName))
               .otherwise(
-                logError(['Object', 'Array', 'Number', 'String'], ruleName),
-              ),
-          ),
-      ),
-    ),
+                logError(['Object', 'Array', 'Number', 'String'], ruleName)
+              )
+          )
+      )
+    )
 })
 
 /**
@@ -643,7 +643,7 @@ export const stringifyRules = rules =>
       if (isAtRule(selectors)) {
         const innerRuleStrings = stringifyRules(styleRules)
         const wrappedWithAtRules = innerRuleStrings.map(
-          rule => `${selectors} { ${rule} }`,
+          rule => `${selectors} { ${rule} }`
         )
 
         return [...result, ...wrappedWithAtRules]
@@ -653,11 +653,11 @@ export const stringifyRules = rules =>
         styleRules,
         toPairs,
         map(createRuleString),
-        join(''),
+        join('')
       )
 
       return [...result, `${selectors} { ${joinedRules} }`]
-    }, []),
+    }, [])
   )
 
 export const ruleCleaner = rules =>
@@ -673,7 +673,7 @@ export const ruleCleaner = rules =>
       const cleanedRules = filterNilAndEmpty(styleRules || {})
       if (isEmpty(selectors.trim())) return mergeDeepRight(result, cleanedRules)
       return mergeDeepRight(result, { [selectors]: cleanedRules })
-    }, {}),
+    }, {})
   )
 
 const _styler = rules => props => {
@@ -683,19 +683,19 @@ const _styler = rules => props => {
       map(r =>
         parseAllStyles({
           parentSelector: '',
-          props,
-        })(r),
+          props
+        })(r)
       ),
       mergeAllDeepRight,
-      ruleCleaner,
+      ruleCleaner
     )
   }
   return flow(
     parseAllStyles({
       parentSelector: '',
-      props,
+      props
     })(rules),
-    ruleCleaner,
+    ruleCleaner
   )
 }
 
@@ -704,7 +704,7 @@ const styler = (...rules) => props =>
 const parseRulesNoDebug = (selector, props, rules) =>
   parseAllStyles({
     parentSelector: [selector],
-    props,
+    props
   })(rules)
 
 export default styler
