@@ -1,6 +1,6 @@
 {
   "name": "@roseys/styler",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "WIP- My css-in-js Utility functions",
   "keywords": [],
   "author": "Joshua Rosenstein",
@@ -90,7 +90,9 @@
     }
   },
   "eslintConfig": {
-      "extends": ["standard", "standard-jsx"]
-
+    "extends": [
+      "standard",
+      "standard-jsx"
+    ]
   }
 }
