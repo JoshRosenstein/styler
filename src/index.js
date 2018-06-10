@@ -1,9 +1,7 @@
-export { default as styler } from './styler'
-
-export { default as spaceProp, BPProp } from './spaceProp'
-
+export { default as styler } from "./styler";
 export {
   returnAsIs,
+  getThemeAttr,
   pxTo,
   pxToRem,
   pxToEm,
@@ -12,8 +10,10 @@ export {
   rem,
   em,
   pct,
-} from './utils'
-export * as styleDefs from './styleDefs'
+  ms
+} from "./utils";
+export { default as spaceProp, BPProp } from "./spaceProp";
+export * as styleDefs from "./styleDefs";
 
 export * as util from './utils'
 
@@ -95,5 +95,5 @@ export {
   textAlign,
   top,
   width,
-  zIndex,
-} from './styleDefs'
+  zIndex
+} from "./styleDefs";

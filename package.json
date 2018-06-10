@@ -14,7 +14,8 @@
     "test": "jest --coverage --no-cache --ci --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "reinstall": "yarn run clean && yarn"
+    "reinstall": "yarn run clean && yarn",
+    "lint": "standard src/*.js"
   },
   "repository": {
     "type": "git",
@@ -62,7 +63,8 @@
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-uglify": "3.0.0"
+    "rollup-plugin-uglify": "3.0.0",
+    "standard": "^11.0.1"
   },
   "bundlesize": [
     {
@@ -88,36 +90,7 @@
     }
   },
   "eslintConfig": {
-    "extends": [
-      "standard",
-      "standard-react",
-      "prettier",
-      "prettier/react"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "parser": "babel-eslint",
-    "rules": {
-      "prettier/prettier": "error",
-      "react/prop-types": 0,
-      "react/no-unused-prop-types": 0,
-      "standard/computed-property-even-spacing": 0,
-      "no-template-curly-in-string": 0,
-      "camelcase": 0
-    },
-    "env": {
-      "browser": true
-    },
-    "overrides": [
-      {
-        "files": [
-          "*.test.js"
-        ],
-        "env": {
-          "jest": true
-        }
-      }
-    ]
+      "extends": ["standard", "standard-jsx"]
+
   }
 }

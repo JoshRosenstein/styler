@@ -76,28 +76,8 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
 
-function _toArray(arr) {
-  return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
-}
-
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-}
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-}
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -124,10 +104,6 @@ function _iterableToArrayLimit(arr, i) {
   }
 
   return _arr;
-}
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
 function _nonIterableRest() {
@@ -628,86 +604,6 @@ var _xfBase = {
     return this.xf['@@transducer/result'](_result);
   }
 };
-
-var XAll =
-/*#__PURE__*/
-function () {
-  function XAll(f, xf) {
-    this.xf = xf;
-    this.f = f;
-    this.all = true;
-  }
-
-  XAll.prototype['@@transducer/init'] = _xfBase.init;
-
-  XAll.prototype['@@transducer/result'] = function (result) {
-    if (this.all) {
-      result = this.xf['@@transducer/step'](result, true);
-    }
-
-    return this.xf['@@transducer/result'](result);
-  };
-
-  XAll.prototype['@@transducer/step'] = function (result, input) {
-    if (!this.f(input)) {
-      this.all = false;
-      result = _reduced(this.xf['@@transducer/step'](result, false));
-    }
-
-    return result;
-  };
-
-  return XAll;
-}();
-
-var _xall =
-/*#__PURE__*/
-_curry2(function _xall(f, xf) {
-  return new XAll(f, xf);
-});
-
-/**
- * Returns `true` if all elements of the list match the predicate, `false` if
- * there are any that don't.
- *
- * Dispatches to the `all` method of the second argument, if present.
- *
- * Acts as a transducer if a transformer is given in list position.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category List
- * @sig (a -> Boolean) -> [a] -> Boolean
- * @param {Function} fn The predicate function.
- * @param {Array} list The array to consider.
- * @return {Boolean} `true` if the predicate is satisfied by every element, `false`
- *         otherwise.
- * @see R.any, R.none, R.transduce
- * @example
- *
- *      var equals3 = R.equals(3);
- *      R.all(equals3)([3, 3, 3, 3]); //=> true
- *      R.all(equals3)([3, 3, 1, 3]); //=> false
- */
-
-var all =
-/*#__PURE__*/
-_curry2(
-/*#__PURE__*/
-_dispatchable(['all'], _xall, function all(fn, list) {
-  var idx = 0;
-
-  while (idx < list.length) {
-    if (!fn(list[idx])) {
-      return false;
-    }
-
-    idx += 1;
-  }
-
-  return true;
-}));
 
 /**
  * Returns the larger of its two arguments.
@@ -1396,40 +1292,6 @@ _curry1(function values(obj) {
   }
 
   return vals;
-});
-
-/**
- * Makes a shallow clone of an object, setting or overriding the specified
- * property with the given value. Note that this copies and flattens prototype
- * properties onto the new object as well. All non-primitive properties are
- * copied by reference.
- *
- * @func
- * @memberOf R
- * @since v0.8.0
- * @category Object
- * @sig String -> a -> {k: v} -> {k: v}
- * @param {String} prop The property name to set
- * @param {*} val The new value
- * @param {Object} obj The object to clone
- * @return {Object} A new object equivalent to the original except for the changed property.
- * @see R.dissoc
- * @example
- *
- *      R.assoc('c', 3, {a: 1, b: 2}); //=> {a: 1, b: 2, c: 3}
- */
-
-var assoc =
-/*#__PURE__*/
-_curry3(function assoc(prop, val, obj) {
-  var result = {};
-
-  for (var p in obj) {
-    result[p] = obj[p];
-  }
-
-  result[prop] = val;
-  return result;
 });
 
 /**
@@ -2953,85 +2815,6 @@ _curry2(function divide(a, b) {
   return a / b;
 });
 
-var XTake =
-/*#__PURE__*/
-function () {
-  function XTake(n, xf) {
-    this.xf = xf;
-    this.n = n;
-    this.i = 0;
-  }
-
-  XTake.prototype['@@transducer/init'] = _xfBase.init;
-  XTake.prototype['@@transducer/result'] = _xfBase.result;
-
-  XTake.prototype['@@transducer/step'] = function (result, input) {
-    this.i += 1;
-    var ret = this.n === 0 ? result : this.xf['@@transducer/step'](result, input);
-    return this.n >= 0 && this.i >= this.n ? _reduced(ret) : ret;
-  };
-
-  return XTake;
-}();
-
-var _xtake =
-/*#__PURE__*/
-_curry2(function _xtake(n, xf) {
-  return new XTake(n, xf);
-});
-
-/**
- * Returns the first `n` elements of the given list, string, or
- * transducer/transformer (or object with a `take` method).
- *
- * Dispatches to the `take` method of the second argument, if present.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category List
- * @sig Number -> [a] -> [a]
- * @sig Number -> String -> String
- * @param {Number} n
- * @param {*} list
- * @return {*}
- * @see R.drop
- * @example
- *
- *      R.take(1, ['foo', 'bar', 'baz']); //=> ['foo']
- *      R.take(2, ['foo', 'bar', 'baz']); //=> ['foo', 'bar']
- *      R.take(3, ['foo', 'bar', 'baz']); //=> ['foo', 'bar', 'baz']
- *      R.take(4, ['foo', 'bar', 'baz']); //=> ['foo', 'bar', 'baz']
- *      R.take(3, 'ramda');               //=> 'ram'
- *
- *      var personnel = [
- *        'Dave Brubeck',
- *        'Paul Desmond',
- *        'Eugene Wright',
- *        'Joe Morello',
- *        'Gerry Mulligan',
- *        'Bob Bates',
- *        'Joe Dodge',
- *        'Ron Crotty'
- *      ];
- *
- *      var takeFive = R.take(5);
- *      takeFive(personnel);
- *      //=> ['Dave Brubeck', 'Paul Desmond', 'Eugene Wright', 'Joe Morello', 'Gerry Mulligan']
- * @symb R.take(-1, [a, b]) = [a, b]
- * @symb R.take(0, [a, b]) = []
- * @symb R.take(1, [a, b]) = [a]
- * @symb R.take(2, [a, b]) = [a, b]
- */
-
-var take =
-/*#__PURE__*/
-_curry2(
-/*#__PURE__*/
-_dispatchable(['take'], _xtake, function take(n, xs) {
-  return slice(0, n < 0 ? Infinity : n, xs);
-}));
-
 var XDropRepeatsWith =
 /*#__PURE__*/
 function () {
@@ -3297,109 +3080,6 @@ _curry1(function empty(x) {
   void 0;
 });
 
-var XFind =
-/*#__PURE__*/
-function () {
-  function XFind(f, xf) {
-    this.xf = xf;
-    this.f = f;
-    this.found = false;
-  }
-
-  XFind.prototype['@@transducer/init'] = _xfBase.init;
-
-  XFind.prototype['@@transducer/result'] = function (result) {
-    if (!this.found) {
-      result = this.xf['@@transducer/step'](result, void 0);
-    }
-
-    return this.xf['@@transducer/result'](result);
-  };
-
-  XFind.prototype['@@transducer/step'] = function (result, input) {
-    if (this.f(input)) {
-      this.found = true;
-      result = _reduced(this.xf['@@transducer/step'](result, input));
-    }
-
-    return result;
-  };
-
-  return XFind;
-}();
-
-var _xfind =
-/*#__PURE__*/
-_curry2(function _xfind(f, xf) {
-  return new XFind(f, xf);
-});
-
-/**
- * Returns the first element of the list which matches the predicate, or
- * `undefined` if no element matches.
- *
- * Dispatches to the `find` method of the second argument, if present.
- *
- * Acts as a transducer if a transformer is given in list position.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category List
- * @sig (a -> Boolean) -> [a] -> a | undefined
- * @param {Function} fn The predicate function used to determine if the element is the
- *        desired one.
- * @param {Array} list The array to consider.
- * @return {Object} The element found, or `undefined`.
- * @see R.transduce
- * @example
- *
- *      var xs = [{a: 1}, {a: 2}, {a: 3}];
- *      R.find(R.propEq('a', 2))(xs); //=> {a: 2}
- *      R.find(R.propEq('a', 4))(xs); //=> undefined
- */
-
-var find =
-/*#__PURE__*/
-_curry2(
-/*#__PURE__*/
-_dispatchable(['find'], _xfind, function find(fn, list) {
-  var idx = 0;
-  var len = list.length;
-
-  while (idx < len) {
-    if (fn(list[idx])) {
-      return list[idx];
-    }
-
-    idx += 1;
-  }
-}));
-
-/**
- * Returns a new list by pulling every item out of it (and all its sub-arrays)
- * and putting them in a new array, depth-first.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category List
- * @sig [a] -> [b]
- * @param {Array} list The array to consider.
- * @return {Array} The flattened list.
- * @see R.unnest
- * @example
- *
- *      R.flatten([1, 2, [3, 4], 5, [6, [7, 8, [9, [10, 11], 12]]]]);
- *      //=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
- */
-
-var flatten =
-/*#__PURE__*/
-_curry1(
-/*#__PURE__*/
-_makeFlat(true));
-
 /**
  * Returns a new function much like the supplied one, except that the first two
  * arguments' order is reversed.
@@ -3518,34 +3198,6 @@ reduceBy(function (acc, item) {
   acc.push(item);
   return acc;
 }, null)));
-
-/**
- * Returns `true` if the first argument is greater than the second; `false`
- * otherwise.
- *
- * @func
- * @memberOf R
- * @since v0.1.0
- * @category Relation
- * @sig Ord a => a -> a -> Boolean
- * @param {*} a
- * @param {*} b
- * @return {Boolean}
- * @see R.lt
- * @example
- *
- *      R.gt(2, 1); //=> true
- *      R.gt(2, 2); //=> false
- *      R.gt(2, 3); //=> false
- *      R.gt('a', 'z'); //=> false
- *      R.gt('z', 'a'); //=> true
- */
-
-var gt =
-/*#__PURE__*/
-_curry2(function gt(a, b) {
-  return a > b;
-});
 
 /**
  * Returns whether or not an object has an own property with the specified name
@@ -4210,95 +3862,6 @@ _curry1(function juxt(fns) {
   }, fns);
 });
 
-function _isNumber(x) {
-  return Object.prototype.toString.call(x) === '[object Number]';
-}
-
-/**
- * Returns the number of elements in the array by returning `list.length`.
- *
- * @func
- * @memberOf R
- * @since v0.3.0
- * @category List
- * @sig [a] -> Number
- * @param {Array} list The array to inspect.
- * @return {Number} The length of the array.
- * @example
- *
- *      R.length([]); //=> 0
- *      R.length([1, 2, 3]); //=> 3
- */
-
-var length =
-/*#__PURE__*/
-_curry1(function length(list) {
-  return list != null && _isNumber(list.length) ? list.length : NaN;
-});
-
-/**
- * Returns a lens for the given getter and setter functions. The getter "gets"
- * the value of the focus; the setter "sets" the value of the focus. The setter
- * should not mutate the data structure.
- *
- * @func
- * @memberOf R
- * @since v0.8.0
- * @category Object
- * @typedefn Lens s a = Functor f => (a -> f a) -> s -> f s
- * @sig (s -> a) -> ((a, s) -> s) -> Lens s a
- * @param {Function} getter
- * @param {Function} setter
- * @return {Lens}
- * @see R.view, R.set, R.over, R.lensIndex, R.lensProp
- * @example
- *
- *      var xLens = R.lens(R.prop('x'), R.assoc('x'));
- *
- *      R.view(xLens, {x: 1, y: 2});            //=> 1
- *      R.set(xLens, 4, {x: 1, y: 2});          //=> {x: 4, y: 2}
- *      R.over(xLens, R.negate, {x: 1, y: 2});  //=> {x: -1, y: 2}
- */
-
-var lens =
-/*#__PURE__*/
-_curry2(function lens(getter, setter) {
-  return function (toFunctorFn) {
-    return function (target) {
-      return map(function (focus) {
-        return setter(focus, target);
-      }, toFunctorFn(getter(target)));
-    };
-  };
-});
-
-/**
- * Returns a lens whose focus is the specified property.
- *
- * @func
- * @memberOf R
- * @since v0.14.0
- * @category Object
- * @typedefn Lens s a = Functor f => (a -> f a) -> s -> f s
- * @sig String -> Lens s a
- * @param {String} k
- * @return {Lens}
- * @see R.view, R.set, R.over
- * @example
- *
- *      var xLens = R.lensProp('x');
- *
- *      R.view(xLens, {x: 1, y: 2});            //=> 1
- *      R.set(xLens, 4, {x: 1, y: 2});          //=> {x: 4, y: 2}
- *      R.over(xLens, R.negate, {x: 1, y: 2});  //=> {x: -1, y: 2}
- */
-
-var lensProp =
-/*#__PURE__*/
-_curry1(function lensProp(k) {
-  return lens(prop(k), assoc(k));
-});
-
 /**
  * Adds together all the elements of a list.
  *
@@ -4602,38 +4165,6 @@ _curry2(function mergeDeepRight(lObj, rObj) {
 });
 
 /**
- * Creates a new object with the own properties of the two provided objects. If
- * a key exists in both objects, the provided function is applied to the values
- * associated with the key in each object, with the result being used as the
- * value associated with the key in the returned object.
- *
- * @func
- * @memberOf R
- * @since v0.19.0
- * @category Object
- * @sig ((a, a) -> a) -> {a} -> {a} -> {a}
- * @param {Function} fn
- * @param {Object} l
- * @param {Object} r
- * @return {Object}
- * @see R.mergeDeepWith, R.merge, R.mergeWithKey
- * @example
- *
- *      R.mergeWith(R.concat,
- *                  { a: true, values: [10, 20] },
- *                  { b: true, values: [15, 35] });
- *      //=> { a: true, b: true, values: [10, 20, 15, 35] }
- */
-
-var mergeWith =
-/*#__PURE__*/
-_curry3(function mergeWith(fn, l, r) {
-  return mergeWithKey(function (_, _l, _r) {
-    return fn(_l, _r);
-  }, l, r);
-});
-
-/**
  * Multiplies two numbers. Equivalent to `a * b` but curried.
  *
  * @func
@@ -4686,51 +4217,6 @@ function _of(x) {
 var of =
 /*#__PURE__*/
 _curry1(_of);
-
-// transforms the held value with the provided function.
-
-var Identity = function Identity(x) {
-  return {
-    value: x,
-    map: function map(f) {
-      return Identity(f(x));
-    }
-  };
-};
-/**
- * Returns the result of "setting" the portion of the given data structure
- * focused by the given lens to the result of applying the given function to
- * the focused value.
- *
- * @func
- * @memberOf R
- * @since v0.16.0
- * @category Object
- * @typedefn Lens s a = Functor f => (a -> f a) -> s -> f s
- * @sig Lens s a -> (a -> a) -> s -> s
- * @param {Lens} lens
- * @param {*} v
- * @param {*} x
- * @return {*}
- * @see R.prop, R.lensIndex, R.lensProp
- * @example
- *
- *      var headLens = R.lensIndex(0);
- *
- *      R.over(headLens, R.toUpper, ['foo', 'bar', 'baz']); //=> ['FOO', 'bar', 'baz']
- */
-
-
-var over =
-/*#__PURE__*/
-_curry3(function over(lens, f, x) {
-  // The value returned by the getter function is first transformed with `f`,
-  // then set as the value of an `Identity`. This is then mapped over with the
-  // setter function of the lens.
-  return lens(function (y) {
-    return Identity(f(y));
-  })(x).value;
-});
 
 function _createPartialApplicator(concat) {
   return _curry2(function (fn, args) {
@@ -4988,65 +4474,6 @@ var project =
 useWith(_map, [pickAll, identity]); // passing `identity` gives correct arity
 
 /**
- * If the given, non-null object has an own property with the specified name,
- * returns the value of that property. Otherwise returns the provided default
- * value.
- *
- * @func
- * @memberOf R
- * @since v0.6.0
- * @category Object
- * @sig a -> String -> Object -> a
- * @param {*} val The default value.
- * @param {String} p The name of the property to return.
- * @param {Object} obj The object to query.
- * @return {*} The value of given property of the supplied object or the default value.
- * @example
- *
- *      var alice = {
- *        name: 'ALICE',
- *        age: 101
- *      };
- *      var favorite = R.prop('favoriteLibrary');
- *      var favoriteWithDefault = R.propOr('Ramda', 'favoriteLibrary');
- *
- *      favorite(alice);  //=> undefined
- *      favoriteWithDefault(alice);  //=> 'Ramda'
- */
-
-var propOr =
-/*#__PURE__*/
-_curry3(function propOr(val, p, obj) {
-  return obj != null && _has(p, obj) ? obj[p] : val;
-});
-
-/**
- * Returns `true` if the specified object property satisfies the given
- * predicate; `false` otherwise. You can test multiple properties with
- * [`R.where`](#where).
- *
- * @func
- * @memberOf R
- * @since v0.16.0
- * @category Logic
- * @sig (a -> Boolean) -> String -> {String: a} -> Boolean
- * @param {Function} pred
- * @param {String} name
- * @param {*} obj
- * @return {Boolean}
- * @see R.where, R.propEq, R.propIs
- * @example
- *
- *      R.propSatisfies(x => x > 0, 'x', {x: 1, y: 2}); //=> true
- */
-
-var propSatisfies =
-/*#__PURE__*/
-_curry3(function propSatisfies(pred, name, obj) {
-  return pred(obj[name]);
-});
-
-/**
  * Returns a single item by iterating through the list, successively calling
  * the iterator function and passing it an accumulator value and the current
  * value from the array, and then passing the result to the next call.
@@ -5141,33 +4568,6 @@ _curryN(4, [], function _reduceWhile(pred, fn, a, list) {
 });
 
 /**
- * Replace a substring or regex match in a string with a replacement.
- *
- * @func
- * @memberOf R
- * @since v0.7.0
- * @category String
- * @sig RegExp|String -> String -> String -> String
- * @param {RegExp|String} pattern A regular expression or a substring to match.
- * @param {String} replacement The string to replace the matches with.
- * @param {String} str The String to do the search and replacement in.
- * @return {String} The result.
- * @example
- *
- *      R.replace('foo', 'bar', 'foo foo foo'); //=> 'bar foo foo'
- *      R.replace(/foo/, 'bar', 'foo foo foo'); //=> 'bar foo foo'
- *
- *      // Use the "g" (global) flag to replace all occurrences:
- *      R.replace(/foo/g, 'bar', 'foo foo foo'); //=> 'bar bar bar'
- */
-
-var replace =
-/*#__PURE__*/
-_curry3(function replace(regex, replacement, str) {
-  return str.replace(regex, replacement);
-});
-
-/**
  * Splits a string into an array of strings based on the given
  * separator.
  *
@@ -5191,57 +4591,6 @@ _curry3(function replace(regex, replacement, str) {
 var split =
 /*#__PURE__*/
 invoker(1, 'split');
-
-/**
- * Splits a given list or string at a given index.
- *
- * @func
- * @memberOf R
- * @since v0.19.0
- * @category List
- * @sig Number -> [a] -> [[a], [a]]
- * @sig Number -> String -> [String, String]
- * @param {Number} index The index where the array/string is split.
- * @param {Array|String} array The array/string to be split.
- * @return {Array}
- * @example
- *
- *      R.splitAt(1, [1, 2, 3]);          //=> [[1], [2, 3]]
- *      R.splitAt(5, 'hello world');      //=> ['hello', ' world']
- *      R.splitAt(-1, 'foobar');          //=> ['fooba', 'r']
- */
-
-var splitAt =
-/*#__PURE__*/
-_curry2(function splitAt(index, array) {
-  return [slice(0, index, array), slice(index, length(array), array)];
-});
-
-/**
- * Checks if a list starts with the provided values
- *
- * @func
- * @memberOf R
- * @since v0.24.0
- * @category List
- * @sig [a] -> Boolean
- * @sig String -> Boolean
- * @param {*} prefix
- * @param {*} list
- * @return {Boolean}
- * @example
- *
- *      R.startsWith('a', 'abc')                //=> true
- *      R.startsWith('b', 'abc')                //=> false
- *      R.startsWith(['a'], ['a', 'b', 'c'])    //=> true
- *      R.startsWith(['b'], ['a', 'b', 'c'])    //=> false
- */
-
-var startsWith =
-/*#__PURE__*/
-_curry2(function (prefix, list) {
-  return equals(take(prefix.length, list), prefix);
-});
 
 function _isRegExp(x) {
   return Object.prototype.toString.call(x) === '[object RegExp]';
@@ -5610,9 +4959,10 @@ var px = pxTo(1, 'px');
 var rem = appendUnit('rem');
 var em = appendUnit('em');
 var pct = appendUnit('%');
+var ms = appendUnit('ms');
 var isNilOrEmpty = either(isNil, isEmpty);
 var isNotNilOrEmpty = complement(isNilOrEmpty);
-var toArray$$1 = unless(anyPass([isArray, isNilOrEmpty]), of);
+var toArray = unless(anyPass([isArray, isNilOrEmpty]), of);
 var isNilOrEmptyOrFalse = either(isNilOrEmpty, equals(false));
 var filterNilAndEmpty = filter(complement(isNilOrEmpty));
 var filterNilOrEmptyOrFalse = filter(complement(isNilOrEmptyOrFalse));
@@ -5641,7 +4991,7 @@ var lookUpValue = curryN(3, function (themeKey, val, props$$1) {
   return isNeg ? isNumber(val) ? val * -1 : '-' + val : val;
 });
 var mapObjOf = curry(function (key, val) {
-  return pipe(toArray$$1, map(objOf(__, val)), mergeAll)(key);
+  return pipe(toArray, map(objOf(__, val)), mergeAll)(key);
 }); /// For quick nested selectors
 
 var nester = function nester(k, v) {
@@ -5655,14 +5005,6 @@ var UnflattenObj = pipe(toPairs, map(function (_ref) {
 
   return nester(k_, v_);
 }), mergeAllDeepLeft);
-var UPPERCASE_LETTERS = split('', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-var LOWERCASE_LETTERS = split('', 'abcdefghijklmnopqrstuvwxyz');
-var NUMERICS = split('', '0123456789');
-
-var ALPHABET = _toConsumableArray(UPPERCASE_LETTERS).concat(_toConsumableArray(LOWERCASE_LETTERS));
-
-var ALPHANUMERIC = _toConsumableArray(ALPHABET).concat(_toConsumableArray(NUMERICS));
-
 var isType = curry(function (expected, value) {
   return toLower(type(value)) === toLower(expected);
 });
@@ -5672,48 +5014,9 @@ var isFalsy = function isFalsy(value) {
 var reduceWhileFalsy = curry(function (handlerFn, list) {
   return reduceWhile(isFalsy, handlerFn, false, list);
 });
-var reduceRecord = function reduceRecord(initialValue) {
-  return function (handlerFn) {
-    return function (original) {
-      return flow(original, toPairs, reduce(function (result, currentPair) {
-        return handlerFn(result, currentPair) || result;
-      }, initialValue));
-    };
-  };
-};
-var mapMerge = curry(function (handlerFn, original) {
-  return flow(original, toPairs, reduce(function (result, _ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
-        key = _ref4[0],
-        value = _ref4[1];
-
-    var combiner = mergeWith(concat, result);
-    var handlerOutput = handlerFn(key, value);
-    var newResult = handlerOutput && combiner(handlerOutput);
-    return newResult || result;
-  }, {}));
-});
-var mapFilterRecord = function mapFilterRecord(handlerFn, original) {
-  return flow(original, toPairs, reduce(function (result, _ref5) {
-    var _ref6 = _slicedToArray(_ref5, 2),
-        key = _ref6[0],
-        value = _ref6[1];
-
-    var outputItem = handlerFn(key, value);
-
-    var newResult = outputItem && _toConsumableArray(result).concat([outputItem]);
-
-    return newResult || result;
-  }, []));
-};
 var includes = curry(function (comparator$$1, value) {
   return value.includes(comparator$$1);
-});
-var noop = function noop() {};
-var id = function id(value) {
-  return value;
-};
-var firstItem = nth(0); // export const isArray = isType('array')
+}); // export const isArray = isType('array')
 // export const isString = isType('string')
 // export const isFunction = isType('function')
 
@@ -5724,184 +5027,8 @@ var isMap = isType('map');
 var isDefined = complement(isNil);
 var isNotDefined = isNil;
 var isUndefinedOrFalse = either(isNotDefined, equals(false));
-var isNotArray = complement(isArray);
-var isNotString = complement(isString);
-var isNotFunction = complement(isFunction);
-var isNotObjectLiteral = complement(isObjectLiteral);
-var sliceFromFirstChar = splitAt(1);
-var reduceToString = curry(function (reduceFn, list) {
-  return reduce(reduceFn, '', list);
-});
 var returnAsIs = function returnAsIs(value) {
   return value;
-};
-var joinWith = function joinWith() {
-  for (var _len2 = arguments.length, values$$1 = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    values$$1[_key2] = arguments[_key2];
-  }
-
-  return function (separator) {
-    return values$$1.join(separator);
-  };
-};
-var getSubstring = function getSubstring(start, end) {
-  return function (original) {
-    return original.substring(start, end);
-  };
-};
-var getSubstringUntil = function getSubstringUntil(end) {
-  return getSubstring(0, end);
-};
-var getSubstringAfter = function getSubstringAfter(start) {
-  return getSubstring(start);
-};
-var startsWithAny = function startsWithAny() {
-  for (var _len3 = arguments.length, searchStrs = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    searchStrs[_key3] = arguments[_key3];
-  }
-
-  return anyPass(map(startsWith, searchStrs));
-}; // (searchStrs >> map(startsWith)) >> anyPass
-
-var combineStrings = function combineStrings() {
-  for (var _len4 = arguments.length, inputs = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    inputs[_key4] = arguments[_key4];
-  }
-
-  return inputs.filter(Boolean).join('');
-}; // Conditional chain expression :) stop using if & else, just use this.
-// Usage: ```
-// const actuallyDoTheThing = (value) => value + " is more than nothing";
-// const trySomethingElse = (value) => "I dunno what '" + value + "' is, sorry!";
-// const doSomething = when(value => value === "something").then(actuallyDoTheThing).otherwise(trySomethingElse)
-// doSomething("something"); // "something is more than nothing"
-// doSomething("not something") // => "I dunno what 'not something' is. sorry!"
-// ```
-
-var convertAndPipe = function convertAndPipe(values$$1) {
-  var callableValues = map(valueAsFunction, values$$1);
-  return pipe.apply(void 0, _toConsumableArray(callableValues));
-};
-
-var when$1 = function when$$1() {
-  for (var _len5 = arguments.length, predicates = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-    predicates[_key5] = arguments[_key5];
-  }
-
-  var evaluateWith = function evaluateWith() {
-    var handleTruthy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [id];
-    return function () {
-      var handleFalsy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [id];
-      return function () {
-        var predicateChain = convertAndPipe(predicates);
-        var truthyChain = convertAndPipe(handleTruthy);
-        var falsyChain = convertAndPipe(handleFalsy);
-
-        if (predicateChain.apply(void 0, arguments)) {
-          return truthyChain.apply(void 0, arguments);
-        }
-
-        return falsyChain.apply(void 0, arguments);
-      };
-    };
-  };
-
-  return {
-    // If predicate doesnt retun a truthy value, then just return the first
-    // argument given to the whole expression
-    onlyThen: function onlyThen() {
-      for (var _len6 = arguments.length, truthyHandlers = new Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-        truthyHandlers[_key6] = arguments[_key6];
-      }
-
-      return evaluateWith(truthyHandlers)();
-    },
-    then: function then() {
-      for (var _len7 = arguments.length, truthyHandlers = new Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-        truthyHandlers[_key7] = arguments[_key7];
-      }
-
-      return proxyFunction(evaluateWith(truthyHandlers)(), {
-        // If the predicate returns truthy, call handleTruthy with the
-        // last set of arguments, otherwise call handleFalsy
-        otherwise: function otherwise() {
-          for (var _len8 = arguments.length, falsyHandlers = new Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-            falsyHandlers[_key8] = arguments[_key8];
-          }
-
-          return evaluateWith(truthyHandlers)(falsyHandlers);
-        }
-      });
-    },
-    otherwise: function otherwise() {
-      for (var _len9 = arguments.length, falsyHandlers = new Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-        falsyHandlers[_key9] = arguments[_key9];
-      }
-
-      return evaluateWith()(falsyHandlers);
-    }
-  };
-};
-var safeJoinWith = function safeJoinWith(separator) {
-  return function () {
-    for (var _len10 = arguments.length, args = new Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
-      args[_key10] = arguments[_key10];
-    }
-
-    return flow(args, when$1(firstItem, isArray).then(firstItem), filter(Boolean), join(separator));
-  };
-};
-var joinString = function joinString(first) {
-  if (isArray(first)) return join('', first);
-
-  for (var _len11 = arguments.length, items = new Array(_len11 > 1 ? _len11 - 1 : 0), _key11 = 1; _key11 < _len11; _key11++) {
-    items[_key11 - 1] = arguments[_key11];
-  }
-
-  return join('', [first].concat(items));
-};
-var mapJoin = curry(function (mapFn, original) {
-  return reduceToString(useWith(joinString, [id, mapFn]))(original);
-});
-var capitalise = function capitalise(original) {
-  if (original.length <= 1) return toUpper(original);
-  return useWith(joinString, [toUpper, id]).apply(void 0, _toConsumableArray(sliceFromFirstChar(original)));
-};
-var unCapitalise = function unCapitalise(original) {
-  return useWith(joinString, [toLower, id]).apply(void 0, _toConsumableArray(sliceFromFirstChar(original)));
-};
-var startsWithCapital = function startsWithCapital(original) {
-  return contains$1(flow(original, sliceFromFirstChar, firstItem), UPPERCASE_LETTERS);
-};
-
-var splitAndCamelise = function splitAndCamelise() {
-  for (var _len12 = arguments.length, separators = new Array(_len12), _key12 = 0; _key12 < _len12; _key12++) {
-    separators[_key12] = arguments[_key12];
-  }
-
-  return function (original) {
-    return reduce(function (result, item) {
-      var _split = split(item, result),
-          _split2 = _toArray(_split),
-          first = _split2[0],
-          rest = _split2.slice(1);
-
-      return useWith(joinString, [id, mapJoin(capitalise)])(first, rest);
-    }, original)(separators);
-  };
-};
-
-var camscalRegex = new RegExp(/[\s_-]/, 'g');
-var capitalize = replace(/^[a-z]/, toUpper);
-var decapitalize = replace(/^[A-Z]/, toLower);
-var toCamelCase = function toCamelCase(original) {
-  if (original.length <= 1) return toLower(original);
-  return flow(original, splitAndCamelise('-', '_', ' '), unCapitalise);
-};
-var cleanCamscal = pipe(split(camscalRegex), reject(isEmpty), when(propSatisfies(gt(__, 1), 'length'), map(pipe(toLower, capitalize))), join(''), decapitalize);
-var camelCase = pipe(cleanCamscal, decapitalize);
-var dasherize = function dasherize(original) {
-  return original.trim().replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
 }; // Takes any value, and if the value is not a function, return a new function that
 // always returns that value; otherwise, if the value is already a function, just return it.
 
@@ -5911,158 +5038,84 @@ var valueAsFunction = function valueAsFunction(value) {
   };
   return value;
 };
-var proxyPropertyGetter = function proxyPropertyGetter(genericHandler) {
-  return new Proxy({}, {
-    get: function get(target, name) {
-      return Reflect.get(target, name) || genericHandler(name);
-    }
-  });
+var fallbackTo = function fallbackTo(fallback) {
+  return compose(defaultTo(fallback), falseToNull);
 };
-var proxyRecord = function proxyRecord(handlers) {
-  return function (originalRecord) {
-    return new Proxy(originalRecord, {
-      get: function get(target, name) {
-        return Reflect.get(target, name) || handlers[name];
-      }
-    });
-  };
+var falseToNull = function falseToNull(value) {
+  if (value === false) return null;
+  return value;
 };
-var proxyFunction = function proxyFunction(callHandler, chainHandlers) {
-  var outerProxy = new Proxy(callHandler, {
-    get: function get(target, name) {
-      return chainHandlers[name] || Reflect.get(target, name);
-    }
-  });
-  return outerProxy;
-}; // export const proxyFunctionWithPropertyHandler = (
-//   functionHandler,
-//   propertyHandler,
-// ) =>
-//   new Proxy(genericHandler, {
-//     get: (target, name) => {
-//       const output = genericHandler(name) || Reflect.get(target, name)
-//       return output
-//     },
-//   })
-
-var proxyPassthroughFunction = function proxyPassthroughFunction(beforePassthrough) {
-  return function (originalFn) {
-    return new Proxy(originalFn, {
-      get: function get(target, name) {
-        if (Reflect.has(target, name)) beforePassthrough(name);
-        return Reflect.get(target, name);
-      },
-      apply: function apply$$1(target, context, givenArgs) {
-        beforePassthrough();
-        return Reflect.apply(target, context, givenArgs);
-      }
-    });
+var iterateUntilResult = curry(function (computeFn, list) {
+  var reduceWhileInvalid = function reduceWhileInvalid(iterateFn) {
+    return reduceWhile(isUndefinedOrFalse, iterateFn, false);
   };
-}; // Type stuff
 
-var is$1 = proxyPropertyGetter;
-var dotPath = curry(function (pathStr, target) {
-  return path(split('.', pathStr), target);
+  var iterateObject = reduceWhileInvalid(function (previous, _ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        key = _ref4[0],
+        value = _ref4[1];
+
+    return computeFn(key, value);
+  });
+  var iterateList = reduceWhileInvalid(function (previous, current) {
+    return computeFn(current);
+  });
+  if (flow(list, isObjectLiteral)) return flow(list, toPairs, iterateObject);
+  return flow(list, iterateList);
 });
-var betterSet = function betterSet() {
-  var initialData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-  var internal = new Set(initialData);
-  var outerMethods = {
-    add: function add$$1() {
-      for (var _len13 = arguments.length, items = new Array(_len13), _key13 = 0; _key13 < _len13; _key13++) {
-        items[_key13] = arguments[_key13];
-      }
+var whenFunctionCallWith = function whenFunctionCallWith() {
+  for (var _len2 = arguments.length, argsToGive = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    argsToGive[_key2] = arguments[_key2];
+  }
 
-      return items.forEach(function (item) {
-        return internal.add(item);
-      }) || outerMethods;
-    },
-    remove: function remove$$1() {
-      for (var _len14 = arguments.length, items = new Array(_len14), _key14 = 0; _key14 < _len14; _key14++) {
-        items[_key14] = arguments[_key14];
-      }
-
-      return items.forEach(function (item) {
-        return internal.delete(item);
-      }) || outerMethods;
-    },
-    forEach: function forEach$$1() {
-      return internal.forEach.apply(internal, arguments) || outerMethods;
-    },
-    clear: function clear() {
-      return internal.clear() && outerMethods;
-    },
-    has: function has$$1() {
-      return internal.has.apply(internal, arguments);
-    },
-    map: function map$$1(mapFn) {
-      return flow(_toConsumableArray(internal).map(mapFn), betterSet);
-    },
-    filter: function filter$$1(filterFn) {
-      return flow(_toConsumableArray(internal).filter(filterFn), betterSet);
-    },
-    reduce: function reduce$$1(reduceFn, initialValue) {
-      return _toConsumableArray(internal).reduce(reduceFn, initialValue);
-    },
-
-    get size() {
-      return internal.size;
-    },
-
-    toArray: function toArray$$1() {
-      return Array.from(internal);
-    }
-  };
-  return outerMethods;
+  return when(is(Function), function (fnItem) {
+    return fnItem.apply(void 0, argsToGive);
+  });
 };
-var stateful = function stateful(initialValue, actions) {
-  var _internalState = initialValue;
-  var reducers = Object.entries(actions).reduce(function (result, _ref7) {
-    var _ref8 = _slicedToArray(_ref7, 2),
-        name = _ref8[0],
-        fn = _ref8[1];
+var isAtRule = function isAtRule(selector) {
+  return selector.indexOf('@') === 0;
+};
+var splitSelectors = function splitSelectors(selectors) {
+  if (isAtRule(selectors)) {
+    return [selectors];
+  }
 
-    return _objectSpread({}, result, _defineProperty({}, name, function () {
-      for (var _len15 = arguments.length, args = new Array(_len15), _key15 = 0; _key15 < _len15; _key15++) {
-        args[_key15] = arguments[_key15];
+  var splitted = [];
+  var parens = 0;
+  var brackets = 0;
+  var current = '';
+
+  for (var i = 0, len = selectors.length; i < len; i++) {
+    var char = selectors[i];
+
+    if (char === '(') {
+      parens += 1;
+    } else if (char === ')') {
+      parens -= 1;
+    } else if (char === '[') {
+      brackets += 1;
+    } else if (char === ']') {
+      brackets -= 1;
+    } else if (char === ',') {
+      if (!parens && !brackets) {
+        splitted.push(current.trim());
+        current = '';
+        continue;
       }
-
-      var actionResult = fn.apply(void 0, [_internalState].concat(args));
-
-      if (isObjectLiteral(_internalState)) {
-        var nextState = _objectSpread({}, _internalState, actionResult);
-
-        _internalState = nextState;
-        return nextState;
-      }
-
-      _internalState = actionResult;
-      return actionResult;
-    }));
-  }, {});
-
-  var getState = function getState(path$$1) {
-    if (isObjectLiteral(_internalState)) {
-      var clonedState = _objectSpread({}, _internalState);
-
-      if (path$$1) return dotPath(path$$1, clonedState);
-      return clonedState;
-    } else if (isMap(_internalState) || _internalState.get) {
-      if (path$$1) return _internalState.get(path$$1);
-      return _internalState;
     }
 
-    return _internalState;
-  };
+    current += char;
+  }
 
-  var innerSelf = {
-    lift: function lift$$1(handler) {
-      handler(reducers, getState);
-      return innerSelf;
-    },
-    getState: getState
-  };
-  return innerSelf;
+  splitted.push(current.trim());
+  return splitted;
+};
+var arrify = function arrify(val) {
+  if (val === null || val === undefined) {
+    return [];
+  }
+
+  return Array.isArray(val) ? val : [val];
 };
 
 var utils = Object.freeze({
@@ -6088,9 +5141,10 @@ var utils = Object.freeze({
 	rem: rem,
 	em: em,
 	pct: pct,
+	ms: ms,
 	isNilOrEmpty: isNilOrEmpty,
 	isNotNilOrEmpty: isNotNilOrEmpty,
-	toArray: toArray$$1,
+	toArray: toArray,
 	isNilOrEmptyOrFalse: isNilOrEmptyOrFalse,
 	filterNilAndEmpty: filterNilAndEmpty,
 	filterNilOrEmptyOrFalse: filterNilOrEmptyOrFalse,
@@ -6103,57 +5157,31 @@ var utils = Object.freeze({
 	isType: isType,
 	isFalsy: isFalsy,
 	reduceWhileFalsy: reduceWhileFalsy,
-	reduceRecord: reduceRecord,
-	mapMerge: mapMerge,
-	mapFilterRecord: mapFilterRecord,
 	includes: includes,
-	noop: noop,
-	id: id,
-	firstItem: firstItem,
 	isObjectLiteral: isObjectLiteral,
 	isSymbol: isSymbol,
 	isMap: isMap,
 	isDefined: isDefined,
 	isNotDefined: isNotDefined,
 	isUndefinedOrFalse: isUndefinedOrFalse,
-	isNotArray: isNotArray,
-	isNotString: isNotString,
-	isNotFunction: isNotFunction,
-	isNotObjectLiteral: isNotObjectLiteral,
-	sliceFromFirstChar: sliceFromFirstChar,
-	reduceToString: reduceToString,
 	returnAsIs: returnAsIs,
-	joinWith: joinWith,
-	getSubstring: getSubstring,
-	getSubstringUntil: getSubstringUntil,
-	getSubstringAfter: getSubstringAfter,
-	startsWithAny: startsWithAny,
-	combineStrings: combineStrings,
-	when: when$1,
-	safeJoinWith: safeJoinWith,
-	joinString: joinString,
-	mapJoin: mapJoin,
-	capitalise: capitalise,
-	unCapitalise: unCapitalise,
-	startsWithCapital: startsWithCapital,
-	capitalize: capitalize,
-	decapitalize: decapitalize,
-	toCamelCase: toCamelCase,
-	camelCase: camelCase,
-	dasherize: dasherize,
 	valueAsFunction: valueAsFunction,
-	proxyPropertyGetter: proxyPropertyGetter,
-	proxyRecord: proxyRecord,
-	proxyFunction: proxyFunction,
-	proxyPassthroughFunction: proxyPassthroughFunction,
-	is: is$1,
-	dotPath: dotPath,
-	betterSet: betterSet,
-	stateful: stateful
+	fallbackTo: fallbackTo,
+	falseToNull: falseToNull,
+	iterateUntilResult: iterateUntilResult,
+	whenFunctionCallWith: whenFunctionCallWith,
+	isAtRule: isAtRule,
+	splitSelectors: splitSelectors,
+	arrify: arrify
 });
 
-var DEFAULT_RULE_KEY_LOOKUP = function DEFAULT_RULE_KEY_LOOKUP(v) {
-  return prop(v, {
+var lookUpShortcut = curry(function (dictionary, value) {
+  return when(isString, function (v) {
+    return dictionary(v) || v;
+  }, value);
+});
+var defaultLookups = {
+  keys: {
     margin: 'space',
     marginTop: 'space',
     marginBottom: 'space',
@@ -6180,10 +5208,8 @@ var DEFAULT_RULE_KEY_LOOKUP = function DEFAULT_RULE_KEY_LOOKUP(v) {
     borderColor: 'colors',
     backgroundColor: 'colors',
     boxShadow: 'shadows'
-  });
-};
-var DEFAULT_RULE_GETTER_LOOKUP = function DEFAULT_RULE_GETTER_LOOKUP(v) {
-  return prop(v, {
+  },
+  getter: {
     margin: 'pxToRem',
     marginTop: 'pxToRem',
     marginBottom: 'pxToRem',
@@ -6195,10 +5221,8 @@ var DEFAULT_RULE_GETTER_LOOKUP = function DEFAULT_RULE_GETTER_LOOKUP(v) {
     paddingLeft: 'pxToRem',
     paddingRight: 'pxToRem',
     fontSize: 'px'
-  });
-};
-var DEFAULT_FUNCTIONS_LOOKUP = function DEFAULT_FUNCTIONS_LOOKUP(v) {
-  return prop(v, {
+  },
+  functions: {
     returnAsIs: returnAsIs,
     identity: returnAsIs,
     propValue: returnAsIs,
@@ -6206,699 +5230,537 @@ var DEFAULT_FUNCTIONS_LOOKUP = function DEFAULT_FUNCTIONS_LOOKUP(v) {
     pxToRem: pxToRem,
     pxToEm: pxToEm,
     pxToPct: pxToPct,
-    px: px
-  });
-};
-
-var _COMBINATOR_INSERTS;
-var pseudoElementNames = ['before', 'after', 'backdrop', 'cue', 'firstLetter', 'firstLine', 'grammarError', 'placeholder', 'selection', 'spellingError'];
-var pseudoFunctionNames = ['dir', 'lang', 'not', 'nthChild', 'nthLastChild', 'nthLastOfType', 'nthOfType'];
-var pseudoClassNames = ['active', 'any', 'anyLink', 'checked', 'default', 'disabled', 'empty', 'enabled', 'first', 'firstChild', 'firstOfType', 'fullscreen', 'focus', 'hover', 'indeterminate', 'inRange', 'invalid', 'lastChild', 'lastOfType', 'left', 'link', 'onlyChild', 'onlyOfType', 'optional', 'outOfRange', 'readOnly', 'readWrite', 'required', 'right', 'root', 'scope', 'target', 'valid', 'visited'];
-var KINDS = {
-  COMBINATOR_AND: 'combinator.and',
-  COMBINATOR_OR: 'combinator.or',
-  PROPERTY_AND: 'property.and',
-  PROPERTY_OR: 'property.or'
-};
-var COMBINATOR_INSERTS = (_COMBINATOR_INSERTS = {}, _defineProperty(_COMBINATOR_INSERTS, KINDS.COMBINATOR_AND, '&&'), _defineProperty(_COMBINATOR_INSERTS, KINDS.PROPERTY_AND, '&&'), _defineProperty(_COMBINATOR_INSERTS, KINDS.COMBINATOR_OR, '||'), _defineProperty(_COMBINATOR_INSERTS, KINDS.PROPERTY_OR, '||'), _COMBINATOR_INSERTS);
-var isDescriptorSym = Symbol('Compute Selector');
-
-var symbolFromKey = function symbolFromKey() {
-  return Symbol.for.apply(Symbol, arguments);
-};
-
-var asPseudoClass = function asPseudoClass(name) {
-  return ":".concat(dasherize(name));
-};
-
-var asPseudoElement = function asPseudoElement(name) {
-  return "::".concat(dasherize(name));
-};
-
-var asPropertySelector = function asPropertySelector(givenName) {
-  return "!!".concat(givenName);
-};
-
-var asPseudoFunction = curry(function (name, value) {
-  return ":".concat(dasherize(name), "(").concat(dasherize(value), ")");
-});
-var styleStore = stateful(new Map(), {
-  addItem: function addItem(store, itemKey, itemValue) {
-    return store.set(itemKey, itemValue);
+    px: px,
+    ms: ms,
+    pct: pct,
+    '%': pct
   }
-});
-var getDescriptor = function getDescriptor(key) {
-  return styleStore.getState(key);
+};
+var getDefaultLookups_ = function getDefaultLookups_(attr) {
+  return path(split('.', attr))(defaultLookups);
+};
+var getDefaultLookups = function getDefaultLookups(attr, fallback) {
+  return getDefaultLookups_(attr) || fallback;
+};
+var getAttrFB = function getAttrFB() {
+  var attr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var defaultTo$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return pathOr(getDefaultLookups(attr, defaultTo$$1), split('.', concat('theme.styler.defaults.', attr)));
+}; // const lookupDefaultOptions_ = (props, dictionary, value) =>
+//   isString(value)
+//     ? getAttrFB(
+//         `${dictionary}.${value}`,
+//         dictionary === "getter" ? null : value
+//       )(props)
+//     : value;
+
+var lookupDefaultOptions_ = function lookupDefaultOptions_(props$$1, dictionary, value) {
+  return isString(value) ? getAttrFB("".concat(dictionary, ".").concat(value), dictionary === 'getter' ? null : value)(props$$1) : value;
 };
 
-var storeDescriptor = function storeDescriptor(descriptorItem) {
-  var symbolKey = descriptorItem.symbolKey;
-  styleStore.lift(function (_ref) {
-    var addItem = _ref.addItem;
-    return addItem(symbolKey, descriptorItem);
-  });
-  return descriptorItem;
-};
+var lookupDefaultOptions = curryN(3, lookupDefaultOptions_);
 
-var createDescriptor = function createDescriptor(kind) {
-  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  return function (value) {
-    var _selfDescriptor;
+//   let { getter } = options
+//   getter = getter || lookupDefaultOptions({}, 'getter', selector)
+//   if (getter) {
+//     val = R.pipe(
+//       lookupDefaultOptions({}, 'functions'),
+//       whenFunctionCallWith(val, props)
+//     )(getter)
+//     return val
+//   }
+//   return val
+// }
+//
+// export const computeTheme = ({ val, selector, options, props }) => {
+//   let { key: themeKey } = options
+//   themeKey = themeKey || lookupDefaultOptions(props, 'keys', selector)
+//
+//   if (themeKey && isString(val)) {
+//     /// Check Strip Negative Before lookingUp
+//     const isNeg = /^-.+/.test(val)
+//     const absN = isNeg ? val.slice(1) : val
+//
+//     val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+//     val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
+//   }
+//
+//   return val
+// }
 
-    var keyOrValue = flow(propOr(value, 'stringKey', config), when$1(isString).otherwise(JSON.stringify));
-    var symbolKey = symbolFromKey(keyOrValue);
-    var selfDescriptor = (_selfDescriptor = {}, _defineProperty(_selfDescriptor, isDescriptorSym, true), _defineProperty(_selfDescriptor, "kind", kind), _defineProperty(_selfDescriptor, "value", value), _defineProperty(_selfDescriptor, "symbolKey", symbolKey), _defineProperty(_selfDescriptor, "originalKey", keyOrValue), _defineProperty(_selfDescriptor, "toString", function toString() {
-      return symbolKey;
-    }), _selfDescriptor);
-    return selfDescriptor;
-  };
-};
+var computeOptions = (function (_ref) {
+  var val = _ref.val,
+      options = _ref.options,
+      selector = _ref.selector,
+      props$$1 = _ref.props;
 
-var descriptorToString = when$1(isString).otherwise(prop('originalKey'));
+  if (options && val) {
+    var themeKey = options.key,
+        getter = options.getter; /// If options was not provided, check default lookUp
 
-var createAndStoreDescriptor = function createAndStoreDescriptor(kind, config) {
-  return compose(storeDescriptor, createDescriptor(kind, config));
-};
+    themeKey = themeKey || lookupDefaultOptions(props$$1, 'keys', selector);
 
-var createCombinator = function createCombinator(kind) {
-  return function () {
-    for (var _len = arguments.length, data = new Array(_len), _key = 0; _key < _len; _key++) {
-      data[_key] = arguments[_key];
+    if (themeKey && isString(val)) {
+      /// Check Strip Negative Before lookingUp
+      var isNeg = /^-.+/.test(val);
+      var absN = isNeg ? val.slice(1) : val;
+      val = getThemeAttr("".concat(themeKey, ".").concat(absN), val)(props$$1);
+      val = isNeg ? isNumber(val) ? val * -1 : '-' + val : val;
     }
 
-    var stringKey = flow(data, map(when$1(isString).otherwise(prop('originalKey'))), join(" ".concat(prop(kind, COMBINATOR_INSERTS), " ")));
-    return flow(data, createAndStoreDescriptor(kind, {
-      stringKey: stringKey
-    }));
-  };
-};
+    getter = getter || lookupDefaultOptions(props$$1, 'getter', selector);
 
-var pseudoCombinators = {
-  and: createCombinator(KINDS.COMBINATOR_AND),
-  or: createCombinator(KINDS.COMBINATOR_OR)
-};
-
-var withAttribute = function withAttribute(givenName) {
-  var quoteString = JSON.stringify;
-
-  var attrWithValue = function attrWithValue(givenValue) {
-    return "[".concat(givenName, "=").concat(quoteString(givenValue), "]");
-  };
-
-  var attrStartsWith = function attrStartsWith(givenValue) {
-    return "[".concat(givenName, "^=").concat(quoteString(givenValue), "]");
-  };
-
-  var attrEndsWith = function attrEndsWith(givenValue) {
-    return "[".concat(givenName, "$=").concat(quoteString(givenValue), "]");
-  };
-
-  var attrContains = function attrContains(givenValue) {
-    return "[".concat(givenName, "*=").concat(quoteString(givenValue), "]");
-  };
-
-  var anyCombinator = function anyCombinator(mapperFn) {
-    return function () {
-      for (var _len2 = arguments.length, givenValues = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        givenValues[_key2] = arguments[_key2];
-      }
-
-      return pseudoCombinators.or.apply(pseudoCombinators, _toConsumableArray(givenValues.map(mapperFn)));
-    };
-  };
-
-  var plainValue = "[".concat(givenName, "]");
-  var outerMethods = {
-    anyOf: anyCombinator(attrWithValue),
-    contains: attrContains,
-    containsAny: anyCombinator(attrContains),
-    startsWith: attrStartsWith,
-    startsWithAny: anyCombinator(attrStartsWith),
-    endsWith: attrEndsWith,
-    endsWithAny: anyCombinator(attrEndsWith),
-    toString: function toString() {
-      return plainValue;
+    if (getter) {
+      val = pipe(lookupDefaultOptions(props$$1, 'functions'), whenFunctionCallWith(val, props$$1))(getter);
     }
-  };
-  return proxyFunction(attrWithValue, outerMethods);
-};
-
-var pseudoClassHandler = function pseudoClassHandler(specialChains) {
-  return function (targetName) {
-    if (pseudoClassNames.includes(targetName)) return asPseudoClass(targetName);
-    if (pseudoFunctionNames.includes(targetName)) return compose(asPseudoFunction(targetName), descriptorToString);
-    if (pseudoElementNames.includes(targetName)) return asPseudoElement(targetName);
-    return prop(targetName, specialChains);
-  };
-};
-
-var style = proxyPropertyGetter(pseudoClassHandler(_objectSpread({}, pseudoCombinators, {
-  element: asPseudoElement,
-  pseudo: function pseudo(name, value) {
-    if (isDefined(value)) return asPseudoFunction(name, value);
-    return asPseudoClass(name);
-  },
-  data: proxyPropertyGetter(when$1(isString).then(compose(withAttribute, concat('data-'), dasherize))),
-  attr: proxyPropertyGetter(when$1(isString).then(compose(withAttribute, dasherize))),
-  prop: proxyPropertyGetter(when$1(isString).then(asPropertySelector)),
-  props: {
-    any: createCombinator(KINDS.PROPERTY_OR),
-    all: createCombinator(KINDS.PROPERTY_AND)
-  }
-})));
-
-var formatName = function formatName(v) {
-  return camelCase(v);
-}; // dasherize //camelCase
-
-var asPseudoElement$1 = function asPseudoElement(key) {
-  return "::".concat(formatName(key));
-};
-
-var isOneOf = function isOneOf() {
-  for (var _len = arguments.length, availableItems = new Array(_len), _key = 0; _key < _len; _key++) {
-    availableItems[_key] = arguments[_key];
   }
 
-  return function (givenItem) {
-    return availableItems.includes(givenItem);
-  };
-};
+  return val;
+});
 
-var createNestedSelector = function createNestedSelector(parent, child) {
-  var selectorPair = [parent, child];
+var parseInlinePattern = (function (_ref) {
+  var value = _ref.value,
+      props$$1 = _ref.props,
+      globalOptions = _ref.globalOptions,
+      key = _ref.key;
 
-  if (isPseudoSelector(child)) {
-    return selectorPair.join('').trim();
+  var defaultValue = value.default,
+      opt = value.options,
+      matchers = _objectWithoutProperties(value, ["default", "options"]);
+
+  var options = merge(globalOptions, opt);
+  var intersectedMatchers = filter(contains$1(__, keys(props$$1)), keys(matchers));
+  var matchedPropName;
+  var reducer = reduceWhile(isUndefinedOrFalse, function (previous, propName) {
+    matchedPropName = propName;
+    return flow(propName, prop(__, matchers), lookupDefaultOptions(props$$1, 'functions'), whenFunctionCallWith(props$$1[propName], props$$1), whenFunctionCallWith(props$$1));
+  }, false, intersectedMatchers);
+  var computedValue;
+
+  if (isEmpty(values(intersectedMatchers)) && isNil(defaultValue)) {
+    return computedValue;
   }
 
-  return selectorPair.join(' ').trim();
-};
-
-var logError = function logError(validTypes, givenKey) {
-  return function (givenValue) {
-    console.error("Shades could not parse the style for ".concat(JSON.stringify(givenKey), " because the provided value type (").concat(flow(givenValue, type, JSON.stringify), ") does not match any valid types (").concat(flow(validTypes, join(', ')), ")"));
-    throw new TypeError("Could not parse the style for ".concat(givenKey, " because the provided value type (").concat(_typeof(givenValue), ")\n    does not match any valid types (").concat(join(', ', validTypes), ")"));
-  };
-};
-
-var isSelector = startsWithAny('.', '#', '>', '&');
-var isAtRule = startsWith('@');
-var isPseudoSelector = startsWithAny(':', '[');
-var isPropertySelector = startsWith('!!');
-var isSelectorOrPseudo = anyPass([isSelector, isPseudoSelector]);
-var isBrowserPrefixed = startsWith('-');
-var isPseudoElement = isOneOf('before', 'after', 'backdrop', 'cue', 'firstLetter', 'firstLine', 'grammarError', 'placeholder', 'selection', 'spellingError'); // Special property selectors typically start with !!, so this removes those
-
-var stripPropertyBangs = when$1(isPropertySelector).then(getSubstringAfter(2));
-
-var wrapContentString = function wrapContentString(key) {
-  return when$1(equals('content', key)).then(JSON.stringify);
-};
-
-var whenFunctionCallWith = function whenFunctionCallWith() {
-  for (var _len4 = arguments.length, argsToGive = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    argsToGive[_key4] = arguments[_key4];
+  if (isEmpty(values(intersectedMatchers)) && !isNil(defaultValue)) {
+    computedValue = whenFunctionCallWith(props$$1)(defaultValue);
   }
 
-  return when$1(isFunction).then(function (fnItem) {
-    return fnItem.apply(void 0, argsToGive);
-  });
-};
-
-var falseToNull = function falseToNull(value) {
-  if (value === false) return null;
-  return value;
-};
-
-var fallbackTo = function fallbackTo(fallback) {
-  return compose(defaultTo(fallback), falseToNull);
-};
-
-var findKeyForValue = function findKeyForValue(needle, fallback) {
-  return function (haystack) {
-    return flow(haystack, toPairs, find(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2),
-          key = _ref2[0],
-          value = _ref2[1];
-
-      return value === needle;
-    }), defaultTo([fallback, true]), firstItem);
-  };
-};
-
-var iterateUntilResult = curry(function (computeFn, list) {
-  var reduceWhileInvalid = function reduceWhileInvalid(iterateFn) {
-    return reduceWhile(isUndefinedOrFalse, iterateFn, false);
-  };
-
-  var iterateObject = reduceWhileInvalid(function (previous, _ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
-        key = _ref4[0],
-        value = _ref4[1];
-
-    return computeFn(key, value);
-  });
-  var iterateList = reduceWhileInvalid(function (previous, current) {
-    return computeFn(current);
-  });
-  if (flow(list, isObjectLiteral)) return flow(list, toPairs, iterateObject);
-  return flow(list, iterateList);
-});
-var createStyleProperty = curry(function (key, value) {
-  if (!isDefined(value)) console.error('createStyleProperty: value not defined!', {
-    key: key,
-    value: value
-  });
-  var ruleKey = flow(key, unless(isBrowserPrefixed, formatName));
-  var ruleValue = flow(value, when$1(isArray).then(join(', ')), wrapContentString(key));
-  return _defineProperty({}, ruleKey, ruleValue);
-});
-
-var appendWith = function appendWith(lastValue) {
-  return function (firstValue) {
-    return [firstValue, lastValue].join('');
-  };
-};
-
-var combinators = function combinators(parentSelector, _ref6) {
-  var props$$1 = _ref6.props,
-      extraCombinators = _objectWithoutProperties(_ref6, ["props"]);
-
-  return function (results) {
-
-    var addToSelector = curry(function (targetSelector, additionalRules) {
-      return flow(results, over(lensProp(targetSelector), function (x) {
-        return merge(x || {}, additionalRules);
-      }));
-    });
-    return _objectSpread({
-      addAtRule: curry(function (atRuleKey, nestedMap) {
-        return flow(results, over(lensProp(atRuleKey), function (x) {
-          return mergeDeepRight(x || {}, nestedMap);
-        }));
-      }),
-      addRuleBlock: curry(function (targetSelector, givenRules) {
-        return flow(givenRules, addToSelector(targetSelector));
-      }),
-      addStyle: curry(function (key, value) {
-        return compose(addToSelector(parentSelector), createStyleProperty)(key, value);
-      }),
-      extendSelector: function extendSelector(trailingSelector) {
-        return flow(parentSelector, map(appendWith(trailingSelector)));
-      },
-      extendSelector2: function extendSelector2(trailingSelector) {
-        return flow(isPseudoSelector(parentSelector) ? '&' : 'ss', map(appendWith(trailingSelector)));
-      },
-      pseudoElementSelector: function pseudoElementSelector(pseudoName) {
-        return flow(parentSelector, map(appendWith(asPseudoElement$1(pseudoName))));
-      },
-      propExists: function propExists(targetProp) {
-        return has(stripPropertyBangs(targetProp), props$$1);
-      },
-      props: props$$1,
-      results: results
-    }, extraCombinators);
-  };
-};
-
-var parseStyleMetaData = function parseStyleMetaData(ruleResponder) {
-  var styleParser = function styleParser(_ref7) {
-    var parentSelector = _ref7.parentSelector,
-        props$$1 = _ref7.props,
-        _ref7$options = _ref7.options,
-        _ref7$initialResult = _ref7.initialResult,
-        initialResult = _ref7$initialResult === void 0 ? {} : _ref7$initialResult;
-    return function (rules) {
-      var parseNestedWithResult = curry(function (givenResult, givenSelectors, givenNestedRules) {
-        return styleParser({
-          parentSelector: givenSelectors,
-          initialResult: givenResult,
-          props: props$$1
-        })(givenNestedRules);
-      });
-      if (isFunction(rules)) return flow(rules, whenFunctionCallWith(props$$1), parseNestedWithResult(initialResult, parentSelector));
-      var asNewParser = parseNestedWithResult({}); // evaluateRule :: ParsedStyles Selector -> StyleKey -> StyleValue -> ParsedStyles Selecctor
-
-      var evaluateRule = function evaluateRule(result) {
-        return function (key, value) {
-          var getCombinatorsFor = combinators(parentSelector, {
-            props: props$$1,
-            parentSelector: parentSelector,
-            reevaluate: curry(function (key, value) {
-              return evaluateRule(result)(key, value);
-            }),
-            parseNestedWithResult: parseNestedWithResult,
-            parseNested: parseNestedWithResult(result),
-            reduceNested: function reduceNested(handler) {
-              return reduceRecord(result)(function (accumulated, _ref8) {
-                var _ref9 = _slicedToArray(_ref8, 2),
-                    key = _ref9[0],
-                    value = _ref9[1];
-
-                var parseNestedReduced = function parseNestedReduced(valueToParse) {
-                  return parseNestedWithResult(accumulated, parentSelector, valueToParse);
-                };
-
-                return handler(parseNestedReduced)(key, value) || accumulated;
-              });
-            },
-            asNewParser: asNewParser
-          });
-          var isStyleSymbol = isSymbol(key);
-          var isFunctionRule = isFunction(value);
-          var hasObjectLiteral = isObjectLiteral(value);
-          var hasNestedRules = hasObjectLiteral || isFunctionRule;
-          var isPropertyMatch = isPropertySelector(key) && hasNestedRules;
-          var isAtRuleBlock = isAtRule(key) && hasNestedRules;
-          var isCombiningSelector = isSelectorOrPseudo(key) && hasNestedRules;
-          var shouldBePseudoElement = isPseudoElement(key) && hasNestedRules;
-          var isPatternBlock = key === '__match' && hasNestedRules;
-          var isInlinePattern = hasObjectLiteral;
-          var ruleType = flow({
-            styleSymbol: isStyleSymbol,
-            propertyMatch: isPropertyMatch,
-            atRule: isAtRuleBlock,
-            combinedSelector: isCombiningSelector,
-            pseudoElement: shouldBePseudoElement,
-            blockPattern: isPatternBlock,
-            inlinePattern: isInlinePattern
-          }, findKeyForValue(true), fallbackTo('style'));
-          var responder = flow(getCombinatorsFor(result), ruleResponder[ruleType]);
-          return responder(key, value) || result;
-        };
-      };
-
-      var symbolRules = flow(Object.getOwnPropertySymbols(rules), map(function (sym) {
-        return [sym, rules[sym]];
-      }));
-      return flow(rules, toPairs, concat(symbolRules), reduce(function (result, _ref10) {
-        var _ref11 = _slicedToArray(_ref10, 2),
-            key = _ref11[0],
-            value = _ref11[1];
-
-        return evaluateRule(result)(key, value);
-      }, initialResult));
-    };
-  };
-
-  return styleParser;
-};
-
-var lookUpShortcut = curry(function (dictionary, value) {
-  return when(isString, converge(defaultTo, [identity, dictionary]), value);
-});
-
-var inlinePattern2 = function inlinePattern2(_ref13) {
-  var addStyle = _ref13.addStyle,
-      parseNested = _ref13.parseNested,
-      props$$1 = _ref13.props,
-      parentSelector = _ref13.parentSelector,
-      globalOptions = _ref13.globalOptions;
-  return function (key, value) {
-    var defaultValue = value.default,
-        opt = value.options,
-        matchers = _objectWithoutProperties(value, ["default", "options"]);
-
-    var options = merge(globalOptions, opt);
-    var intersectedMatchers = filter(contains$1(__, keys(props$$1)), keys(matchers));
-    var matchedPropName;
-    var reducer = reduceWhile(isUndefinedOrFalse, function (previous, propName) {
-      matchedPropName = propName;
-      return flow(propName, prop(__, matchers), lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(props$$1[propName], props$$1), whenFunctionCallWith(props$$1));
-    }, false, intersectedMatchers);
-    var computedValue;
-
-    if (isEmpty(values(intersectedMatchers)) && isNil(defaultValue)) {
-      return;
-    }
-
-    if (isEmpty(values(intersectedMatchers)) && !isNil(defaultValue)) {
-      computedValue = whenFunctionCallWith(props$$1)(defaultValue);
-    }
-
-    if (!isEmpty(intersectedMatchers)) {
-      computedValue = pipe(falseToNull, defaultTo(whenFunctionCallWith(props$$1)(defaultValue)))(reducer);
-    }
-
-    if (!computedValue) {
-      return;
-    }
-
-    var matchedProp = prop(matchedPropName, props$$1);
-    var nonResponisiveComputedValue = computedValue;
-    var isResponsiveBoolean = isString(computedValue) && is(Object, matchedProp);
-
-    if (isResponsiveBoolean) {
-      computedValue = matchedProp;
-    }
-
-    var computeOptions = function computeOptions(val) {
-      if (options && val) {
-        var themeKey = options.key,
-            getter = options.getter; /// If options was not provided, check default lookUp
-
-        themeKey = themeKey || DEFAULT_RULE_KEY_LOOKUP(key); // console.log(DEFAULT_RULE_KEY_LOOKUP('margin'))
-
-        if (themeKey && isString(val)) {
-          /// Check Strip Negative Before lookingUp
-          var isNeg = /^-.+/.test(val);
-          var absN = isNeg ? val.slice(1) : val;
-          val = getThemeAttr("".concat(themeKey, ".").concat(absN), val)(props$$1);
-          val = isNeg ? isNumber(val) ? val * -1 : '-' + val : val;
-        }
-
-        getter = getter || DEFAULT_RULE_GETTER_LOOKUP(key);
-
-        if (getter) {
-          val = pipe(lookUpShortcut(DEFAULT_FUNCTIONS_LOOKUP), whenFunctionCallWith(val, props$$1))(getter);
-        }
-      }
-
-      return val;
-    }; /// responisive PropVal
-
-
-    if (isObjectLiteral(computedValue) || isArray(computedValue)) {
-      var breakpoints = computedValue;
-      var themeBPs = getThemeAttr('breakpoints')(props$$1);
-
-      if (isArray(themeBPs)) {
-        themeBPs = pipe(toPairs, fromPairs)(themeBPs);
-      }
-
-      if (isArray(breakpoints)) {
-        breakpoints = pipe(toPairs, fromPairs)(breakpoints);
-
-        if (isObjectLiteral(themeBPs)) {
-          themeBPs = pipe(values, toPairs, fromPairs)(themeBPs);
-        }
-      }
-
-      var getBp = prop(__, themeBPs);
-      breakpoints = Object.keys(breakpoints).sort(function (a, b) {
-        return getBp(a) - getBp(b);
-      }).reduce(function (acc, key) {
-        acc[key] = breakpoints[key];
-        return acc;
-      }, {});
-      var CSSObj = Object.keys(breakpoints).reduce(function (acc, bpKey) {
-        var minWidth = pxToEm(getBp(bpKey));
-        var currentVal = when(both(always(isResponsiveBoolean), isBool), ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null)))(breakpoints[bpKey]);
-        var res = isNil(computeOptions(currentVal)) ? {} : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1 ? objOf(key, computeOptions(currentVal)) : mapObjOf("@media screen and (min-width:".concat(minWidth, ")"), objOf(key, computeOptions(currentVal)));
-        return mergeDeepRight(acc, res);
-      }, {}); // console.log(CSSObj)
-
-      return parseNested(parentSelector)(CSSObj);
-    }
-
-    computedValue = computeOptions(computedValue);
-    return computedValue && addStyle(key, computedValue);
-  };
-};
-
-var parseAllStyles = parseStyleMetaData({
-  atRule: function atRule(_ref14) {
-    var addRuleBlock = _ref14.addRuleBlock,
-        parseNested = _ref14.parseNested,
-        parentSelector = _ref14.parentSelector,
-        addAtRule = _ref14.addAtRule,
-        asNewParser = _ref14.asNewParser,
-        results = _ref14.results;
-    return function (key, value) {
-      var res = addAtRule(key, flow(value, asNewParser(parentSelector)));
-      if (isEmpty(res)) console.log('aa'); // console.log('emptty', { parentSelector, results, res })
-
-      return addAtRule(key, flow(value, asNewParser(parentSelector)));
-    };
-  },
-  combinedSelector: function combinedSelector(_ref15) {
-    var addRuleBlock = _ref15.addRuleBlock,
-        parentSelector = _ref15.parentSelector,
-        extendSelector2 = _ref15.extendSelector2,
-        extendSelector = _ref15.extendSelector,
-        parseNested = _ref15.parseNested;
-    return function (extraSelector, extraRules) {
-      // console.log('combinedSelector----------')
-      //  const newSelectors = extendSelector(extraSelector)
-      var newSelectors = createNestedSelector(parentSelector, extraSelector); // console.log({ extraSelector, newSelectors, extraRules })
-
-      return flow(extraRules, parseNested(newSelectors));
-    };
-  },
-  pseudoElement: function pseudoElement(_ref16) {
-    var addRuleBlock = _ref16.addRuleBlock,
-        pseudoElementSelector = _ref16.pseudoElementSelector,
-        parseNested = _ref16.parseNested;
-    return function (pseudoName, nestedRules) {
-      var newSelectors = pseudoElementSelector(pseudoName);
-      return flow(nestedRules, parseNested(newSelectors));
-    };
-  },
-  blockPattern: function blockPattern(_ref17) {
-    var parseNestedWithResult = _ref17.parseNestedWithResult,
-        props$$1 = _ref17.props,
-        results = _ref17.results,
-        parentSelector = _ref17.parentSelector;
-    return function (unneededKey, propsToMatch) {
-      return flow(propsToMatch, toPairs, reduce(function (accumulated, _ref18) {
-        var _ref19 = _slicedToArray(_ref18, 2),
-            propName = _ref19[0],
-            rulesForProp = _ref19[1];
-
-        // console.log(parentSelector, accumulated, [propName, rulesForProp])
-        // if (parentSelector[0] === 'debug')
-        //   console.log(parentSelector, accumulated.toJS(), [propName, rulesForProp])
-        if (flow(props$$1, has(propName))) return flow(rulesForProp, whenFunctionCallWith(props$$1[propName], props$$1), parseNestedWithResult(accumulated, parentSelector));
-        return accumulated;
-      }, results));
-    };
-  },
-  inlinePattern: inlinePattern2,
-  propertyMatch: function propertyMatch(_ref20) {
-    var addRuleBlock = _ref20.addRuleBlock,
-        parseNested = _ref20.parseNested,
-        parentSelector = _ref20.parentSelector,
-        props$$1 = _ref20.props,
-        propExists = _ref20.propExists;
-    return function (key, value) {
-      var propName = stripPropertyBangs(key);
-      if (propExists(propName)) return flow(value, whenFunctionCallWith(props$$1[propName]), parseNested(parentSelector));
-    };
-  },
-  styleSymbol: function styleSymbol(_ref21) {
-    var addRuleBlock = _ref21.addRuleBlock,
-        extendSelector = _ref21.extendSelector,
-        extendSelector2 = _ref21.extendSelector2,
-        props$$1 = _ref21.props,
-        parseNested = _ref21.parseNested,
-        parentSelector = _ref21.parentSelector,
-        propExists = _ref21.propExists;
-    return function (symbolKey, styleBlock) {
-      var _handlers;
-
-      var parseStyleBlockWith = function parseStyleBlockWith(argsToPass) {
-        return function (selector) {
-          return flow(styleBlock, whenFunctionCallWith(argsToPass), parseNested(selector));
-        };
-      };
-
-      var handlers = (_handlers = {}, _defineProperty(_handlers, KINDS.PROPERTY_OR, function (targetProps) {
-        if (find(propExists)(targetProps)) return parseStyleBlockWith(props$$1)(parentSelector);
-      }), _defineProperty(_handlers, KINDS.PROPERTY_AND, function (targetProps) {
-        if (all(propExists)(targetProps)) return parseStyleBlockWith(props$$1)(parentSelector);
-      }), _defineProperty(_handlers, KINDS.COMBINATOR_OR, function (targetAttrs) {
-        return (//      flow(chain(extendSelector)(targetAttrs), parseStyleBlockWith(props)),
-          flow(chain(extendSelector)(targetAttrs), parseStyleBlockWith(props$$1))
-        );
-      }), _defineProperty(_handlers, KINDS.COMBINATOR_AND, function (targetAttrs) {
-        return (// flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props)),
-          flow(targetAttrs, join(''), extendSelector, parseStyleBlockWith(props$$1))
-        );
-      }), _handlers);
-
-      var _getDescriptor = getDescriptor(symbolKey),
-          kind = _getDescriptor.kind,
-          value = _getDescriptor.value;
-
-      return handlers[kind](value);
-    };
-  },
-  style: function style$$1(_ref22) {
-    var addStyle = _ref22.addStyle,
-        props$$1 = _ref22.props,
-        reevaluate = _ref22.reevaluate,
-        parentSelector = _ref22.parentSelector;
-    return function (ruleName, value) {
-      return flow(value, whenFunctionCallWith(props$$1), when$1(isUndefinedOrFalse).otherwise( // The following line is for cases where a function returns
-      // inline pattern matching blocks
-      when$1(isObjectLiteral).then(reevaluate(ruleName)).otherwise(when$1(isArray).then(join(', ')), when$1(either(isString, isNumber)).then(addStyle(ruleName)).otherwise(logError(['Object', 'Array', 'Number', 'String'], ruleName)))));
-    };
+  if (!isEmpty(intersectedMatchers)) {
+    computedValue = pipe(falseToNull, defaultTo(whenFunctionCallWith(props$$1)(defaultValue)))(reducer);
   }
-});
-var ruleCleaner = function ruleCleaner(rules) {
-  return flow(rules, toPairs, reduce(function (result, _ref27) {
-    var _ref28 = _slicedToArray(_ref27, 2),
-        selectors = _ref28[0],
-        styleRules = _ref28[1];
 
-    if (isAtRule(selectors)) {
-      var innerRuleStrings = ruleCleaner(styleRules || {});
-      return mergeDeepRight(result, _defineProperty({}, selectors, innerRuleStrings));
-    }
+  if (!computedValue) {
+    return computedValue;
+  }
 
-    var cleanedRules = filterNilAndEmpty(styleRules || {});
-    if (isEmpty(selectors.trim())) return mergeDeepRight(result, cleanedRules);
-    return mergeDeepRight(result, _defineProperty({}, selectors, cleanedRules));
-  }, {}));
-};
+  var matchedProp = prop(matchedPropName, props$$1);
+  var nonResponisiveComputedValue = computedValue;
+  var isResponsiveBoolean = isString(computedValue) && is(Object, matchedProp);
 
-var _styler = function _styler(rules) {
-  return function (props$$1) {
-    if (isArray(rules)) {
-      return flow(rules, map(function (r) {
-        return parseAllStyles({
-          parentSelector: '',
-          props: props$$1
-        })(r);
-      }), mergeAllDeepRight, ruleCleaner);
-    }
+  if (isResponsiveBoolean) {
+    computedValue = matchedProp;
+  }
 
-    return flow(parseAllStyles({
-      parentSelector: '',
+  var computeOpt = function computeOpt(val) {
+    return computeOptions({
+      val: val,
+      options: options,
+      selector: key,
       props: props$$1
-    })(rules), ruleCleaner);
+    });
+  };
+
+  if (isObjectLiteral(computedValue) || isArray(computedValue)) {
+    var breakpoints = computedValue;
+    var themeBPs = getThemeAttr('breakpoints')(props$$1);
+
+    if (isArray(themeBPs)) {
+      themeBPs = pipe(toPairs, fromPairs)(themeBPs);
+    }
+
+    if (isArray(breakpoints)) {
+      breakpoints = pipe(toPairs, fromPairs)(breakpoints);
+
+      if (isObjectLiteral(themeBPs)) {
+        themeBPs = pipe(values, toPairs, fromPairs)(themeBPs);
+      }
+    }
+
+    var getBp = prop(__, themeBPs);
+    breakpoints = Object.keys(breakpoints).sort(function (a, b) {
+      return getBp(a) - getBp(b);
+    }).reduce(function (acc, key) {
+      acc[key] = breakpoints[key];
+      return acc;
+    }, {}); // key='&'
+
+    var CSSObj = Object.keys(breakpoints).reduce(function (acc, bpKey) {
+      var minWidth = pxToEm(getBp(bpKey));
+      var currentVal = when(both(always(isResponsiveBoolean), isBool), ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null)))(breakpoints[bpKey]);
+      var res = isNil(computeOpt(currentVal)) ? {} : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1 ? objOf(key, computeOpt(currentVal)) : mapObjOf("@media screen and (min-width:".concat(minWidth, ")"), objOf(key, computeOpt(currentVal)));
+      return mergeDeepRight(acc, res);
+    }, {});
+    return CSSObj;
+  }
+
+  return computeOpt(computedValue);
+});
+
+var defaultUnits = {
+  animationDelay: "ms",
+  animationDuration: "ms",
+  backgroundPosition: "px",
+  backgroundPositionX: "px",
+  backgroundPositionY: "px",
+  backgroundSize: "px",
+  border: "px",
+  borderAfterWidth: "px",
+  borderBeforeWidth: "px",
+  borderBottom: "px",
+  borderBottomLeftRadius: "px",
+  borderBottomRightRadius: "px",
+  borderBottomWidth: "px",
+  borderEndWidth: "px",
+  borderHorizontalSpacing: "px",
+  borderLeft: "px",
+  borderLeftWidth: "px",
+  borderRadius: "px",
+  borderRight: "px",
+  borderRightWidth: "px",
+  borderSpacing: "px",
+  borderStartWidth: "px",
+  borderTop: "px",
+  borderTopLeftRadius: "px",
+  borderTopRightRadius: "px",
+  borderTopWidth: "px",
+  borderVerticalSpacing: "px",
+  borderWidth: "px",
+  bottom: "px",
+  boxShadow: "px",
+  boxShadowBlur: "px",
+  boxShadowSpread: "px",
+  boxShadowX: "px",
+  boxShadowY: "px",
+  columnGap: "px",
+  columnRule: "px",
+  columnRuleWidth: "px",
+  columnWidth: "px",
+  flexBasis: "px",
+  fontLineHeight: "px",
+  fontSize: "px",
+  fontSizeDelta: "px",
+  height: "px",
+  left: "px",
+  letterSpacing: "px",
+  logicalHeight: "px",
+  logicalWidth: "px",
+  margin: "px",
+  marginAfter: "px",
+  marginBefore: "px",
+  marginBottom: "px",
+  marginEnd: "px",
+  marginLeft: "px",
+  marginRight: "px",
+  marginStart: "px",
+  marginTop: "px",
+  maskPositionX: "px",
+  maskPositionY: "px",
+  maskSize: "px",
+  maxHeight: "px",
+  maxLogicalHeight: "px",
+  maxLogicalWidth: "px",
+  maxWidth: "px",
+  minHeight: "px",
+  minLogicalHeight: "px",
+  minLogicalWidth: "px",
+  minWidth: "px",
+  motion: "px",
+  motionOffset: "px",
+  outline: "px",
+  outlineOffset: "px",
+  outlineWidth: "px",
+  padding: "px",
+  paddingAfter: "px",
+  paddingBefore: "px",
+  paddingBottom: "px",
+  paddingEnd: "px",
+  paddingLeft: "px",
+  paddingRight: "px",
+  paddingStart: "px",
+  paddingTop: "px",
+  perspective: "px",
+  perspectiveOriginX: "pct",
+  perspectiveOriginY: "pct",
+  right: "px",
+  shapeMargin: "px",
+  size: "px",
+  textIndent: "px",
+  textShadowBlur: "px",
+  textShadowX: "px",
+  textShadowY: "px",
+  textStroke: "px",
+  textStrokeWidth: "px",
+  top: "px",
+  transformOrigin: "pct",
+  transformOriginX: "pct",
+  transformOriginY: "pct",
+  transformOriginZ: "pct",
+  transitionDelay: "ms",
+  transitionDuration: "ms",
+  verticalAlign: "px",
+  width: "px",
+  wordSpacing: "px"
+};
+var getDefaultUnit = (function (selector) {
+  return defaultUnits[selector];
+});
+
+var PSUEDO_WITHOUT_SELECTOR = /(^|\s)(:{1,2})(\w)/g;
+var REFERENCE_SELECTOR = /&/g;
+var isNestableAtRule = function isNestableAtRule(selector) {
+  return /@\S*\b(media|supports|keyframes)\b/.test(selector);
+};
+var containsSpecial = function containsSpecial(str) {
+  return /[~`!@#$%\^&*+=\-\[\]\\';.,/{}|\\":<>\?\s]/g.test(str);
+};
+var hasReference = function hasReference(selector) {
+  return selector.indexOf('&') !== -1;
+};
+var isNestable = function isNestable(selector) {
+  return isAtRule(selector) && isNestableAtRule(selector);
+};
+
+var formatOutput = function formatOutput(grouped) {
+  return Object.keys(grouped).reduce(function (style, loc) {
+    return Object.keys(grouped[loc]).reduce(function (style, propVal) {
+      var rule = grouped[loc][propVal];
+
+      if (isNil(rule.value)) {
+        return style;
+      }
+
+      if (rule.value === '' && rule.property !== 'content') {
+        rule.value = undefined;
+      }
+
+      var location = rule.location.concat(rule.selectors.join(', '));
+      location.reduce(function (style, selector, i, arr) {
+        if (!selector) {
+          if (rule.property === '@font-face') {
+            style[rule.property] = style[rule.property] ? arrify(style[rule.property]).concat(rule.value) : rule.value;
+          } else {
+            style[rule.property] = rule.value;
+          }
+
+          return style;
+        }
+
+        var r = {};
+
+        if (i === arr.length - 1) {
+          r[rule.property] = rule.value;
+        }
+
+        style[selector] = merge(style[selector], r);
+        return style[selector];
+      }, style);
+      return style;
+    }, style);
+  }, {});
+};
+
+var groupRules = function groupRules(rules) {
+  var grouped = {};
+
+  for (var i = 0, len = rules.length; i < len; i++) {
+    var rule = rules[i];
+    var id = rule.property + (_typeof(rule.value) !== 'object' ? rule.value : '__' + i);
+
+    if (!grouped[rule.location]) {
+      grouped[rule.location] = {};
+    }
+
+    if (!grouped[rule.location][id]) {
+      grouped[rule.location][id] = {
+        location: rule.location,
+        selectors: rule.selector ? [rule.selector] : [],
+        property: rule.property,
+        value: rule.value
+      };
+    } else if (rule.selector) {
+      grouped[rule.location][id].selectors.push(rule.selector);
+    }
+  }
+
+  return grouped;
+};
+
+var getRules = function getRules(_ref) {
+  var obj = _ref.obj,
+      _ref$parents = _ref.parents,
+      parents = _ref$parents === void 0 ? [] : _ref$parents,
+      _ref$location = _ref.location,
+      location = _ref$location === void 0 ? [] : _ref$location,
+      props$$1 = _ref.props,
+      _ref$options = _ref.options,
+      options = _ref$options === void 0 ? {} : _ref$options;
+
+  if (is(Function)(obj)) {
+    obj = obj(props$$1);
+  }
+
+  var _obj = obj,
+      globalOptions = _obj.options,
+      rules = _objectWithoutProperties(_obj, ["options"]);
+
+  var getNested = function getNested(givenObj, givenParents, givenLocation) {
+    return getRules({
+      obj: givenObj,
+      parents: givenParents,
+      location: givenLocation,
+      options: globalOptions,
+      props: props$$1
+    });
+  };
+
+  return pipe(keys, reduce(function (result, selectors) {
+    return pipe(splitSelectors, reduce(function (res, selector) {
+      var parsed = parseRules(getNested, selector, rules[selectors], parents.slice(), location.slice(), props$$1, options);
+      return res.concat(parsed);
+    }, result))(selectors);
+  }, []))(obj);
+};
+
+var isPatternBlock = function isPatternBlock(key) {
+  return key === '__match';
+};
+
+var isInlinePattern = function isInlinePattern(value, selector, location) {
+  return isObjectLiteral(value) && !isEmpty(value) && !containsSpecial(selector) && !isEmpty(selector) && !isNestable(last(location) || []) && !isPatternBlock(selector);
+};
+
+var parseRules = function parseRules(parseNested, selector, value, parents, location, props$$1, options) {
+  var next = selector;
+  value = flow(value, whenFunctionCallWith(props$$1), falseToNull);
+
+  if (parents.length) {
+    next = next.replace(PSUEDO_WITHOUT_SELECTOR, '$1&$2$3');
+
+    if (hasReference(next)) {
+      next = next.replace(REFERENCE_SELECTOR, parents.pop());
+    }
+  }
+
+  if (selector === '@font-face') {
+    return {
+      location: [],
+      selector: '',
+      property: selector,
+      value: value
+    };
+  }
+
+  if (isPatternBlock(selector)) {
+    var res = flow(value, toPairs, reduce(function (accumulated, _ref2) {
+      var _ref3 = _slicedToArray(_ref2, 2),
+          propName = _ref3[0],
+          rulesForProp = _ref3[1];
+
+      return flow(props$$1, ifElse(has(propName), pipe(always(rulesForProp), whenFunctionCallWith(props$$1[propName], props$$1), mergeDeepRight(accumulated)), always(accumulated)));
+    }, {}));
+    return parseNested(res, parents, location);
+  }
+
+  if (isInlinePattern(value, selector, parents)) {
+    value = parseInlinePattern({
+      props: props$$1,
+      value: value,
+      key: selector,
+      globalOptions: options
+    }); // return parseNested(value, parents, location);
+
+    if (isObjectLiteral(value)) {
+      return parseNested(value, parents, location);
+    }
+  }
+
+  if (isObjectLiteral(value)) {
+    var nestable = isNestable(selector);
+
+    if (nestable) {
+      location = location.concat(selector);
+    } else if (isAtRule(selector)) {
+      parents = [next];
+      location = [];
+    } else if (location.length && isNestable(location[location.length - 1]) && location[location.length - 1].indexOf(' ') === -1) {
+      location[location.length - 1] += ' ' + selector;
+    } else {
+      parents = parents.concat(next);
+    }
+
+    return parseNested(value, parents, location);
+  } // value = computeGetter({ val: value, options, selector, props });
+
+
+  if (typeof value === 'number' && value !== 0) {
+    var unit = getDefaultUnit(selector);
+
+    if (unit) {
+      value = value + unit;
+    }
+  }
+
+  return {
+    location: location,
+    selector: parents.join(' '),
+    property: selector,
+    value: value
   };
 };
 
-var styler = function styler() {
-  for (var _len5 = arguments.length, rules = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-    rules[_key5] = arguments[_key5];
-  }
-
+var styler = function styler(obj) {
   return function (props$$1) {
-    return flow(map(function (x) {
-      return _styler(x)(props$$1);
-    }, flatten(rules)), mergeAllDeepRight);
+    var rules;
+
+    if (is(Function)(obj)) {
+      return styler(obj(props$$1))(props$$1);
+    }
+
+    if (Array.isArray(obj)) {
+      rules = obj.reduce(function (r, o$$1) {
+        return r.concat(getRules({
+          obj: o$$1,
+          props: props$$1
+        }));
+      }, []);
+    } else {
+      // return obj
+      rules = getRules({
+        obj: obj,
+        props: props$$1
+      });
+    }
+
+    return flow(rules, groupRules, formatOutput);
   };
 };
 
 var BPProp = function BPProp() {
-  var cssProp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var cssProp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   return function (p) {
-    var themeBPs = getThemeAttr('breakpoints')(p);
+    var themeBPs = getThemeAttr("breakpoints")(p);
     cssProp = valueAsFunction(cssProp)(p);
-    return cssProp ? styler(pipe(pick(keys(themeBPs)), objOf('default'), when(always(isNotNilOrEmpty(options)), merge(objOf('options', options))), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), UnflattenObj)(p))(p) : {};
+    return cssProp ? styler(pipe(pick(keys(themeBPs)), objOf("default"), when(always(isNotNilOrEmpty(options)), merge(objOf("options", options))), when(always(isNotNilOrEmpty(cssProp)), mapObjOf(cssProp)), UnflattenObj)(p))(p) : {};
   };
 }; /// TODO make more efficient
 
 var spaceProp = function spaceProp() {
-  var cssProp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  var getter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'pxToRem';
+  var cssProp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+  var getter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "pxToRem";
   return function (p) {
     return BPProp(cssProp, {
-      key: 'space',
+      key: "space",
       getter: getter
     })(p);
   };
@@ -6929,7 +5791,7 @@ var fontSize = {
   fontSize: 'returnAsIs',
   f: 'returnAsIs',
   options: {
-    getter: px,
+    getter: 'px',
     key: 'fontSizes'
   }
 };
@@ -6976,7 +5838,7 @@ var letterSpacing = {
   letterSpacing: 'returnAsIs',
   options: {
     key: 'letterSpacings',
-    getter: px
+    getter: 'px'
   }
 };
 var display = {
@@ -6986,42 +5848,42 @@ var maxWidth = {
   maxWidth: 'returnAsIs',
   options: {
     key: 'maxWidths',
-    getter: px
+    getter: 'px'
   }
 };
 var minWidth = {
   minWidth: 'returnAsIs',
   options: {
     key: 'minWidths',
-    getter: px
+    getter: 'px'
   }
 };
 var height = {
   height: 'returnAsIs',
   options: {
     key: 'heights',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var maxHeight = {
   maxHeight: 'returnAsIs',
   options: {
     key: 'maxHeights',
-    getter: px
+    getter: 'px'
   }
 };
 var minHeight = {
   minHeight: 'returnAsIs',
   options: {
     key: 'minHeights',
-    getter: px
+    getter: 'px'
   }
 };
 var size_width_c = {
   width: {
     size: 'returnAsIs',
     options: {
-      getter: px
+      getter: 'px'
     }
   }
 };
@@ -7029,7 +5891,7 @@ var size_height_c = {
   height: {
     size: 'returnAsIs',
     options: {
-      getter: px
+      getter: 'px'
     }
   }
 };
@@ -7100,7 +5962,7 @@ var gridGap = {
 var gridColumnGap = {
   gridColumnGap: 'returnAsIs',
   options: {
-    getter: px,
+    getter: 'px',
     key: 'space'
   }
 };
@@ -7214,7 +6076,7 @@ var borderRadius = {
   bdRs: 'returnAsIs',
   options: {
     key: 'radii',
-    getter: px
+    getter: 'px'
   }
 };
 var background = {
@@ -7256,25 +6118,25 @@ var zIndex = {
 var top = {
   top: 'returnAsIs',
   options: {
-    getter: px
+    getter: 'px'
   }
 };
 var right = {
   right: 'returnAsIs',
   options: {
-    getter: px
+    getter: 'px'
   }
 };
 var bottom = {
   bottom: 'returnAsIs',
   options: {
-    getter: px
+    getter: 'px'
   }
 };
 var left = {
   left: 'returnAsIs',
   options: {
-    getter: px
+    getter: 'px'
   }
 };
 var boxShadow = {
@@ -7289,7 +6151,7 @@ var padding = {
   p: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var paddingLeft = {
@@ -7298,7 +6160,7 @@ var paddingLeft = {
   px: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var paddingRight = {
@@ -7307,7 +6169,7 @@ var paddingRight = {
   px: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var paddingTop = {
@@ -7316,7 +6178,7 @@ var paddingTop = {
   py: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var paddingBottom = {
@@ -7325,7 +6187,7 @@ var paddingBottom = {
   py: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var margin = {
@@ -7333,7 +6195,7 @@ var margin = {
   m: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var marginLeft = {
@@ -7342,7 +6204,7 @@ var marginLeft = {
   mx: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var marginRight = {
@@ -7351,7 +6213,7 @@ var marginRight = {
   mx: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var marginTop = {
@@ -7360,7 +6222,7 @@ var marginTop = {
   my: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var marginBottom = {
@@ -7369,7 +6231,7 @@ var marginBottom = {
   my: 'returnAsIs',
   options: {
     key: 'space',
-    getter: pxToRem
+    getter: 'pxToRem'
   }
 };
 var space = {
@@ -7468,5 +6330,5 @@ var index = Object.freeze({
 	zIndex: zIndex
 });
 
-export { index as styleDefs, utils as util, styler, spaceProp, BPProp, returnAsIs, pxTo, pxToRem, pxToEm, pxToPct, px, rem, em, pct, alignContent, alignItems, alignSelf, background, backgroundColor, backgroundImage, backgroundPosition, backgroundRepeat, backgroundSize, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, borders_c, bottom, boxShadow, color, colors, display, flex, flexDirection, flexBasis, flexWrap, fontFamily, fontSize, fontWeight, getters, gridArea, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, gridAutoColumns, gridAutoFlow, gridAutoRows, gridColumn, gridColumnGap, gridGap, gridRow, gridTemplate, gridTemplateAreas, gridTemplateColumns, gridTemplateRows, height, justifyContent, justifySelf, left, letterSpacing, lineHeight, margin, marginBottom, marginLeft, marginRight, marginTop, maxHeight, maxWidth, minHeight, minWidth, order, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, position, ratio_c, right, size_c, size_height_c, size_width_c, space, textAlign, top, width, zIndex };
+export { index as styleDefs, utils as util, styler, returnAsIs, getThemeAttr, pxTo, pxToRem, pxToEm, pxToPct, px, rem, em, pct, ms, spaceProp, BPProp, alignContent, alignItems, alignSelf, background, backgroundColor, backgroundImage, backgroundPosition, backgroundRepeat, backgroundSize, border, borderBottom, borderColor, borderLeft, borderRadius, borderRight, borderTop, borders_c, bottom, boxShadow, color, colors, display, flex, flexDirection, flexBasis, flexWrap, fontFamily, fontSize, fontWeight, getters, gridArea, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, gridAutoColumns, gridAutoFlow, gridAutoRows, gridColumn, gridColumnGap, gridGap, gridRow, gridTemplate, gridTemplateAreas, gridTemplateColumns, gridTemplateRows, height, justifyContent, justifySelf, left, letterSpacing, lineHeight, margin, marginBottom, marginLeft, marginRight, marginTop, maxHeight, maxWidth, minHeight, minWidth, order, padding, paddingBottom, paddingLeft, paddingRight, paddingTop, position, ratio_c, right, size_c, size_height_c, size_width_c, space, textAlign, top, width, zIndex };
 //# sourceMappingURL=styler.es.js.map
