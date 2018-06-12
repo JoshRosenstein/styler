@@ -5,6 +5,9 @@ import uglify from 'rollup-plugin-uglify'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
+import cleanup from 'rollup-plugin-cleanup'
+import filesize from 'rollup-plugin-filesize'
+
 import getNamedExports from './scripts/getNamedExports'
 import pkg from './package.json'
 
@@ -40,34 +43,23 @@ const plugins = [
     exclude: 'node_modules/**',
     ENV: JSON.stringify(process.env.NODE_ENV || 'development')
   }),
-  process.env.NODE_ENV === 'production' && uglify()
+  uglify(),
+  filesize()
 ]
-const external = F.keys( pkg.dependencies)
+const external = F.keys(pkg.dependencies)
 
 const configBase = {
   input: 'src/index.js',
   external,
-  treeshake:true,
+  treeshake: true,
   output: [
-    { file: pkg.module, format: 'es', sourcemap: true },
-    { file: pkg.main, format: 'cjs', sourcemap: true },
-    { file: pkg.browser, format: 'umd', name: pkg.moduleName, sourcemap: true }
+    { file: pkg.module, format: 'es', sourcemap: false },
+    { file: pkg.main, format: 'cjs', sourcemap: false },
+    { file: pkg.browser, format: 'umd', name: pkg.moduleName, sourcemap: false }
   ],
   plugins
 }
 
-// const UMDBase = {
-//   input: 'src/index.js',
-//   external,
-//   output: [
-//     {
-//       file: pkg.browser,
-//       format: 'umd',
-//       name: pkg.moduleName
-//     }
-//   ],
-//
-//   plugins
-// }
+
 
 export default configBase
