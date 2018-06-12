@@ -1,4 +1,17 @@
-import * as R from 'ramda'
+import {
+  isNil,
+  merge,
+  is,
+  keys,
+  reduce,
+  isEmpty,
+  last,
+  always,
+  pipe,
+  mergeDeepRight,
+  ifElse,
+  has
+} from '@roseys/futils'
 import parseInlinePattern from './parseInlinePattern'
 import {
   arrify,
@@ -31,7 +44,7 @@ const formatOutput = grouped =>
       Object.keys(grouped[loc]).reduce((style, propVal) => {
         var rule = grouped[loc][propVal]
 
-        if (R.isNil(rule.value)) {
+        if (isNil(rule.value)) {
           return style
         }
 
@@ -55,7 +68,7 @@ const formatOutput = grouped =>
           if (i === arr.length - 1) {
             r[rule.property] = rule.value
           }
-          style[selector] = R.merge(style[selector], r)
+          style[selector] = merge(style[selector] || {}, r)
           return style[selector]
         }, style)
         return style
@@ -93,7 +106,7 @@ const getRules = ({
   props,
   options = {}
 }) => {
-  if (R.is(Function)(obj)) {
+  if (is('Function')(obj)) {
     obj = obj(props)
   }
   const { options: globalOptions, ...rules } = obj
@@ -107,13 +120,13 @@ const getRules = ({
       props
     })
 
-  return R.pipe(
-    R.keys,
-    R.reduce(
+  return pipe(
+    keys,
+    reduce(
       (result, selectors) =>
-        R.pipe(
+        pipe(
           splitSelectors,
-          R.reduce((res, selector) => {
+          reduce((res, selector) => {
             const parsed = parseRules(
               getNested,
               selector,
@@ -136,10 +149,10 @@ const isPatternBlock = key => key === '__match'
 
 const isInlinePattern = (value, selector, location) =>
   isObjectLiteral(value) &&
-  !R.isEmpty(value) &&
+  !isEmpty(value) &&
   !containsSpecial(selector) &&
-  !R.isEmpty(selector) &&
-  !isNestable(R.last(location) || []) &&
+  !isEmpty(selector) &&
+  !isNestable(last(location) || []) &&
   !isPatternBlock(selector)
 
 const parseRules = (
@@ -167,18 +180,17 @@ const parseRules = (
   if (isPatternBlock(selector)) {
     const res = flow(
       value,
-      R.toPairs,
-      R.reduce((accumulated, [propName, rulesForProp]) => {
+      reduce((accumulated, rulesForProp, propName) => {
         return flow(
           props,
-          R.ifElse(
-            R.has(propName),
-            R.pipe(
-              R.always(rulesForProp),
+          ifElse(
+            has(propName),
+            pipe(
+              always(rulesForProp),
               whenFunctionCallWith(props[propName], props),
-              R.mergeDeepRight(accumulated)
+              mergeDeepRight(accumulated)
             ),
-            R.always(accumulated)
+            always(accumulated)
           )
         )
       }, {})
@@ -238,7 +250,7 @@ const parseRules = (
 const styler = obj => props => {
   var rules
 
-  if (R.is(Function)(obj)) {
+  if (is('Function')(obj)) {
     return styler(obj(props))(props)
   }
   if (Array.isArray(obj)) {

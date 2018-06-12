@@ -1,69 +1,82 @@
-import * as R from 'ramda'
+import {
+  merge,
+  always,
+  both,
+  isEmpty,
+  keys,
+  prop,
+  ifElse,
+  objOf,
+  values,
+  pick,
+  isNil,
+  is,
+  flip,
+  mergeDeepRight,
+  defaultTo,
+  when,
+} from '@roseys/futils'
+
 import {
   whenFunctionCallWith,
   isObjectLiteral,
   flow,
-  isUndefinedOrFalse,
   falseToNull,
   getThemeAttr,
-  mapObjOf,
   isBool,
   isTrueBool,
   pxToEm,
   isArray,
-  isString
+  isString,
+  iterateUntilResult,
+  arrToObj
 } from './utils'
 import computeOptions from './computeOptions'
 import lookupDefaultOptions from './lookupDefaultOptions'
 
 export default ({ value, props, globalOptions, key }) => {
   const { default: defaultValue, options: opt, ...matchers } = value
-  const options = R.merge(globalOptions, opt)
-  const intersectedMatchers = R.filter(
-    R.contains(R.__, R.keys(props)),
-    R.keys(matchers)
-  )
+  const options = merge(globalOptions, opt)
+  const intersectedMatchers = keys(pick(keys(matchers), props))
   let matchedPropName
 
-  const reducer = R.reduceWhile(
-    isUndefinedOrFalse,
-    (previous, propName) => {
-      matchedPropName = propName
-      return flow(
-        propName,
-        R.prop(R.__, matchers),
-        lookupDefaultOptions(props, 'functions'),
-        whenFunctionCallWith(props[propName], props),
-        whenFunctionCallWith(props)
-      )
-    },
-    false,
-    intersectedMatchers
-  )
-
   let computedValue
-
-  if (R.isEmpty(R.values(intersectedMatchers)) && R.isNil(defaultValue)) {
+  // console.log(intersectedMatchers,isEmpty(intersectedMatchers))
+  if (isEmpty(intersectedMatchers) && isNil(defaultValue)) {
     return computedValue
   }
 
-  if (R.isEmpty(R.values(intersectedMatchers)) && !R.isNil(defaultValue)) {
+  if (isEmpty(intersectedMatchers) && !isNil(defaultValue)) {
     computedValue = whenFunctionCallWith(props)(defaultValue)
   }
 
-  if (!R.isEmpty(intersectedMatchers)) {
-    computedValue = R.pipe(
+  if (!isEmpty(intersectedMatchers)) {
+    computedValue = flow(
+      intersectedMatchers,
+      iterateUntilResult((previous, propName) => {
+        matchedPropName = propName
+
+        return flow(
+          propName,
+          flip(prop)(matchers),
+          lookupDefaultOptions(props)('functions'),
+          whenFunctionCallWith(props[propName], props),
+          whenFunctionCallWith(props)
+        )
+      }),
       falseToNull,
-      R.defaultTo(whenFunctionCallWith(props)(defaultValue))
-    )(reducer)
+      defaultTo(whenFunctionCallWith(props)(defaultValue))
+    )
   }
 
   if (!computedValue) {
     return computedValue
   }
-  const matchedProp = R.prop(matchedPropName, props)
+  const matchedProp = prop(matchedPropName, props)
   let nonResponisiveComputedValue = computedValue
-  let isResponsiveBoolean = isString(computedValue) && R.is(Object, matchedProp)
+  let isResponsiveBoolean =
+    (isString(computedValue) && is('Array', matchedProp)) ||
+    is('Object', matchedProp)
 
   if (isResponsiveBoolean) {
     computedValue = matchedProp
@@ -76,18 +89,21 @@ export default ({ value, props, globalOptions, key }) => {
     let themeBPs = getThemeAttr('breakpoints')(props)
 
     if (isArray(themeBPs)) {
-      themeBPs = R.pipe(R.toPairs, R.fromPairs)(themeBPs)
+      themeBPs = arrToObj(themeBPs)
     }
 
     if (isArray(breakpoints)) {
-      breakpoints = R.pipe(R.toPairs, R.fromPairs)(breakpoints)
+      // console.log(breakpoints)
 
+      breakpoints = arrToObj(breakpoints)
+      // console.log(breakpoints)
       if (isObjectLiteral(themeBPs)) {
-        themeBPs = R.pipe(R.values, R.toPairs, R.fromPairs)(themeBPs)
+        themeBPs = arrToObj(values(themeBPs))
+        // console.log(themeBPs)
       }
     }
 
-    let getBp = R.prop(R.__, themeBPs)
+    let getBp = flip(prop)(themeBPs)
 
     breakpoints = Object.keys(breakpoints)
       .sort((a, b) => getBp(a) - getBp(b))
@@ -95,24 +111,20 @@ export default ({ value, props, globalOptions, key }) => {
         acc[key] = breakpoints[key]
         return acc
       }, {})
-    // key='&'
+
     const CSSObj = Object.keys(breakpoints).reduce((acc, bpKey) => {
       const minWidth = pxToEm(getBp(bpKey))
-      const currentVal = R.when(
-        R.both(R.always(isResponsiveBoolean), isBool),
-        R.ifElse(
-          isTrueBool,
-          R.always(nonResponisiveComputedValue),
-          R.always(null)
-        )
+      const currentVal = when(
+        both(always(isResponsiveBoolean), isBool),
+        ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null))
       )(breakpoints[bpKey])
-      const res = R.isNil(computeOpt(currentVal))
+      const res = isNil(computeOpt(currentVal))
         ? {}
         : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1
-          ? R.objOf(key, computeOpt(currentVal))
-          : mapObjOf(
-              `@media screen and (min-width:${minWidth})`,
-              R.objOf(key, computeOpt(currentVal))
+          ? objOf(key, computeOpt(currentVal))
+          : objOf(
+              [`@media screen and (min-width:${minWidth})`, key],
+              computeOpt(currentVal)
             )
 
       const mkey =
@@ -120,7 +132,7 @@ export default ({ value, props, globalOptions, key }) => {
           ? key
           : `@media screen and (min-width:${minWidth})`
 
-      return R.mergeDeepRight(acc, res)
+      return mergeDeepRight(acc, res)
     }, {})
 
     return CSSObj

@@ -8,13 +8,13 @@ import {
   ms,
   pct
 } from './utils'
-import * as R from 'ramda'
 
-import { concat } from 'ramda'
+import { when, concat, path, pathOr, split } from '@roseys/futils'
 
-export const lookUpShortcut = R.curry((dictionary, value) =>
-  R.when(isString, v => dictionary(v) || v, value)
-)
+
+// export const lookUpShortcut = curry2((dictionary, value) =>
+//   when(isString, v => dictionary(v) || v, value)
+// )
 
 const defaultLookups = {
   keys: {
@@ -73,16 +73,15 @@ const defaultLookups = {
   }
 }
 
-export const getDefaultLookups_ = attr =>
-  R.path(R.split('.', attr))(defaultLookups)
+export const getDefaultLookups_ = attr => path(split('.', attr))(defaultLookups)
 
 export const getDefaultLookups = (attr, fallback) =>
   getDefaultLookups_(attr) || fallback
 
 export const getAttrFB = (attr = '', defaultTo = '') =>
-  R.pathOr(
+  pathOr(
     getDefaultLookups(attr, defaultTo),
-    R.split('.', concat('theme.styler.defaults.', attr))
+    split('.', concat('theme.styler.defaults.', attr))
   )
 
 // const lookupDefaultOptions_ = (props, dictionary, value) =>
@@ -93,7 +92,7 @@ export const getAttrFB = (attr = '', defaultTo = '') =>
 //       )(props)
 //     : value;
 
-const lookupDefaultOptions_ = (props, dictionary, value) =>
+const lookupDefaultOptions = props => dictionary => value =>
   isString(value)
     ? getAttrFB(
         `${dictionary}.${value}`,
@@ -101,4 +100,4 @@ const lookupDefaultOptions_ = (props, dictionary, value) =>
       )(props)
     : value
 
-export default R.curryN(3, lookupDefaultOptions_)
+export default lookupDefaultOptions

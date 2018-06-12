@@ -1,11 +1,11 @@
-import * as F from 'ramda'
+import * as F from '@roseys/futils'
 
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
-
+import getNamedExports from './scripts/getNamedExports'
 import pkg from './package.json'
 
 const plugins = [
@@ -16,7 +16,8 @@ const plugins = [
   }),
   commonjs({
     include: 'node_modules/**',
-    extensions: ['.js']
+    extensions: ['.js'],
+    namedExports: getNamedExports(['@roseys/futils/curry'])
   }),
   babel({
     babelrc: false,
@@ -41,7 +42,7 @@ const plugins = [
   }),
   process.env.NODE_ENV === 'production' && uglify()
 ]
-const external = F.keys(F.omit(['ramda'], pkg.dependencies))
+const external = F.keys( pkg.dependencies)
 
 const configBase = {
   input: 'src/index.js',

@@ -1,62 +1,65 @@
-import * as R from 'ramda'
-
 import {
   curry,
-  curryN,
   pipe,
-  type,
   isNil,
   complement,
-  toLower,
-  anyPass,
-  equals,
-  map,
+  flip,
+  toString,
+  test,
+  identity,
+  mapValues as map,
+  curryN,
+  simplyEquals,
   reduce,
   split,
-  flip,
   reduceWhile,
   either,
   concat,
   toPairs,
   filter,
-  __,
-  isEmpty,
-  is as RIs,
-  both,
   divide,
-  unless,
-  of,
-  when as Rwhen,
+  isEmpty,
+  is,
+  mergeAll,
+  reduceRight,
   mergeDeepLeft,
   mergeDeepRight,
-  defaultTo,
-  identity,
+  when,
+  toArray,
+  both,
   pathOr,
   objOf,
-  reduceRight,
-  mergeAll,
-  toString,
-  test
-} from 'ramda'
+  defaultTo,
+  attach
+} from '@roseys/futils'
+
 import defaultTheme from './defaultTheme'
+
+export const arrToObj = arr => {
+  return reduce(
+    (accumulated, value, key) => attach(key, value, accumulated),
+    {},
+    arr
+  )
+}
 export const flow = (value, ...argsToGive) => pipe(...argsToGive)(value)
 // pxToEm, returnAsIs, pxToRem, pxToPct, px
-export const isArray = RIs(Array)
-export const isString = RIs(String)
-export const isFunction = RIs(Function)
-export const isNumber = RIs(Number)
-export const isBool = RIs(Boolean)
-export const isTruthy = either(Boolean, equals(0))
+export const isArray = is('Array')
+export const isString = is('String')
+export const isFunction = is('Function')
+export const isNumber = is('Number')
+export const isBool = is('Boolean')
+export const isTruthy = either(Boolean, simplyEquals(0))
 export const isTrueBool = both(isBool, isTruthy)
 
 export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
 export const mergeAllDeepRight = reduce(mergeDeepRight, {})
 
-export const isNonZeroNumber = both(RIs(Number), complement(equals(0)))
+export const isNonZeroNumber = both(is('Number'), complement(simplyEquals(0)))
 export const appendString = flip(concat)
 
 export const whenisNonZeroNumber = curryN(2, (fn, input) =>
-  Rwhen(isNonZeroNumber, defaultTo(identity, fn))(input)
+  when(isNonZeroNumber, defaultTo(identity, fn))(input)
 )
 
 export const appendUnit = unit =>
@@ -81,8 +84,8 @@ export const pct = appendUnit('%')
 export const ms = appendUnit('ms')
 export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
-export const toArray = unless(anyPass([isArray, isNilOrEmpty]), of)
-export const isNilOrEmptyOrFalse = either(isNilOrEmpty, equals(false))
+export { toArray }
+export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
 
 export const filterNilAndEmpty = filter(complement(isNilOrEmpty))
 export const filterNilOrEmptyOrFalse = filter(complement(isNilOrEmptyOrFalse))
@@ -110,7 +113,7 @@ export const lookUpValue = curryN(3, (themeKey, val, props) => {
 })
 
 export const mapObjOf = curry((key, val) =>
-  pipe(toArray, map(objOf(__, val)), mergeAll)(key)
+  pipe(toArray, map(x => objOf(x, val)), mergeAll)(key)
 )
 
 /// For quick nested selectors
@@ -122,10 +125,6 @@ export const UnflattenObj = pipe(
   mergeAllDeepLeft
 )
 
-export const isType = curry(
-  (expected, value) => toLower(type(value)) === toLower(expected)
-)
-
 export const isFalsy = value => !value
 
 export const reduceWhileFalsy = curry((handlerFn, list) =>
@@ -134,18 +133,15 @@ export const reduceWhileFalsy = curry((handlerFn, list) =>
 
 export const includes = curry((comparator, value) => value.includes(comparator))
 
-// export const isArray = isType('array')
-// export const isString = isType('string')
-// export const isFunction = isType('function')
-export const isObjectLiteral = isType('object')
-// export const isNumber = isType('number')
-export const isSymbol = isType('symbol')
-export const isMap = isType('map')
+export const isObjectLiteral = is('Object')
+
+export const isSymbol = is('Symbol')
+export const isMap = is('Map')
 
 export const isDefined = complement(isNil)
 export const isNotDefined = isNil
 
-export const isUndefinedOrFalse = either(isNotDefined, equals(false))
+export const isUndefinedOrFalse = either(isNotDefined, simplyEquals(false))
 
 export const returnAsIs = value => value
 
@@ -156,30 +152,16 @@ export const valueAsFunction = value => {
   return value
 }
 
-export const fallbackTo = fallback =>
-  R.compose(R.defaultTo(fallback), falseToNull)
 export const falseToNull = value => {
   if (value === false) return null
   return value
 }
-
-export const iterateUntilResult = R.curry((computeFn, list) => {
-  const reduceWhileInvalid = iterateFn =>
-    R.reduceWhile(isUndefinedOrFalse, iterateFn, false)
-  const iterateObject = reduceWhileInvalid((previous, [key, value]) =>
-    computeFn(key, value)
-  )
-  const iterateList = reduceWhileInvalid((previous, current) =>
-    computeFn(current)
-  )
-
-  if (flow(list, isObjectLiteral)) return flow(list, R.toPairs, iterateObject)
-
-  return flow(list, iterateList)
-})
+export const fallbackTo = fallback => pipe(falseToNull, defaultTo(fallback))
+export const iterateUntilResult = computeFn => obj =>
+  reduceWhile(isUndefinedOrFalse, computeFn, false, obj)
 
 export const whenFunctionCallWith = (...argsToGive) =>
-  R.when(R.is(Function), fnItem => fnItem(...argsToGive))
+  when(is('Function'), fnItem => fnItem(...argsToGive))
 
 export const isAtRule = selector => selector.indexOf('@') === 0
 

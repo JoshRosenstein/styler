@@ -1,4 +1,5 @@
-import * as R from 'ramda'
+import { pipe } from '@roseys/futils'
+
 import { whenFunctionCallWith, getThemeAttr, isNumber, isString } from './utils'
 
 import lookupDefaultOptions from './lookupDefaultOptions'
@@ -37,7 +38,7 @@ export default ({ val, options, selector, props }) => {
     let { key: themeKey, getter } = options
     /// If options was not provided, check default lookUp
 
-    themeKey = themeKey || lookupDefaultOptions(props, 'keys', selector)
+    themeKey = themeKey || lookupDefaultOptions(props)('keys')(selector)
 
     if (themeKey && isString(val)) {
       /// Check Strip Negative Before lookingUp
@@ -48,10 +49,10 @@ export default ({ val, options, selector, props }) => {
       val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
     }
 
-    getter = getter || lookupDefaultOptions(props, 'getter', selector)
+    getter = getter || lookupDefaultOptions(props)('getter')(selector)
     if (getter) {
-      val = R.pipe(
-        lookupDefaultOptions(props, 'functions'),
+      val = pipe(
+        lookupDefaultOptions(props)('functions'),
 
         whenFunctionCallWith(val, props)
       )(getter)
