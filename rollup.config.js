@@ -47,8 +47,7 @@ const external = F.keys( pkg.dependencies)
 const configBase = {
   input: 'src/index.js',
   external,
-  legacy: false,
-  treeshake: true,
+  treeshake:true,
   output: [
     { file: pkg.module, format: 'es', sourcemap: true },
     { file: pkg.main, format: 'cjs', sourcemap: true },
