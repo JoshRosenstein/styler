@@ -1,4 +1,4 @@
-import { pipe } from '@roseys/futils'
+import { pipe,isEmpty } from '@roseys/futils'
 
 import { whenFunctionCallWith, getThemeAttr, isNumber, isString } from './utils'
 
@@ -32,7 +32,7 @@ import lookupDefaultOptions from './lookupDefaultOptions'
 //
 //   return val
 // }
-
+// // TODO: themeKey empty string, if grabbing from root
 export default ({ val, options, selector, props }) => {
   if (options && val) {
     let { key: themeKey, getter } = options
@@ -44,8 +44,8 @@ export default ({ val, options, selector, props }) => {
       /// Check Strip Negative Before lookingUp
       const isNeg = /^-.+/.test(val)
       const absN = isNeg ? val.slice(1) : val
-
-      val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+      const themeProp = !isEmpty(themeKey) ? `${themeKey}.${absN}` : absN
+      val = getThemeAttr(themeProp, val)(props)
       val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
     }
 

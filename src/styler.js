@@ -10,7 +10,8 @@ import {
   pipe,
   mergeDeepRight,
   ifElse,
-  has
+  has,
+  objOf
 } from '@roseys/futils'
 import parseInlinePattern from './parseInlinePattern'
 import {
@@ -38,65 +39,92 @@ export const hasReference = selector => selector.indexOf('&') !== -1
 export const isNestable = selector =>
   isAtRule(selector) && isNestableAtRule(selector)
 
-const formatOutput = grouped =>
-  Object.keys(grouped).reduce(
-    (style, loc) =>
-      Object.keys(grouped[loc]).reduce((style, propVal) => {
-        var rule = grouped[loc][propVal]
+//let debug = false
 
-        if (isNil(rule.value)) {
+//const log = (...args) => debug && log(...args)
+
+const reduceRule = (rules, result) =>
+  reduce(
+    (style, rule, ruleid) => {
+      if (isNil(rule.value)) {
+        return style
+      }
+      if (rule.value === '' && rule.property !== 'content') {
+        rule.value = undefined
+      }
+      ///For Nested selectors
+      var location = rule.location.concat(rule.selectors.join(', '))
+      location.reduce((style, selector, i, arr) => {
+        selector = selector.trim()
+        if (!selector) {
+          if (rule.property === '@font-face') {
+            style[rule.property] = style[rule.property]
+              ? arrify(style[rule.property]).concat(rule.value)
+              : rule.value
+          } else {
+            style[rule.property] = rule.value
+          }
           return style
         }
-
-        if (rule.value === '' && rule.property !== 'content') {
-          rule.value = undefined
+        const r = {}
+        if (i === arr.length - 1) {
+          r[rule.property] = rule.value
         }
-
-        var location = rule.location.concat(rule.selectors.join(', '))
-        location.reduce((style, selector, i, arr) => {
-          if (!selector) {
-            if (rule.property === '@font-face') {
-              style[rule.property] = style[rule.property]
-                ? arrify(style[rule.property]).concat(rule.value)
-                : rule.value
-            } else {
-              style[rule.property] = rule.value
-            }
-            return style
-          }
-          var r = {}
-          if (i === arr.length - 1) {
-            r[rule.property] = rule.value
-          }
-          style[selector] = merge(style[selector] || {}, r)
-          return style[selector]
-        }, style)
-        return style
-      }, style),
-    {}
+        style[selector] = merge(style[selector] || {}, r)
+        return style[selector]
+      }, style)
+      //return style[selector]
+      return style
+    },
+    result,
+    rules
   )
 
-const groupRules = rules => {
-  var grouped = {}
-  for (var i = 0, len = rules.length; i < len; i++) {
-    var rule = rules[i]
-    var id =
-      rule.property + (typeof rule.value !== 'object' ? rule.value : '__' + i)
-    if (!grouped[rule.location]) {
-      grouped[rule.location] = {}
+const formatOutput = grouped => {
+  return reduce(
+    (result, rules, parentSelector) => {
+      return reduceRule(rules, result)
+    },
+    {},
+    grouped
+  )
+}
+
+const groupRules = (rules, group = true) => {
+  const idFn = (property, selector, value, i) => {
+    if (group) {
+      return (
+        property +
+        (selector === '' ? 'root' : '') +
+        (typeof value !== 'object' ? value : '__' + i)
+      )
     }
-    if (!grouped[rule.location][id]) {
-      grouped[rule.location][id] = {
-        location: rule.location,
-        selectors: rule.selector ? [rule.selector] : [],
-        property: rule.property,
-        value: rule.value
-      }
-    } else if (rule.selector) {
-      grouped[rule.location][id].selectors.push(rule.selector)
-    }
+    return selector + property + (typeof value !== 'object' ? value : '__' + i)
   }
-  return grouped
+
+  return reduce(
+    (grouped, rule, i) => {
+      var id = idFn(rule.property, rule.selector, rule.value, i)
+
+      if (!grouped[rule.location]) {
+        grouped[rule.location] = {}
+      }
+
+      if (!grouped[rule.location][id]) {
+        grouped[rule.location][id] = {
+          location: rule.location,
+          selectors: rule.selector ? [rule.selector] : [],
+          property: rule.property,
+          value: rule.value
+        }
+      } else if (rule.selector) {
+        grouped[rule.location][id].selectors.push(rule.selector)
+      }
+      return grouped
+    },
+    {},
+    rules
+  )
 }
 
 const getRules = ({
@@ -247,9 +275,9 @@ const parseRules = (
   }
 }
 
-const styler = obj => props => {
+const styler = (obj, groupSelectors = false) => props => {
   var rules
-
+  ///debug = props.debug ? true : false
   if (is('Function')(obj)) {
     return styler(obj(props))(props)
   }
@@ -261,6 +289,9 @@ const styler = obj => props => {
     // return obj
     rules = getRules({ obj, props })
   }
+
+  const grouped = groupRules(rules, groupSelectors)
+
   return flow(rules, groupRules, formatOutput)
 }
 

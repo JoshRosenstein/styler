@@ -14,7 +14,7 @@ import {
   flip,
   mergeDeepRight,
   defaultTo,
-  when,
+  when
 } from '@roseys/futils'
 
 import {
