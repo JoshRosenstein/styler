@@ -1,6 +1,5 @@
 export { default as styler } from "./styler";
 export {
-  returnAsIs,
   getThemeAttr,
   pxTo,
   pxToRem,
@@ -12,10 +11,7 @@ export {
   pct,
   ms
 } from "./utils";
-export { default as spaceProp, BPProp } from "./spaceProp";
-export * as styleDefs from "./styleDefs";
-
-export * as util from './utils'
+export { spaceProp, spacePropDef, BPPropDef, BPProp } from './spaceProp'
 
 export {
   alignContent,

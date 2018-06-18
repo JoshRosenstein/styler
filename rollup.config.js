@@ -15,12 +15,13 @@ const plugins = [
   resolve({
     jsnext: true,
     main: true,
-    browser: true
+    browser: true,
   }),
   commonjs({
     include: 'node_modules/**',
-    extensions: ['.js'],
-    namedExports: getNamedExports(['@roseys/futils/curry'])
+    extensions: ['.js']
+    //namedExports: { '@roseys/futils/lib/isNil': ['isNil'] }
+    //getNamedExports(['@roseys/futils/curry'])
   }),
   babel({
     babelrc: false,

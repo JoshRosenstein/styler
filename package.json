@@ -6,6 +6,7 @@
   "author": "Joshua Rosenstein",
   "license": "MIT",
   "scripts": {
+    "prepack": "yarn run build:prod",
     "clean": "rimraf node_modules && rimraf dist",
     "build:prod": "SET NODE_ENV=production && rollup -c",
     "build:dev": "rollup -c",
@@ -29,7 +30,7 @@
   "browser": "dist/styler.umd.js",
   "moduleName": "roseyStyler",
   "dependencies": {
-    "@roseys/futils": "^0.0.9"
+    "@roseys/futils": "latest"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.42",
@@ -61,7 +62,6 @@
     "node-eval": "^2.0.0",
     "path": "^0.12.7",
     "prettier": "^1.11.1",
-    "ramda": "0.25.0",
     "rimraf": "^2.6.1",
     "rollup": "0.59.2",
     "rollup-plugin-babel": "4.0.0-beta.2",

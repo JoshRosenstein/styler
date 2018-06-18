@@ -1,5 +1,4 @@
 import {
-  curry,
   pipe,
   isNil,
   complement,
@@ -16,21 +15,21 @@ import {
   either,
   concat,
   toPairs,
-  filter,
   divide,
   isEmpty,
   is,
-  mergeAll,
   reduceRight,
-  mergeDeepLeft,
-  mergeDeepRight,
   when,
   toArray,
   both,
   pathOr,
   objOf,
   defaultTo,
-  attach
+  attach,
+  round,
+  mergeAllDeepLeft,
+  mergeAllDeepRight,
+  not
 } from '@roseys/futils'
 
 import defaultTheme from './defaultTheme'
@@ -42,7 +41,7 @@ export const arrToObj = arr => {
     arr
   )
 }
-export const flow = (value, ...argsToGive) => pipe(...argsToGive)(value)
+
 // pxToEm, returnAsIs, pxToRem, pxToPct, px
 export const isArray = is('Array')
 export const isString = is('String')
@@ -52,8 +51,8 @@ export const isBool = is('Boolean')
 export const isTruthy = either(Boolean, simplyEquals(0))
 export const isTrueBool = both(isBool, isTruthy)
 
-export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
-export const mergeAllDeepRight = reduce(mergeDeepRight, {})
+//export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
+//export const mergeAllDeepRight = reduce(mergeDeepRight, {})
 
 export const isNonZeroNumber = both(is('Number'), complement(simplyEquals(0)))
 export const appendString = flip(concat)
@@ -67,12 +66,32 @@ export const appendUnit = unit =>
 
 const divideBy = flip(divide)
 
-export const pxTo = curry((divisor, unit, num) =>
-  whenisNonZeroNumber(
-    pipe(divideBy(defaultTo(16, divisor)), toString, appendString(unit)),
-    num
-  )
-)
+export function stripUnit(value, returnUnit) {
+  const unitlessValue = parseFloat(value)
+
+  if (returnUnit) {
+    const cssRegex = /^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/
+    if (typeof value === 'number' || !value.match(cssRegex)) return [value, 0]
+    return [unitlessValue, value.match(cssRegex)[2]]
+  } else {
+    if (isNaN(unitlessValue)) return value
+    return unitlessValue
+  }
+}
+
+export const pxTo = curryN(3, (divisor, unit, num) => {
+  const [unitless, un] = stripUnit(num, true)
+  if (un && un !== 'px') return num
+  if (isNonZeroNumber(unitless)) {
+    return pipe(
+      divideBy(defaultTo(16, divisor)),
+      round(3),
+      toString,
+      appendString(unit)
+    )(unitless)
+  }
+  return num
+})
 
 export const pxToRem = pxTo(16, 'rem')
 export const pxToEm = pxTo(16, 'em')
@@ -84,11 +103,11 @@ export const pct = appendUnit('%')
 export const ms = appendUnit('ms')
 export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
-export { toArray }
+
 export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
 
-export const filterNilAndEmpty = filter(complement(isNilOrEmpty))
-export const filterNilOrEmptyOrFalse = filter(complement(isNilOrEmptyOrFalse))
+//export const filterNilAndEmpty = reject(isNilOrEmpty)
+//export const filterNilOrEmptyOrFalse = reject(isNilOrEmptyOrFalse)
 
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(split('.', attr))(fallBackObj)
@@ -112,8 +131,8 @@ export const lookUpValue = curryN(3, (themeKey, val, props) => {
   return isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
 })
 
-export const mapObjOf = curry((key, val) =>
-  pipe(toArray, map(x => objOf(x, val)), mergeAll)(key)
+export const mapObjOf = curryN(2, (key, val) =>
+  pipe(toArray, map(x => objOf(x, val)), mergeAllDeepRight)(key)
 )
 
 /// For quick nested selectors
@@ -125,32 +144,11 @@ export const UnflattenObj = pipe(
   mergeAllDeepLeft
 )
 
-export const isFalsy = value => !value
-
-export const reduceWhileFalsy = curry((handlerFn, list) =>
-  reduceWhile(isFalsy, handlerFn, false, list)
+export const reduceWhileFalsy = curryN(2, (handlerFn, list) =>
+  reduceWhile(not, handlerFn, false, list)
 )
 
-export const includes = curry((comparator, value) => value.includes(comparator))
-
-export const isObjectLiteral = is('Object')
-
-export const isSymbol = is('Symbol')
-export const isMap = is('Map')
-
-export const isDefined = complement(isNil)
-export const isNotDefined = isNil
-
-export const isUndefinedOrFalse = either(isNotDefined, simplyEquals(false))
-
-export const returnAsIs = value => value
-
-// Takes any value, and if the value is not a function, return a new function that
-// always returns that value; otherwise, if the value is already a function, just return it.
-export const valueAsFunction = value => {
-  if (!isFunction(value)) return () => value
-  return value
-}
+export const isUndefinedOrFalse = either(isNil, simplyEquals(false))
 
 export const falseToNull = value => {
   if (value === false) return null
@@ -194,12 +192,4 @@ export const splitSelectors = selectors => {
   }
   splitted.push(current.trim())
   return splitted
-}
-
-export const arrify = val => {
-  if (val === null || val === undefined) {
-    return []
-  }
-
-  return Array.isArray(val) ? val : [val]
 }

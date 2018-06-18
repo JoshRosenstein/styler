@@ -3,8 +3,7 @@
  */
 
 import stylerWithTheme from './utils/stylerWithTheme'
-import * as Utils from '../src/utils'
-import { styler, returnAsIs, getThemeAttr } from '../src'
+import { styler, getThemeAttr } from '../src'
 
 describe('Styler', () => {
   describe('Simple Match Boolean Execution', () => {
@@ -64,7 +63,7 @@ describe('Styler', () => {
       testCSSProp: {
         addOne: v => v,
         returnPropValue: v => v,
-        returnAsIs: returnAsIs,
+        returnAsIs: 'returnAsIs',
         dependsOnOtherProp: (value, p) => p.otherProp,
         getThemeColor: (value, p) => getThemeAttr(`colors.${value}`)(p),
         default: 'white'
@@ -282,7 +281,7 @@ describe('Styler', () => {
         },
         {
           testCSSProp2: {
-            contollerProp: returnAsIs
+            contollerProp: 'returnAsIs'
           }
         }
       ])

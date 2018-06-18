@@ -11,14 +11,13 @@ import {
   mergeDeepRight,
   ifElse,
   has,
-  objOf
+  flow,
+  toArray,
+  isObject
 } from '@roseys/futils'
 import parseInlinePattern from './parseInlinePattern'
 import {
-  arrify,
   whenFunctionCallWith,
-  isObjectLiteral,
-  flow,
   falseToNull,
   splitSelectors,
   isAtRule
@@ -59,7 +58,7 @@ const reduceRule = (rules, result) =>
         if (!selector) {
           if (rule.property === '@font-face') {
             style[rule.property] = style[rule.property]
-              ? arrify(style[rule.property]).concat(rule.value)
+              ? toArray(style[rule.property]).concat(rule.value)
               : rule.value
           } else {
             style[rule.property] = rule.value
@@ -176,7 +175,7 @@ const getRules = ({
 const isPatternBlock = key => key === '__match'
 
 const isInlinePattern = (value, selector, location) =>
-  isObjectLiteral(value) &&
+  isObject(value) &&
   !isEmpty(value) &&
   !containsSpecial(selector) &&
   !isEmpty(selector) &&
@@ -235,12 +234,12 @@ const parseRules = (
       globalOptions: options
     })
     // return parseNested(value, parents, location);
-    if (isObjectLiteral(value)) {
+    if (isObject(value)) {
       return parseNested(value, parents, location)
     }
   }
 
-  if (isObjectLiteral(value)) {
+  if (isObject(value)) {
     var nestable = isNestable(selector)
     if (nestable) {
       location = location.concat(selector)

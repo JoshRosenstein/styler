@@ -1,8 +1,36 @@
-import { pipe,isEmpty } from '@roseys/futils'
+import { pipe } from '@roseys/futils'
 
 import { whenFunctionCallWith, getThemeAttr, isNumber, isString } from './utils'
 
 import lookupDefaultOptions from './lookupDefaultOptions'
+
+export default ({ val, options, selector, props }) => {
+  if (options && val) {
+    let { key: themeKey, getter } = options
+    /// If options was not provided, check default lookUp
+
+    themeKey = themeKey || lookupDefaultOptions(props)('keys')(selector)
+
+    if (themeKey && isString(val)) {
+      /// Check Strip Negative Before lookingUp
+      const isNeg = /^-.+/.test(val)
+      const absN = isNeg ? val.slice(1) : val
+
+      val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+      val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
+    }
+
+    getter = getter || lookupDefaultOptions(props)('getter')(selector)
+    if (getter) {
+      val = pipe(
+        lookupDefaultOptions(props)('functions'),
+
+        whenFunctionCallWith(val, props)
+      )(getter)
+    }
+  }
+  return val
+}
 
 // export const computeGetter = ({ val, selector, options, props }) => {
 //   let { getter } = options
@@ -32,31 +60,3 @@ import lookupDefaultOptions from './lookupDefaultOptions'
 //
 //   return val
 // }
-// // TODO: themeKey empty string, if grabbing from root
-export default ({ val, options, selector, props }) => {
-  if (options && val) {
-    let { key: themeKey, getter } = options
-    /// If options was not provided, check default lookUp
-
-    themeKey = themeKey || lookupDefaultOptions(props)('keys')(selector)
-
-    if (themeKey && isString(val)) {
-      /// Check Strip Negative Before lookingUp
-      const isNeg = /^-.+/.test(val)
-      const absN = isNeg ? val.slice(1) : val
-      const themeProp = !isEmpty(themeKey) ? `${themeKey}.${absN}` : absN
-      val = getThemeAttr(themeProp, val)(props)
-      val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
-    }
-
-    getter = getter || lookupDefaultOptions(props)('getter')(selector)
-    if (getter) {
-      val = pipe(
-        lookupDefaultOptions(props)('functions'),
-
-        whenFunctionCallWith(val, props)
-      )(getter)
-    }
-  }
-  return val
-}

@@ -14,13 +14,13 @@ import {
   flip,
   mergeDeepRight,
   defaultTo,
-  when
+  when,
+  flow,
+  isObject
 } from '@roseys/futils'
 
 import {
   whenFunctionCallWith,
-  isObjectLiteral,
-  flow,
   falseToNull,
   getThemeAttr,
   isBool,
@@ -41,7 +41,6 @@ export default ({ value, props, globalOptions, key }) => {
   let matchedPropName
 
   let computedValue
-  // console.log(intersectedMatchers,isEmpty(intersectedMatchers))
   if (isEmpty(intersectedMatchers) && isNil(defaultValue)) {
     return computedValue
   }
@@ -84,7 +83,7 @@ export default ({ value, props, globalOptions, key }) => {
   const computeOpt = val =>
     computeOptions({ val, options, selector: key, props })
 
-  if (isObjectLiteral(computedValue) || isArray(computedValue)) {
+  if (isObject(computedValue) || isArray(computedValue)) {
     let breakpoints = computedValue
     let themeBPs = getThemeAttr('breakpoints')(props)
 
@@ -93,13 +92,10 @@ export default ({ value, props, globalOptions, key }) => {
     }
 
     if (isArray(breakpoints)) {
-      // console.log(breakpoints)
-
       breakpoints = arrToObj(breakpoints)
-      // console.log(breakpoints)
-      if (isObjectLiteral(themeBPs)) {
+
+      if (isObject(themeBPs)) {
         themeBPs = arrToObj(values(themeBPs))
-        // console.log(themeBPs)
       }
     }
 

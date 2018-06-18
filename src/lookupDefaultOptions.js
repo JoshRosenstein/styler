@@ -1,20 +1,14 @@
+import { pxToEm, pxToRem, pxToPct, px, isString, ms, pct } from './utils'
+
 import {
-  pxToEm,
-  returnAsIs,
-  pxToRem,
-  pxToPct,
-  px,
-  isString,
-  ms,
-  pct
-} from './utils'
-
-import { when, concat, path, pathOr, split } from '@roseys/futils'
-
-
-// export const lookUpShortcut = curry2((dictionary, value) =>
-//   when(isString, v => dictionary(v) || v, value)
-// )
+  when,
+  concat,
+  path,
+  pathOr,
+  split,
+  curryN,
+  identity
+} from '@roseys/futils'
 
 const defaultLookups = {
   keys: {
@@ -59,10 +53,10 @@ const defaultLookups = {
     fontSize: 'px'
   },
   functions: {
-    returnAsIs: returnAsIs,
-    identity: returnAsIs,
-    propValue: returnAsIs,
-    self: returnAsIs,
+    returnAsIs: identity,
+    identity: identity,
+    propValue: identity,
+    self: identity,
     pxToRem: pxToRem,
     pxToEm: pxToEm,
     pxToPct: pxToPct,
@@ -78,7 +72,7 @@ export const getDefaultLookups_ = attr => path(split('.', attr))(defaultLookups)
 export const getDefaultLookups = (attr, fallback) =>
   getDefaultLookups_(attr) || fallback
 
-export const getAttrFB = (attr = '', defaultTo = '') =>
+const getAttrFB = (attr = '', defaultTo = '') =>
   pathOr(
     getDefaultLookups(attr, defaultTo),
     split('.', concat('theme.styler.defaults.', attr))
@@ -92,12 +86,15 @@ export const getAttrFB = (attr = '', defaultTo = '') =>
 //       )(props)
 //     : value;
 
-const lookupDefaultOptions = props => dictionary => value =>
-  isString(value)
-    ? getAttrFB(
-        `${dictionary}.${value}`,
-        dictionary === 'getter' ? null : value
-      )(props)
-    : value
+const lookupDefaultOptions = curryN(
+  3,
+  (props, dictionary, value) =>
+    isString(value)
+      ? getAttrFB(
+          `${dictionary}.${value}`,
+          dictionary === 'getter' ? null : value
+        )(props)
+      : value
+)
 
 export default lookupDefaultOptions
