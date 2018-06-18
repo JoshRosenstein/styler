@@ -42,7 +42,6 @@ export const arrToObj = arr => {
   )
 }
 
-// pxToEm, returnAsIs, pxToRem, pxToPct, px
 export const isArray = is('Array')
 export const isString = is('String')
 export const isFunction = is('Function')
@@ -50,9 +49,6 @@ export const isNumber = is('Number')
 export const isBool = is('Boolean')
 export const isTruthy = either(Boolean, simplyEquals(0))
 export const isTrueBool = both(isBool, isTruthy)
-
-//export const mergeAllDeepLeft = reduce(mergeDeepLeft, {})
-//export const mergeAllDeepRight = reduce(mergeDeepRight, {})
 
 export const isNonZeroNumber = both(is('Number'), complement(simplyEquals(0)))
 export const appendString = flip(concat)
@@ -66,7 +62,7 @@ export const appendUnit = unit =>
 
 const divideBy = flip(divide)
 
-export function stripUnit(value, returnUnit) {
+export const stripUnit = (value, returnUnit) => {
   const unitlessValue = parseFloat(value)
 
   if (returnUnit) {
@@ -105,9 +101,6 @@ export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
 
 export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
-
-//export const filterNilAndEmpty = reject(isNilOrEmpty)
-//export const filterNilOrEmptyOrFalse = reject(isNilOrEmptyOrFalse)
 
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(split('.', attr))(fallBackObj)
@@ -192,4 +185,12 @@ export const splitSelectors = selectors => {
   }
   splitted.push(current.trim())
   return splitted
+}
+
+export const PROD = process.env.NODE_ENV.trim() === 'production'
+export const DEV = process.env.NODE_ENV.trim() !== 'production'
+export const logger = bool => (...args) => {
+  if (bool && DEV) {
+    console.log(...args)
+  }
 }

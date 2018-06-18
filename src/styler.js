@@ -31,16 +31,12 @@ export const isNestableAtRule = selector =>
   /@\S*\b(media|supports|keyframes)\b/.test(selector)
 
 export const containsSpecial = str =>
-  /[~`!@#$%\^&*+=\-\[\]\\';.,/{}|\\":<>\?\s]/g.test(str)
+  /[~`!@#$%\^&*+=\-\[\]\\';.,/{}|\\":<>\?\s]/g.test(str) // eslint-disable-line no-useless-escape
 
 export const hasReference = selector => selector.indexOf('&') !== -1
 
 export const isNestable = selector =>
   isAtRule(selector) && isNestableAtRule(selector)
-
-//let debug = false
-
-//const log = (...args) => debug && log(...args)
 
 const reduceRule = (rules, result) =>
   reduce(
@@ -51,7 +47,7 @@ const reduceRule = (rules, result) =>
       if (rule.value === '' && rule.property !== 'content') {
         rule.value = undefined
       }
-      ///For Nested selectors
+      /// For Nested selectors
       var location = rule.location.concat(rule.selectors.join(', '))
       location.reduce((style, selector, i, arr) => {
         selector = selector.trim()
@@ -72,7 +68,7 @@ const reduceRule = (rules, result) =>
         style[selector] = merge(style[selector] || {}, r)
         return style[selector]
       }, style)
-      //return style[selector]
+      // return style[selector]
       return style
     },
     result,
@@ -276,7 +272,6 @@ const parseRules = (
 
 const styler = (obj, groupSelectors = false) => props => {
   var rules
-  ///debug = props.debug ? true : false
   if (is('Function')(obj)) {
     return styler(obj(props))(props)
   }
@@ -288,8 +283,6 @@ const styler = (obj, groupSelectors = false) => props => {
     // return obj
     rules = getRules({ obj, props })
   }
-
-  const grouped = groupRules(rules, groupSelectors)
 
   return flow(rules, groupRules, formatOutput)
 }
