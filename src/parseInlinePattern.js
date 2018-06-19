@@ -109,7 +109,17 @@ export default ({ value, props, globalOptions, key }) => {
       }, {})
 
     const CSSObj = Object.keys(breakpoints).reduce((acc, bpKey) => {
-      const minWidth = pxToEm(getBp(bpKey))
+      const bpVal=getBp(bpKey)
+      if (isNil(bpVal)) {
+  console.warn(
+    `Styler could not find a match for breakPoints in ${key} style with ${matchedPropName}=${JSON.stringify(
+      computedValue
+    )}`
+  )
+  return acc
+}
+
+      const minWidth = pxToEm(bpVal)
       const currentVal = when(
         both(always(isResponsiveBoolean), isBool),
         ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null))
