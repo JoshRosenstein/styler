@@ -1,24 +1,21 @@
 import { flow, isDefined } from '@roseys/futils'
 
-import {
-  whenFunctionCallWith,
-  getThemeAttr,
-  isNumber,
-  isString,
-  get
-} from './utils'
+import { whenFunctionCallWith, isNumber, isString, logger, get } from './utils'
 
 import lookupDefaultOptions from './lookupDefaultOptions'
 
 export default ({ val, options, selector, props }) => {
-  if (options && val) {
+  const defaultLookup = lookupDefaultOptions(props)('keys')(selector)
+  const defaultGetter = lookupDefaultOptions(props)('getter')(selector)
+  const log = logger(props['debug'])
+  log('computeOptions')
+  if (val && (options || defaultLookup || defaultGetter)) {
     let { key: themeKey, getter, postFn, preFn, path } = options
     if (preFn) {
       val = flow(preFn, whenFunctionCallWith(val, props))
     }
 
-    themeKey =
-      themeKey || path || lookupDefaultOptions(props)('keys')(selector) || ''
+    themeKey = themeKey || path || defaultLookup || ''
     const isKeyEmpty = themeKey === ''
 
     if (isDefined(themeKey) && isString(val)) {
@@ -35,7 +32,7 @@ export default ({ val, options, selector, props }) => {
       val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
     }
 
-    getter = getter || postFn || lookupDefaultOptions(props)('getter')(selector)
+    getter = getter || postFn || defaultGetter
     if (getter) {
       val = flow(
         getter,

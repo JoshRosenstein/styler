@@ -15,12 +15,16 @@ import {
   toArray,
   isObject
 } from '@roseys/futils'
+
+import stylerCx from './stylerCx'
+
 import parseInlinePattern from './parseInlinePattern'
 import {
   whenFunctionCallWith,
   falseToNull,
   splitSelectors,
-  isAtRule
+  isAtRule,
+ // logger
 } from './utils'
 import getDefaultUnit from './defaultUnits'
 
@@ -120,6 +124,23 @@ const groupRules = (rules, group = true) => {
     {},
     rules
   )
+}
+
+const getRules_ = ({ obj, props }) => {
+  //const log = logger(props.debug)
+  const { options, ...rules } = obj
+  let newProps = { ...props }
+
+  if (options) {
+    const { cx, ...opt } = options
+    if (cx) {
+      newProps = stylerCx(cx, props)
+    }
+    //  log('newProps', {obj,newProps})
+    return getRules({ obj: { ...rules, ...opt }, props: newProps })
+  }
+  // log('getRules_')
+  return getRules({ obj, props })
 }
 
 const getRules = ({
@@ -281,7 +302,7 @@ const styler = (obj, groupSelectors = false) => props => {
     }, [])
   } else {
     // return obj
-    rules = getRules({ obj, props })
+    rules = getRules_({ obj, props })
   }
 
   return flow(rules, groupRules, formatOutput)

@@ -1,5 +1,7 @@
-export { default as styler } from "./styler";
+export { default as styler } from './styler'
+export { default as cx } from './stylerCx'
 export {
+  returnAsIs,
   getThemeAttr,
   pxTo,
   pxToRem,
@@ -10,7 +12,7 @@ export {
   em,
   pct,
   ms
-} from "./utils";
+} from './utils'
 export { spaceProp, spacePropDef, BPPropDef, BPProp } from './spaceProp'
 
 export {
@@ -92,4 +94,4 @@ export {
   top,
   width,
   zIndex
-} from "./styleDefs";
+} from './styleDefs'

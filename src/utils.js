@@ -193,6 +193,6 @@ export const PROD = process.env.NODE_ENV.trim() === 'production'
 export const DEV = process.env.NODE_ENV.trim() !== 'production'
 export const logger = bool => (...args) => {
   if (bool && DEV) {
-    console.log(...args)
+    console.log(bool, ...args)
   }
 }
