@@ -101,17 +101,19 @@ export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
 
 export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
-
+//TODO : remove unessary Split
 const getThemeFallback = fallBackObj => (attr, fallback) =>
-  pathOr(fallback)(split('.', attr))(fallBackObj)
+  pathOr(fallback)(attr)(fallBackObj)
 
 export const getThemeAttrFB = fallBackObj => (attr = '', defaultTo = '') =>
-  pathOr(
-    getThemeFallback(fallBackObj)(attr, defaultTo),
-    split('.', concat('theme.', attr))
-  )
+  pathOr(getThemeFallback(fallBackObj)(attr, defaultTo), concat('theme.', attr))
+
+export const pathWithFallback = fallBackObj => (attr = '', defaultTo = '') =>
+  pathOr(getThemeFallback(fallBackObj)(attr, defaultTo), attr)
 
 export const getThemeAttr = getThemeAttrFB(defaultTheme)
+export const get = pathWithFallback({ theme: defaultTheme })
+
 export const isNegative = test(/^-.+/)
 
 export const lookUpValue = curryN(3, (themeKey, val, props) => {

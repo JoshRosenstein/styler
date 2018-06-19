@@ -4,11 +4,10 @@
 import compute from '../src/computeOptions'
 
 describe('ComputeOptions', () => {
-  
   it('If Theme Key is empty, searches root', () => {
     const selector = 'color'
     const val = 'color_black'
-    const options = { key: '' }
+    const options = { path: 'theme' }
     const props = {
       theme: {
         color_blue: 'blueColor',

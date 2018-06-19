@@ -1,30 +1,41 @@
-import { flow } from '@roseys/futils'
+import { flow, isDefined } from '@roseys/futils'
 
-import { whenFunctionCallWith, getThemeAttr, isNumber, isString } from './utils'
+import {
+  whenFunctionCallWith,
+  getThemeAttr,
+  isNumber,
+  isString,
+  get
+} from './utils'
 
 import lookupDefaultOptions from './lookupDefaultOptions'
 
 export default ({ val, options, selector, props }) => {
   if (options && val) {
-    let { key: themeKey, getter } = options
-    const isKeyEmpty = themeKey === ''
-    /// If options was not provided, check default lookUp
-    if (!isKeyEmpty) {
-      themeKey = themeKey || lookupDefaultOptions(props)('keys')(selector)
+    let { key: themeKey, getter, postFn, preFn, path } = options
+    if (preFn) {
+      val = flow(preFn, whenFunctionCallWith(val, props))
     }
 
-    if ((themeKey || isKeyEmpty) && isString(val)) {
+    themeKey =
+      themeKey || path || lookupDefaultOptions(props)('keys')(selector) || ''
+    const isKeyEmpty = themeKey === ''
+
+    if (isDefined(themeKey) && isString(val)) {
       /// Check Strip Negative Before lookingUp
       const isNeg = /^-.+/.test(val)
       const absN = isNeg ? val.slice(1) : val
 
-      const themeProp = !isKeyEmpty ? `${themeKey}.${absN}` : absN
+      const themeProp = isDefined(path)
+        ? `${themeKey}.${absN}`
+        : `theme.${themeKey}.${absN}`
 
-      val = getThemeAttr(themeProp, val)(props)
+      val = get(themeProp, val)(props)
+
       val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
     }
 
-    getter = getter || lookupDefaultOptions(props)('getter')(selector)
+    getter = getter || postFn || lookupDefaultOptions(props)('getter')(selector)
     if (getter) {
       val = flow(
         getter,

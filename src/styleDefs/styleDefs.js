@@ -13,7 +13,7 @@ export const width = {
   width: 'returnAsIs',
   w: 'returnAsIs',
   options: {
-    getter: getters.getWidth
+    postFn: getters.getWidth
   }
 }
 
@@ -21,7 +21,7 @@ export const fontSize = {
   fontSize: 'returnAsIs',
   f: 'returnAsIs',
   options: {
-    getter: 'px',
+    postFn: 'px',
     key: 'fontSizes'
   }
 }
@@ -76,7 +76,7 @@ export const letterSpacing = {
   letterSpacing: 'returnAsIs',
   options: {
     key: 'letterSpacings',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -88,7 +88,7 @@ export const maxWidth = {
   maxWidth: 'returnAsIs',
   options: {
     key: 'maxWidths',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -96,7 +96,7 @@ export const minWidth = {
   minWidth: 'returnAsIs',
   options: {
     key: 'minWidths',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -104,7 +104,7 @@ export const height = {
   height: 'returnAsIs',
   options: {
     key: 'heights',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 
@@ -112,14 +112,14 @@ export const maxHeight = {
   maxHeight: 'returnAsIs',
   options: {
     key: 'maxHeights',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 export const minHeight = {
   minHeight: 'returnAsIs',
   options: {
     key: 'minHeights',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -127,7 +127,7 @@ export const size_width_c = {
   width: {
     size: 'returnAsIs',
     options: {
-      getter: 'px'
+      postFn: 'px'
     }
   }
 }
@@ -136,7 +136,7 @@ export const size_height_c = {
   height: {
     size: 'returnAsIs',
     options: {
-      getter: 'px'
+      postFn: 'px'
     }
   }
 }
@@ -151,7 +151,7 @@ export const ratio_c = {
   paddingBottom: {
     ratio: 'returnAsIs',
     options: {
-      getter: n => n * 100 + '%'
+      postFn: n => n * 100 + '%'
     }
   }
 }
@@ -211,7 +211,7 @@ export const flexFlow = {
 export const flexBasis = {
   flexBasis: 'returnAsIs',
   options: {
-    getter: getters.getWidth
+    postFn: getters.getWidth
   }
 }
 
@@ -235,14 +235,14 @@ export const gridGap = {
   gridGap: 'returnAsIs',
   gap: 'returnAsIs',
   options: {
-    getter: px,
+    postFn: px,
     key: 'space'
   }
 }
 export const gridColumnGap = {
   gridColumnGap: 'returnAsIs',
   options: {
-    getter: 'px',
+    postFn: 'px',
     key: 'space'
   }
 }
@@ -315,7 +315,7 @@ export const border = {
   bd: 'returnAsIs',
   options: {
     key: 'borders',
-    getter: getters.getBorder
+    postFn: getters.getBorder
   }
 }
 
@@ -324,7 +324,7 @@ export const borderTop = {
   bdT: 'returnAsIs',
   options: {
     key: 'borders',
-    getter: getters.getBorder
+    postFn: getters.getBorder
   }
 }
 
@@ -333,7 +333,7 @@ export const borderRight = {
   bdR: 'returnAsIs',
   options: {
     key: 'borders',
-    getter: getters.getBorder
+    postFn: getters.getBorder
   }
 }
 
@@ -342,7 +342,7 @@ export const borderBottom = {
   bdB: 'returnAsIs',
   options: {
     key: 'borders',
-    getter: getters.getBorder
+    postFn: getters.getBorder
   }
 }
 
@@ -351,7 +351,7 @@ export const borderLeft = {
   bdL: 'returnAsIs',
   options: {
     key: 'borders',
-    getter: getters.getBorder
+    postFn: getters.getBorder
   }
 }
 
@@ -376,7 +376,7 @@ export const borderRadius = {
   bdRs: 'returnAsIs',
   options: {
     key: 'radii',
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -389,7 +389,7 @@ export const backgroundImage = {
   backgroundImage: 'returnAsIs',
   bgImage: 'returnAsIs',
   options: {
-    getter: v => `url(${v})`
+    postFn: v => `url(${v})`
   }
 }
 
@@ -422,28 +422,28 @@ export const zIndex = {
 export const top = {
   top: 'returnAsIs',
   options: {
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
 export const right = {
   right: 'returnAsIs',
   options: {
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
 export const bottom = {
   bottom: 'returnAsIs',
   options: {
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
 export const left = {
   left: 'returnAsIs',
   options: {
-    getter: 'px'
+    postFn: 'px'
   }
 }
 
@@ -460,7 +460,7 @@ export const padding = {
   p: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const paddingLeft = {
@@ -469,7 +469,7 @@ export const paddingLeft = {
   px: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const paddingRight = {
@@ -478,7 +478,7 @@ export const paddingRight = {
   px: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const paddingTop = {
@@ -487,7 +487,7 @@ export const paddingTop = {
   py: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const paddingBottom = {
@@ -496,7 +496,7 @@ export const paddingBottom = {
   py: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const margin = {
@@ -504,7 +504,7 @@ export const margin = {
   m: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const marginLeft = {
@@ -513,7 +513,7 @@ export const marginLeft = {
   mx: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const marginRight = {
@@ -522,7 +522,7 @@ export const marginRight = {
   mx: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const marginTop = {
@@ -531,7 +531,7 @@ export const marginTop = {
   my: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 export const marginBottom = {
@@ -540,7 +540,7 @@ export const marginBottom = {
   my: 'returnAsIs',
   options: {
     key: 'space',
-    getter: 'pxToRem'
+    postFn: 'pxToRem'
   }
 }
 
