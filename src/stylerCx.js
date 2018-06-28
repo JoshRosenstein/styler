@@ -1,13 +1,6 @@
 import {
   toArray,
-  split,
-  length,
-  gt,
-  reject,
   pipe,
-  isEmpty,
-  replace,
-  toLower,
   is,
   when,
   reduce,
@@ -22,23 +15,21 @@ import {
   ifElse
 } from '@roseys/futils'
 
-const toUpper = str => str.toUpperCase()
+const camelCase = str =>
+  str
+    .split(
+      /[\s\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]+/
+    )
+    .reduce((res, word, i) => {
+      return word === ''
+        ? res
+        : res.concat(
+          i > 0 ? word[0].toUpperCase() : word[0].toLowerCase(),
+          word.slice(1)
+          )
+    }, '')
 
-const capitalize = replace(/^[a-z]/, toUpper)
-const camscalRegex = new RegExp(/[\s_-]/, 'g')
-const decapitalize = replace(/^[A-Z]/, toLower)
-
-const cleanCamscal = pipe(
-  split(camscalRegex),
-  reject(isEmpty),
-  when(x => gt(length(x), 1), map(pipe(toLower, capitalize))),
-  join(''),
-  decapitalize
-)
-
-const camelCase = pipe(cleanCamscal, decapitalize)
-
-const stylerCx = (prefix, props_) => {
+const stylerCx = (prefix, { theme, ...props_ }) => {
   const isBool = is('Boolean')
   let collectObjProps = {}
   const checkPropType = name =>
@@ -59,6 +50,13 @@ const stylerCx = (prefix, props_) => {
       when(isBool, x => (x ? name : 'skip'))
     )(props_)
 
+  const alwaysKey = name =>
+    pipe(
+      prop(name),
+      checkPropType(name),
+      ifElse(isNil, always('skip'), x => (x ? name : 'skip'))
+    )(props_)
+
   const keyOrValueSingle = name =>
     pipe(
       prop(name),
@@ -67,7 +65,6 @@ const stylerCx = (prefix, props_) => {
       ifElse(isBool, x => (x ? name : 'skip'), x => [name, x])
     )(props_)
 
-  const step1 = pipe(toArray, map(keyOrValue))
   const noSkip = pipe(join(' '), camelCase, x => ({ [x]: true }))
   const skipCond = contains('skip')
   const Skip = always({})
@@ -84,7 +81,18 @@ const stylerCx = (prefix, props_) => {
   const res = reduce(
     (acc, v) => {
       if (is('Array', v)) {
-        return pipe(step1, ifElse(skipCond, Skip, noSkip), merge(acc))(v)
+        const withValues = pipe(
+          toArray,
+          map(keyOrValue),
+          ifElse(skipCond, Skip, noSkip)
+        )(v)
+        const withKeys = pipe(
+          toArray,
+          map(alwaysKey),
+          ifElse(skipCond, Skip, noSkip),
+          merge(withValues)
+        )(v)
+        return merge(acc, withKeys)
       }
 
       return pipe(
@@ -98,7 +106,7 @@ const stylerCx = (prefix, props_) => {
     prefix
   )
   // console.log('collectObjProps', collectObjProps)
-  return { ...res, theme: props_.theme, ...collectObjProps }
+  return { ...res, ...(theme ? { theme } : {}), ...collectObjProps }
 }
 
 export default curryN(2, stylerCx)

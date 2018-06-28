@@ -24,7 +24,7 @@ import {
   falseToNull,
   splitSelectors,
   isAtRule,
- // logger
+  logger
 } from './utils'
 import getDefaultUnit from './defaultUnits'
 
@@ -127,7 +127,7 @@ const groupRules = (rules, group = true) => {
 }
 
 const getRules_ = ({ obj, props }) => {
-  //const log = logger(props.debug)
+  const log = logger(props.debug)
   const { options, ...rules } = obj
   let newProps = { ...props }
 
@@ -136,8 +136,9 @@ const getRules_ = ({ obj, props }) => {
     if (cx) {
       newProps = stylerCx(cx, props)
     }
+    log('options', opt)
     //  log('newProps', {obj,newProps})
-    return getRules({ obj: { ...rules, ...opt }, props: newProps })
+    return getRules({ obj: { ...rules, options: opt }, props: newProps })
   }
   // log('getRules_')
   return getRules({ obj, props })
@@ -154,16 +155,17 @@ const getRules = ({
     obj = obj(props)
   }
   const { options: globalOptions, ...rules } = obj
-
+  options = { ...options, ...globalOptions }
   const getNested = (givenObj, givenParents, givenLocation) =>
     getRules({
       obj: givenObj,
       parents: givenParents,
       location: givenLocation,
-      options: globalOptions,
+      options: options,
       props
     })
-
+  const log = logger(props.debug)
+  log('gOptions', options)
   return pipe(
     keys,
     reduce(
@@ -242,7 +244,8 @@ const parseRules = (
 
     return parseNested(res, parents, location)
   }
-
+  const log = logger(props.debug)
+  log('isInlinePattern', options)
   if (isInlinePattern(value, selector, parents)) {
     value = parseInlinePattern({
       props,

@@ -18,14 +18,23 @@ describe('stylerCx', () => {
     )
     const b = stylerCx([['variant', 'primary', 'minimal']], p_)
 
+    // expect(a).toEqual({
+    //   primaryMinimal: true,
+    //   regularPrimary: true,
+    //   sizeSmall: true,
+    //   variantRegular: true
+    // })
     expect(a).toEqual({
       primaryMinimal: true,
       regularPrimary: true,
       sizeSmall: true,
+      variantPrimary: true,
       variantRegular: true
     })
-
-    expect(b).toEqual({ regularPrimaryMinimal: true })
+    expect(b).toEqual({
+      regularPrimaryMinimal: true,
+      variantPrimaryMinimal: true
+    })
   })
 
   it('Works with responsive propValues', () => {
@@ -47,12 +56,14 @@ describe('stylerCx', () => {
     expect(a).toEqual({
       primaryMinimal: true,
       sizeSmall: true,
-      variant: { md: 'fine', sm: 'regular' }
+      variant: { md: 'fine', sm: 'regular' },
+      variantPrimary: true
     })
 
     expect(b).toEqual({
       primaryMinimal: true,
-      variant: { md: 'fine', sm: 'regular' }
+      variant: { md: 'fine', sm: 'regular' },
+      variantPrimaryMinimal: true
     })
   })
 

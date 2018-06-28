@@ -49,6 +49,19 @@ describe('ComputeOptions', () => {
     expect(compute({ val, options, selector, props })).toEqual(result)
   })
 
+  it('Correctly Computes Negative value', () => {
+    const selector = 'margin'
+    const val = '-.5rem'
+    const options = {}
+    const props = {
+      theme: {
+        space: { sm: 16 }
+      }
+    }
+    const result = '-1rem'
+    expect(compute({ val, options, selector, props })).toEqual('-.5rem')
+  })
+
   it('Fallsback To default Theme for lookup', () => {
     const selector = 'margin'
     const val = '-sm'

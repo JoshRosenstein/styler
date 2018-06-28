@@ -5,6 +5,24 @@
 import stylerWithTheme from './utils/stylerWithTheme'
 import { styler, getThemeAttr } from '../src'
 
+const StylerEq = ({ args, props, result }) => {
+  expect(styler(args)(props)).toEqual(result)
+}
+
+const StylerTest = (Name, args) =>
+  it(Name, () => {
+    StylerEq(args)
+  })
+
+const StylerWithThemeEq = ({ args, props, result }) => {
+  expect(stylerWithTheme(args)(props)).toEqual(result)
+}
+
+const StylerWithThemeTest = (Name, args) =>
+  it(Name, () => {
+    StylerWithThemeEq(args)
+  })
+
 describe('Styler', () => {
   describe('Simple Match Boolean Execution', () => {
     const testStyler = styler({
@@ -170,21 +188,21 @@ describe('Styler', () => {
       shouldExecute ? { testCSSProp: 'returned' } : {}
 
     const testStyler = stylerWithTheme(ifFunction)
-
-    expect(
-      testStyler({
-        shouldExecute: true
+    it('Works ', () => {
+      expect(
+        testStyler({
+          shouldExecute: true
+        })
+      ).toEqual({
+        testCSSProp: 'returned'
       })
-    ).toEqual({
-      testCSSProp: 'returned'
+      expect(
+        testStyler({
+          shouldExecute: false
+        })
+      ).toEqual({})
     })
-    expect(
-      testStyler({
-        shouldExecute: false
-      })
-    ).toEqual({})
   })
-
   describe('DEFAULT_RULE_KEY_LOOKUP', () => {
     it('Autolooks for key in theme if Rule has a default Key ', () => {
       const testStyler = stylerWithTheme({
@@ -366,45 +384,42 @@ describe('Styler', () => {
       })
     })
 
-    it('Should lookup key Functions using "pxToRem" ', () => {
-      const testStyler = stylerWithTheme({
+    StylerTest('Should lookup key Functions using "pxToRem"', {
+      args: {
         testCSSProp: {
           testProp: 'pxToRem',
           default: 'small'
         }
-      })
-
-      const testProps = {
+      },
+      props: {
         testProp: 16
-      }
-
-      expect(testStyler(testProps)).toEqual({
+      },
+      result: {
         testCSSProp: '1rem'
-      })
-    }),
-      it('Should join Nested Selectors ', () => {
-        const testStyler = stylerWithTheme({
-          '>:first-child': {
-            '>*': {
-              debugMode: 1
-            }
-          }
-        })
+      }
+    })
 
-        const testProps = {
-          testProp: 'thisShouldBeReturned'
+    StylerTest('Should join Nested Selectors', {
+      args: {
+        '>:first-child': {
+          '>*': {
+            cssProp: 1
+          }
         }
-        // {">*": {"margin": 1}, ">:first-child": {}}
-        expect(testStyler(testProps)).toEqual({
-          '>:first-child >*': { debugMode: 1 }
-        })
-      })
+      },
+      props: {
+        column: { mobile: true, tablet: true },
+        row: { mobile: true }
+      },
+      result: {
+        '>:first-child >*': { cssProp: 1 }
+      }
+    })
   })
 
   describe('Strings on Matchers are responsive', () => {
-    it('Should lookup key Functions using "returnAsIs" ', () => {
-      // column: isObject ? 'returnAsIs' : 'column',
-      const testStyler = stylerWithTheme({
+    StylerTest('Should lookup key Functions using "returnAsIs', {
+      args: {
         flexDirection: {
           flexDirection: 'returnAsIs',
           direction: 'returnAsIs',
@@ -414,55 +429,54 @@ describe('Styler', () => {
           rowReverse: 'row-reverse',
           columnReverse: 'column-reverse'
         }
-      })
-
-      const testProps = {
+      },
+      props: {
         column: { mobile: true, tablet: true },
         row: { mobile: true }
-      }
+      },
+      result: { flexDirection: 'row' }
+    })
 
-      expect(testStyler(testProps)).toEqual({ flexDirection: 'row' })
-    }),
-      it('Should Works With Arrays', () => {
-        // column: isObject ? 'returnAsIs' : 'column',
-        const testStyler = stylerWithTheme({
-          flexDirection: {
-            flexDirection: 'returnAsIs',
-            direction: 'returnAsIs',
-            fxdirection: 'returnAsIs',
-            row: 'row',
-            column: 'column',
-            rowReverse: 'row-reverse',
-            columnReverse: 'column-reverse'
-          }
-        })
-
-        const testProps = {
-          column: [true, true]
+    StylerWithThemeTest('Should Works With Arrays', {
+      args: {
+        flexDirection: {
+          flexDirection: 'returnAsIs',
+          direction: 'returnAsIs',
+          fxdirection: 'returnAsIs',
+          row: 'row',
+          column: 'column',
+          rowReverse: 'row-reverse',
+          columnReverse: 'column-reverse'
         }
-
-        expect(testStyler(testProps)).toEqual({
-          '@media screen and (min-width:tablet)': { flexDirection: 'column' },
-          flexDirection: 'column'
-        })
-      })
+      },
+      props: {
+        column: [true, true]
+      },
+      result: {
+        '@media screen and (min-width:tablet)': { flexDirection: 'column' },
+        flexDirection: 'column'
+      }
+    })
   })
 
   describe('Default Options', () => {
-    const testStyler = styler({ margin: 1 })
-    it('It Should return default unit for margin', () => {
-      expect(testStyler({})).toEqual({ margin: '1px' })
+    StylerTest('It Should return default unit for margin', {
+      args: { margin: 1 },
+      props: {},
+      result: { margin: '1px' }
     })
-    it('It Should return default unit For animationDelay ', () => {
-      expect(styler({ animationDelay: 1 })({})).toEqual({
+    StylerTest('It Should return default unit For animationDelay', {
+      args: { animationDelay: 1 },
+      props: {},
+      result: {
         animationDelay: '1ms'
-      })
+      }
     })
   })
 
   describe('Deeply Nested', () => {
-    it('Nested inline Pattern within Block Pattern', () => {
-      const style = {
+    StylerTest('Nested inline Pattern within Block Pattern', {
+      args: {
         __match: {
           variant: v => ({
             backgroundColor: {
@@ -489,18 +503,17 @@ describe('Styler', () => {
             default: 'grayL4'
           }
         }
-      }
-
-      const a = stylerWithTheme(style)({ variant: 'blue' })
-      expect(a).toEqual({
+      },
+      props: { variant: 'blue' },
+      result: {
         '&:hover': { backgroundColor: 'grayL4' },
         backgroundColor: 'grayL4',
         color: 'blueD1'
-      })
+      }
     })
 
-    it('correctly reformats Result', () => {
-      const Nested = {
+    StylerTest('correctly reformats Result', {
+      args: {
         '@media only screen and (max-width: 700px)': {
           '&:hover': { margin: '1px', color: 'red' }
         },
@@ -510,15 +523,43 @@ describe('Styler', () => {
             '': { test: 'hey' }
           }
         }
-      }
-      var res = {
+      },
+      props: {},
+      result: {
         '@media only screen and (max-width: 700px)': {
           '&:hover': { color: 'blue', margin: '1px', test: 'hey' }
         }
       }
+    })
+  })
 
-      const b = stylerWithTheme(Nested)({ debug: true })
-      expect(b).toEqual(res)
+  describe('ComputeOptions', () => {
+    StylerTest('If Theme Key is empty, searches root', {
+      args: {
+        options: { path: 'theme' },
+        color: {
+          color: v => `color_${v}`
+        }
+      },
+      props: {
+        color: 'black',
+        theme: {
+          color_blue: 'blueColor',
+          color_black: 'blackColor',
+          colors: { blue: 'Themedblue' }
+        }
+      },
+      result: { color: 'blackColor' }
+    })
+
+    StylerTest('Correctly Returns Negatives', {
+      args: {
+        marginTop: {
+          default: '-.5rem'
+        }
+      },
+      props: {},
+      result: { marginTop: '-.5rem' }
     })
   })
 })
