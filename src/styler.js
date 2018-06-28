@@ -24,7 +24,9 @@ import {
   falseToNull,
   splitSelectors,
   isAtRule,
-  logger
+  logger,
+  evalTemplate,
+  isTemplate
 } from './utils'
 import getDefaultUnit from './defaultUnits'
 
@@ -286,6 +288,9 @@ const parseRules = (
     }
   }
 
+  if (isTemplate(value)) {
+    value = evalTemplate(value, props)
+  }
   return {
     location: location,
     selector: parents.join(' '),

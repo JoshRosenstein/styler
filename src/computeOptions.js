@@ -1,15 +1,40 @@
 import { flow, isDefined } from '@roseys/futils'
 
-import { whenFunctionCallWith, isNumber, isString, get } from './utils'
+import {
+  whenFunctionCallWith,
+  isNumber,
+  isString,
+  get,
+  isTemplate,
+  evalTemplate
+} from './utils'
 
 import lookupDefaultOptions from './lookupDefaultOptions'
 
 export default ({ val, options, selector, props }) => {
-  const defaultLookup = lookupDefaultOptions(props)('keys')(selector)
-  const defaultGetter = lookupDefaultOptions(props)('getter')(selector)
+  let {
+    defaultLookup: doDefaultLookup = true,
+    defaultTransform: doDefaultTransform = true,
+    key: themeKey,
+    getter,
+    postFn,
+    preFn,
+    path
+  } = options
 
-  if (val && (options || defaultLookup || defaultGetter)) {
-    let { key: themeKey, getter, postFn, preFn, path } = options
+  const defaultLookup =
+    doDefaultLookup && lookupDefaultOptions(props)('keys')(selector)
+  const defaultGetter =
+    doDefaultTransform && lookupDefaultOptions(props)('getter')(selector)
+
+  if (isTemplate(val)) {
+    val = evalTemplate(val, props)
+  }
+
+  if (
+    val &&
+    (defaultLookup || defaultGetter || getter || postFn || preFn || path)
+  ) {
     if (preFn) {
       val = flow(preFn, whenFunctionCallWith(val, props))
     }

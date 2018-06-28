@@ -562,4 +562,91 @@ describe('Styler', () => {
       result: { marginTop: '-.5rem' }
     })
   })
+
+  describe('Reference Props by Template', () => {
+    StylerTest('TemplateReference', {
+      args: { marginTop: '{!margin}' },
+      props: { margin: '1px' },
+      result: { marginTop: '1px' }
+    })
+
+    StylerTest('Nested TemplateReference', {
+      args: { marginTop: '{!theme.margin}' },
+      props: { theme: { margin: '1px' } },
+      result: { marginTop: '1px' }
+    })
+
+    StylerTest('Within Block Match', {
+      args: { marginTop: { default: '{!theme.margin}' } },
+      props: { theme: { margin: 16 } },
+      result: { marginTop: '1rem' }
+    })
+
+    StylerTest('Multiple Templates', {
+      args: {
+        border:
+          '{!theme.borderWidth}px {!theme.borderStyle} {!theme.borderColor}'
+      },
+      props: {
+        theme: {
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'blue'
+        }
+      },
+      result: { border: '1px solid blue' }
+    })
+
+    StylerTest('Multiple Block Match', {
+      args: {
+        border: {
+          default:
+            '{!theme.borderWidth}px {!theme.borderStyle} {!theme.borderColor}'
+        }
+      },
+      props: {
+        theme: {
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'blue'
+        }
+      },
+      result: { border: '1px solid blue' }
+    })
+  })
+  describe('Turn Off Default Getters and Lookups', () => {
+    StylerTest('Doesnt Compute Global', {
+      args: {
+        options: {
+          defaultTransform: false,
+          defaultLookup: false
+        },
+        marginBottom: { default: '1px' },
+        marginTop: { default: 'sm' }
+      },
+      props: { theme: { margin: '1px' } },
+      result: { marginBottom: '1px', marginTop: 'sm' }
+    })
+
+    StylerTest('Doesnt Compute Local', {
+      args: {
+        marginBottom: {
+          default: '1px',
+          options: {
+            defaultTransform: false,
+            defaultLookup: false
+          }
+        },
+        marginTop: {
+          default: 'sm',
+          options: {
+            defaultTransform: false,
+            defaultLookup: false
+          }
+        }
+      },
+      props: { theme: { margin: '1px' } },
+      result: { marginBottom: '1px', marginTop: 'sm' }
+    })
+  })
 })

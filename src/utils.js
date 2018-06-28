@@ -34,6 +34,14 @@ import {
 
 import defaultTheme from './defaultTheme'
 
+export const isTemplate = test(/{\!([^}]+)}/g)
+export const evalTemplate = (string, data) =>
+  is('String', string)
+    ? string.replace(/{\!([^}]+)}/g, (_, key) => {
+        return pathOr(`{!${key}}`, key, data)
+      })
+    : string
+
 export const arrToObj = arr => {
   return reduce(
     (accumulated, value, key) => attach(key, value, accumulated),

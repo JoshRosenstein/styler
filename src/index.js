@@ -1,7 +1,6 @@
 export { default as styler } from './styler'
 export { default as cx } from './stylerCx'
 export {
-  returnAsIs,
   getThemeAttr,
   pxTo,
   pxToRem,
