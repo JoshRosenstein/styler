@@ -36,7 +36,6 @@ describe('stylerCx', () => {
       variantPrimaryMinimal: true
     })
   })
-
   it('Works with responsive propValues', () => {
     const p_ = {
       variant: { sm: 'regular', md: 'fine' },
@@ -56,28 +55,27 @@ describe('stylerCx', () => {
     expect(a).toEqual({
       primaryMinimal: true,
       sizeSmall: true,
-      variant: { md: 'fine', sm: 'regular' },
       variantPrimary: true
     })
 
     expect(b).toEqual({
       primaryMinimal: true,
-      variant: { md: 'fine', sm: 'regular' },
       variantPrimaryMinimal: true
     })
   })
 
   describe('styler', () => {
+    const cx = [
+      'variant',
+      'primary',
+      'outlined',
+      ['variant', 'primary'],
+      ['variant', 'outlined'],
+      ['outlined', 'primary'],
+      ['variant', 'outlined', 'primary']
+    ]
     const options = {
-      cx: [
-        'variant',
-        'primary',
-        'outlined',
-        ['variant', 'primary'],
-        ['variant', 'outlined'],
-        ['outlined', 'primary'],
-        ['variant', 'outlined', 'primary']
-      ]
+      cx
     }
     test('With Styler Block Pattern Match global Options', () => {
       const stylesBlock = {
@@ -90,11 +88,13 @@ describe('stylerCx', () => {
           warningOutlined: 'warningOutlinedColor',
           primary: 'primaryColor',
           outlined: 'outlinedColor',
+          notInCx: 'self',
           variantRegular: 'variantColor'
         },
         options
       }
       const defaultProps = {
+        options,
         variant: 'regular',
         outlined: false,
         primary: false
@@ -127,6 +127,18 @@ describe('stylerCx', () => {
         primary: true
       })
       expect(e).toEqual({ color: 'warningOutlinedPrimary' })
+
+      const G = stylerCx(cx)({
+        ...defaultProps,
+        notInCx: 'Hello'
+      })
+      expect(G).toEqual({ variantRegular: true })
+
+      const f = stylerWithTheme(stylesBlock)({
+        ...defaultProps,
+        notInCx: 'aa'
+      })
+      expect(f).toEqual({ color: 'aa' })
     })
 
     test('With Styler Block Pattern Match global Options Responsive', () => {

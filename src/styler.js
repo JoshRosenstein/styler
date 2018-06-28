@@ -140,7 +140,10 @@ const getRules_ = ({ obj, props }) => {
     }
     log('options', opt)
     //  log('newProps', {obj,newProps})
-    return getRules({ obj: { ...rules, options: opt }, props: newProps })
+    return getRules({
+      obj: { ...rules, options: opt },
+      props: { ...newProps, ...props }
+    })
   }
   // log('getRules_')
   return getRules({ obj, props })
