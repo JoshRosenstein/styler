@@ -5,29 +5,29 @@ import uglify from 'rollup-plugin-uglify'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
-import cleanup from 'rollup-plugin-cleanup'
+// import cleanup from 'rollup-plugin-cleanup'
 import filesize from 'rollup-plugin-filesize'
 
-import getNamedExports from './scripts/getNamedExports'
+// import getNamedExports from './scripts/getNamedExports'
 import pkg from './package.json'
 
 const plugins = [
   resolve({
     jsnext: true,
     main: true,
-    browser: true,
+    browser: true
   }),
   commonjs({
     include: 'node_modules/**',
     extensions: ['.js']
-    //namedExports: { '@roseys/futils/lib/isNil': ['isNil'] }
-    //getNamedExports(['@roseys/futils/curry'])
+    // namedExports: { '@roseys/futils/lib/isNil': ['isNil'] }
+    // getNamedExports(['@roseys/futils/curry'])
   }),
   babel({
     babelrc: false,
     presets: [
       [
-        '@babel/preset-env',
+        'babel-preset-env',
         {
           targets: {
             browsers: ['last 2 versions', 'ie >= 9']
@@ -35,7 +35,7 @@ const plugins = [
           modules: false
         }
       ],
-      '@babel/preset-stage-0'
+      'stage-0'
     ],
     exclude: 'node_modules/**',
     runtimeHelpers: true
@@ -60,7 +60,5 @@ const configBase = {
   ],
   plugins
 }
-
-
 
 export default configBase

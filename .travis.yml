@@ -6,3 +6,15 @@ script: "npm run test:coverage"
 
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/codecov/bin/codecov
+
+before_deploy:
+  - cd dox
+  - npm install
+  - npm run build
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GH_TOKEN
+  local_dir: dist
+  on:
+    branch: master
