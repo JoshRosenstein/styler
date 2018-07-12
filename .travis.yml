@@ -11,10 +11,12 @@ before_deploy:
   - cd dox
   - npm install
   - npm run build
+  - cd ..
+  - cp -R docx/dist .site
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GH_TOKEN
-  local_dir: dist
+  local_dir: .site
   on:
     branch: master
