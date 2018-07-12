@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { renderStylesToString } from 'emotion-server'
 
 export default {
+  basePath: 'styler',
   getSiteData: () => ({
     title: 'Styler Examples',
   }),
