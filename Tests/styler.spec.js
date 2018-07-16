@@ -138,7 +138,22 @@ describe('Styler', () => {
         outline: 'none'
       })
     })
-
+    it('block pattern does not return false bool matches', () => {
+      const testBlock = styler({
+        __match: {
+          isActive: {
+            fontWeight: 'bold',
+            color: 'purple'
+          }
+        }
+      })
+      const result = testBlock({ isActive: true })
+      expect(testBlock({ isActive: true })).toEqual({
+        color: 'purple',
+        fontWeight: 'bold'
+      })
+      expect(testBlock({ isActive: false })).toEqual({})
+    })
     it('Can return propValue using Custom', () => {
       const testProps = {
         returnPropValue: 'ThisWillBeReturned'
@@ -560,6 +575,15 @@ describe('Styler', () => {
       },
       props: {},
       result: { marginTop: '-.5rem' }
+    }),
+    StylerWithThemeTest('MQ pattern match', {
+      args: {
+        mq_mobile: {
+          test: 1
+        }
+      },
+      props: {},
+      result: { '@media screen and (min-width:mobile)': { test: 1 } }
     })
   })
 

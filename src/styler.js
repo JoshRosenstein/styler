@@ -10,10 +10,10 @@ import {
   pipe,
   mergeDeepRight,
   ifElse,
-  has,
+  prop,
   flow,
   toArray,
-  isObject
+  isObject, pathOr
 } from '@roseys/futils'
 
 import stylerCx from './stylerCx'
@@ -26,7 +26,8 @@ import {
   isAtRule,
   logger,
   evalTemplate,
-  isTemplate
+  isTemplate, isTruthy, isMQ,
+  pxToEm
 } from './utils'
 import getDefaultUnit from './defaultUnits'
 
@@ -228,6 +229,20 @@ const parseRules = (
     return { location: [], selector: '', property: selector, value: value }
   }
 
+  if (isMQ(selector)) {
+    const bp = selector.replace(/^MQ|mq_+/, '')
+    const mqVal = flow(
+      pathOr(
+        bp,
+        ['theme', 'breakpoints', selector.replace(/^MQ|mq_+/, '')],
+        props
+      ),
+      pxToEm
+    )
+
+    selector = `@media screen and (min-width:${mqVal})`
+  }
+
   if (isPatternBlock(selector)) {
     const res = flow(
       value,
@@ -235,10 +250,11 @@ const parseRules = (
         return flow(
           props,
           ifElse(
-            has(propName),
+            x => isTruthy(prop(propName, x)),
             pipe(
               always(rulesForProp),
               whenFunctionCallWith(props[propName], props),
+              whenFunctionCallWith(props),
               mergeDeepRight(accumulated)
             ),
             always(accumulated)

@@ -38,8 +38,8 @@ export const isTemplate = test(/{\!([^}]+)}/g)
 export const evalTemplate = (string, data) =>
   is('String', string)
     ? string.replace(/{\!([^}]+)}/g, (_, key) => {
-        return pathOr(`{!${key}}`, key, data)
-      })
+      return pathOr(`{!${key}}`, key, data)
+    })
     : string
 
 export const arrToObj = arr => {
@@ -109,7 +109,7 @@ export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
 
 export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
-//TODO : remove unessary Split
+// TODO : remove unessary Split
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(attr)(fallBackObj)
 
@@ -165,7 +165,7 @@ export const whenFunctionCallWith = (...argsToGive) =>
   when(is('Function'), fnItem => fnItem(...argsToGive))
 
 export const isAtRule = selector => selector.indexOf('@') === 0
-
+export const isMQ = selector => /^(MQ|mq)+/.test(selector)
 export const splitSelectors = selectors => {
   if (isAtRule(selectors)) {
     return [selectors]

@@ -99,7 +99,7 @@ export default ({ value, props, globalOptions, key }) => {
       }
     }
 
-    let getBp = flip(prop)(themeBPs)
+    let getBp = x => prop(x, themeBPs)
 
     breakpoints = Object.keys(breakpoints)
       .sort((a, b) => getBp(a) - getBp(b))
@@ -109,15 +109,15 @@ export default ({ value, props, globalOptions, key }) => {
       }, {})
 
     const CSSObj = Object.keys(breakpoints).reduce((acc, bpKey) => {
-      const bpVal=getBp(bpKey)
+      const bpVal = getBp(bpKey)
       if (isNil(bpVal)) {
-  console.warn(
-    `Styler could not find a match for breakPoints in ${key} style with ${matchedPropName}=${JSON.stringify(
-      computedValue
-    )}`
-  )
-  return acc
-}
+        console.warn(
+          `Styler could not find a match for breakPoints in ${key} style with ${matchedPropName}=${JSON.stringify(
+            computedValue
+          )}`
+        )
+        return acc
+      }
 
       const minWidth = pxToEm(bpVal)
       const currentVal = when(
@@ -129,9 +129,9 @@ export default ({ value, props, globalOptions, key }) => {
         : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1
           ? objOf(key, computeOpt(currentVal))
           : objOf(
-              [`@media screen and (min-width:${minWidth})`, key],
-              computeOpt(currentVal)
-            )
+            [`@media screen and (min-width:${minWidth})`, key],
+            computeOpt(currentVal)
+          )
 
       const mkey =
         bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1

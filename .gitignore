@@ -1,6 +1,6 @@
 /coverage
 /demo/dist
-dist/
+
 
 node_modules/
 *.log
@@ -11,6 +11,7 @@ package-lock.json
 .cache
 public/
 notes/
+dist/
 
 yarn.lock
 lerna-debug.log
