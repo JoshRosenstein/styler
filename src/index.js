@@ -10,7 +10,10 @@ export {
   rem,
   em,
   pct,
-  ms
+  ms,
+  uniqifyKeys,
+  mergeStyles,
+  mergeStylesWithUniqKeys
 } from './utils'
 export { spaceProp, spacePropDef, BPPropDef, BPProp } from './spaceProp'
 

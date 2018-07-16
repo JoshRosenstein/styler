@@ -29,7 +29,8 @@ import {
   round,
   mergeAllDeepLeft,
   mergeAllDeepRight, mapKeys,
-  not
+  not,
+  merge
 } from '@roseys/futils'
 
 import defaultTheme from './defaultTheme'
@@ -47,6 +48,11 @@ const uniqueID = (prefix = '') => {
 }
 
 export const uniqifyKeys = mapKeys(uniqueID)
+
+export const mergeStyles = (...args) => mergeAllDeepRight(args)
+
+export const mergeStylesWithUniqKeys = (...args) =>
+  args.reduce((acc, v) => merge(acc, uniqifyKeys(v)), {})
 
 export const isTemplate = test(/{\!([^}]+)}/g)
 export const evalTemplate = (string, data) =>

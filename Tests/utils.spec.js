@@ -38,6 +38,25 @@ describe('uniqifyKeys', () => {
     expect(keys).not.toEqual(Object.keys(obj))
   })
 })
+describe('mergeStylesWithUniqKeys', () => {
+  it('Works', () => {
+    const res = Utils.mergeStylesWithUniqKeys({ a: 1 }, { a: 2 })
+    const keys = Object.keys(res)
+    const values = Object.values(res)
+
+    expect(keys).toHaveLength(2)
+    expect(values).toHaveLength(2)
+    expect(values).toEqual([1, 2])
+  })
+})
+
+describe('mergeDeepStyles', () => {
+  it('Works', () => {
+    const res = Utils.mergeStyles({ a: 1 }, { a: 2 })
+
+    expect(res).toEqual({ a: 2 })
+  })
+})
 
 describe('Basic Utils Tests', () => {
   describe('isArray', () => {
