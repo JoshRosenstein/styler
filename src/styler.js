@@ -13,11 +13,13 @@ import {
   prop,
   flow,
   toArray,
-  isObject, pathOr
+  isObject, pathOr,
+  complement,
+  when
 } from '@roseys/futils'
 
 import stylerCx from './stylerCx'
-
+import toMq from './toMq'
 import parseInlinePattern from './parseInlinePattern'
 import {
   whenFunctionCallWith,
@@ -232,16 +234,12 @@ const parseRules = (
 
   if (isMQ(selector)) {
     const bp = selector.replace(/^MQ_|mq_+/, '')
-    const mqVal = flow(
+    selector = flow(
       pathOr(
         bp,
         ['theme', 'breakpoints', selector.replace(/^MQ_|mq_+/, '')],
         props
-      ),
-      pxToEm
-    )
-
-    selector = `@media screen and (min-width:${mqVal})`
+      ), toMq)
   }
 
   if (isPatternBlock(selector)) {

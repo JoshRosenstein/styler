@@ -1,5 +1,6 @@
 export { default as styler } from './styler'
 export { default as cx } from './stylerCx'
+export { toMq } from './toMq'
 export {
   getThemeAttr,
   pxTo,

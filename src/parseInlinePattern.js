@@ -33,6 +33,7 @@ import {
 } from './utils'
 import computeOptions from './computeOptions'
 import lookupDefaultOptions from './lookupDefaultOptions'
+import toMq from './toMq'
 
 export default ({ value, props, globalOptions, key }) => {
   const { default: defaultValue, options: opt, ...matchers } = value
@@ -110,7 +111,7 @@ export default ({ value, props, globalOptions, key }) => {
 
     const CSSObj = Object.keys(breakpoints).reduce((acc, bpKey) => {
       const bpVal = getBp(bpKey)
-      if (isNil(bpVal)) {
+      if (isNil(bpVal) && bpKey !== 'default') {
         console.warn(
           `Styler could not find a match for breakPoints in ${key} style with ${matchedPropName}=${JSON.stringify(
             computedValue
@@ -119,24 +120,17 @@ export default ({ value, props, globalOptions, key }) => {
         return acc
       }
 
-      const minWidth = pxToEm(bpVal)
       const currentVal = when(
         both(always(isResponsiveBoolean), isBool),
         ifElse(isTrueBool, always(nonResponisiveComputedValue), always(null))
       )(breakpoints[bpKey])
-      const res = isNil(computeOpt(currentVal))
-        ? {}
-        : bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1
-          ? objOf(key, computeOpt(currentVal))
-          : objOf(
-            [`@media screen and (min-width:${minWidth})`, key],
-            computeOpt(currentVal)
-          )
 
-      const mkey =
-        bpKey === 'mobile' || bpKey === '0' || minWidth < 1.1
-          ? key
-          : `@media screen and (min-width:${minWidth})`
+      const computedVal = computeOpt(currentVal)
+      const res = isNil(computedVal)
+        ? {}
+        : bpKey === 'mobile' || bpKey === '0' || bpKey === 'default' || bpVal === 0
+          ? objOf(key, computedVal)
+          : objOf([toMq(bpVal), key], computedVal)
 
       return mergeDeepRight(acc, res)
     }, {})
