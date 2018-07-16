@@ -216,6 +216,7 @@ const parseRules = (
   props,
   options
 ) => {
+  selector = selector.replace(/__.$/, '')
   var next = selector
   value = flow(value, whenFunctionCallWith(props), falseToNull)
 
@@ -230,11 +231,11 @@ const parseRules = (
   }
 
   if (isMQ(selector)) {
-    const bp = selector.replace(/^MQ|mq_+/, '')
+    const bp = selector.replace(/^MQ_|mq_+/, '')
     const mqVal = flow(
       pathOr(
         bp,
-        ['theme', 'breakpoints', selector.replace(/^MQ|mq_+/, '')],
+        ['theme', 'breakpoints', selector.replace(/^MQ_|mq_+/, '')],
         props
       ),
       pxToEm

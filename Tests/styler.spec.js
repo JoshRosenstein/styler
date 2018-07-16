@@ -24,6 +24,54 @@ const StylerWithThemeTest = (Name, args) =>
   })
 
 describe('Styler', () => {
+  describe('Duplicate Keys Issue', () => {
+    it('Template', () => {
+      expect(styler({ border: 1, border__2: 2 })({})).toEqual({ border: '2px' })
+    })
+
+    it('with MQ', () => {
+      expect(
+        styler({
+          mq_mobile__1: { border: 1 },
+          mq_mobile__2: { borderTop__2: 2 }
+        })({})
+      ).toEqual({
+        '@media screen and (min-width:mobile)': {
+          border: '1px',
+          borderTop: '2px'
+        }
+      })
+    })
+  })
+
+  describe('MQ Selector', () => {
+    expect(
+      stylerWithTheme({ mq_mobile: { marginTop: '{!margin}' } })({
+        margin: '1px'
+      })
+    ).toEqual({ '@media screen and (min-width:mobile)': { marginTop: '1px' } })
+
+    expect(
+      stylerWithTheme({
+        MQ_desktop: {
+          alignItems: 'stretch',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginLeft: 'auto'
+        }
+      })({
+        margin: '1px'
+      })
+    ).toEqual({
+      '@media screen and (min-width:desktop)': {
+        alignItems: 'stretch',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginLeft: 'auto'
+      }
+    })
+  })
+
   describe('Simple Match Boolean Execution', () => {
     const testStyler = styler({
       testCSSProp: {
@@ -109,6 +157,22 @@ describe('Styler', () => {
       })
     })
 
+    it('block pattern does not return false bool matches', () => {
+      const testBlock = styler({
+        __match: {
+          isActive: {
+            fontWeight: 'bold',
+            color: 'purple'
+          }
+        }
+      })
+      const result = testBlock({ isActive: true })
+      expect(testBlock({ isActive: true })).toEqual({
+        color: 'purple',
+        fontWeight: 'bold'
+      })
+      expect(testBlock({ isActive: false })).toEqual({})
+    })
     it('will merge block of styles for a block pattern correctly', () => {
       const testBlock = styler({
         cursor: 'pointer',
@@ -138,22 +202,7 @@ describe('Styler', () => {
         outline: 'none'
       })
     })
-    it('block pattern does not return false bool matches', () => {
-      const testBlock = styler({
-        __match: {
-          isActive: {
-            fontWeight: 'bold',
-            color: 'purple'
-          }
-        }
-      })
-      const result = testBlock({ isActive: true })
-      expect(testBlock({ isActive: true })).toEqual({
-        color: 'purple',
-        fontWeight: 'bold'
-      })
-      expect(testBlock({ isActive: false })).toEqual({})
-    })
+
     it('Can return propValue using Custom', () => {
       const testProps = {
         returnPropValue: 'ThisWillBeReturned'
@@ -268,13 +317,13 @@ describe('Styler', () => {
           testCSSProp: 'returnThis'
         },
         {
-          testCSSProp2: 'returnThis'
+          testCSSProp2_: 'returnThis'
         }
       ])
 
       expect(testStyler({})).toEqual({
         testCSSProp: 'returnThis',
-        testCSSProp2: 'returnThis'
+        testCSSProp2_: 'returnThis'
       })
     })
     it('Should execute if a Single Array Nested Styler Function', () => {
@@ -575,15 +624,6 @@ describe('Styler', () => {
       },
       props: {},
       result: { marginTop: '-.5rem' }
-    }),
-    StylerWithThemeTest('MQ pattern match', {
-      args: {
-        mq_mobile: {
-          test: 1
-        }
-      },
-      props: {},
-      result: { '@media screen and (min-width:mobile)': { test: 1 } }
     })
   })
 
@@ -636,6 +676,16 @@ describe('Styler', () => {
         }
       },
       result: { border: '1px solid blue' }
+    })
+
+    StylerWithThemeTest('MQ pattern match', {
+      args: {
+        mq_mobile: {
+          test: 1
+        }
+      },
+      props: {},
+      result: { '@media screen and (min-width:mobile)': { test: 1 } }
     })
   })
   describe('Turn Off Default Getters and Lookups', () => {

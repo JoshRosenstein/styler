@@ -26,6 +26,19 @@ describe('mapObjOf', () => {
   })
 })
 
+describe('uniqifyKeys', () => {
+  it('Works', () => {
+    const obj = { a: 1, b: 2 }
+    const res = Utils.uniqifyKeys(obj)
+    const keys = Object.keys(res)
+    const values = Object.values(res)
+    expect(keys).toHaveLength(2)
+    expect(values).toHaveLength(2)
+    expect(values).toEqual(Object.values(obj))
+    expect(keys).not.toEqual(Object.keys(obj))
+  })
+})
+
 describe('Basic Utils Tests', () => {
   describe('isArray', () => {
     it('should return true', () => {

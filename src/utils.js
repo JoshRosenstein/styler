@@ -28,11 +28,25 @@ import {
   attach,
   round,
   mergeAllDeepLeft,
-  mergeAllDeepRight,
+  mergeAllDeepRight, mapKeys,
   not
 } from '@roseys/futils'
 
 import defaultTheme from './defaultTheme'
+
+const uniqueID = (prefix = '') => {
+  if (/__.$/.test(prefix)) {
+    return prefix
+  }
+
+  const hash = Math.random()
+    .toString(36)
+    .substring(8)
+
+  return prefix + '__' + hash
+}
+
+export const uniqifyKeys = mapKeys(uniqueID)
 
 export const isTemplate = test(/{\!([^}]+)}/g)
 export const evalTemplate = (string, data) =>
