@@ -58,7 +58,6 @@ describe('ComputeOptions', () => {
         space: { sm: 16 }
       }
     }
-    const result = '-1rem'
     expect(compute({ val, options, selector, props })).toEqual('-.5rem')
   })
 

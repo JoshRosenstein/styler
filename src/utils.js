@@ -6,7 +6,7 @@ import {
   toString,
   test,
   identity,
-  mapValues as map,
+  map,
   curryN,
   simplyEquals,
   reduce,
@@ -44,7 +44,7 @@ const uniqueID = (prefix = '') => {
     .toString(36)
     .substring(8)
 
-  return prefix + '__' + hash
+  return `${prefix  }__${  hash}`
 }
 
 export const uniqifyKeys = mapKeys(uniqueID)
@@ -54,21 +54,17 @@ export const mergeStyles = (...args) => mergeAllDeepRight(args)
 export const mergeStylesWithUniqKeys = (...args) =>
   args.reduce((acc, v) => merge(acc, uniqifyKeys(v)), {})
 
-export const isTemplate = test(/{\!([^}]+)}/g)
+export const isTemplate = test(/{!([^}]+)}/g)
 export const evalTemplate = (string, data) =>
   is('String', string)
-    ? string.replace(/{\!([^}]+)}/g, (_, key) => {
-      return pathOr(`{!${key}}`, key, data)
-    })
+    ? string.replace(/{!([^}]+)}/g, (_, key) => pathOr(`{!${key}}`, key, data))
     : string
 
-export const arrToObj = arr => {
-  return reduce(
-    (accumulated, value, key) => attach(key, value, accumulated),
-    {},
-    arr
-  )
-}
+export const arrToObj = arr => reduce(
+  (accumulated, value, key) => attach(key, value, accumulated),
+  {},
+  arr
+)
 
 export const isArray = is('Array')
 export const isString = is('String')
@@ -97,10 +93,10 @@ export const stripUnit = (value, returnUnit) => {
     const cssRegex = /^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/
     if (typeof value === 'number' || !value.match(cssRegex)) return [value, 0]
     return [unitlessValue, value.match(cssRegex)[2]]
-  } else {
-    if (isNaN(unitlessValue)) return value
-    return unitlessValue
   }
+  if (Number.isNaN(unitlessValue)) return value
+  return unitlessValue
+
 }
 
 export const pxTo = curryN(3, (divisor, unit, num) => {
@@ -145,20 +141,20 @@ export const get = pathWithFallback({ theme: defaultTheme })
 export const isNegative = test(/^-.+/)
 
 export const lookUpValue = curryN(3, (themeKey, val, props) => {
-  /// Check Strip Negative Before lookingUp
+  // / Check Strip Negative Before lookingUp
   if (!isString(val)) return val
   const isNeg = /^-.+/.test(val)
   const absN = isNeg ? val.slice(1) : val
 
   val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
-  return isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
+  return isNeg ? (isNumber(val) ? val * -1 : `-${  val}`) : val
 })
 
 export const mapObjOf = curryN(2, (key, val) =>
   pipe(toArray, map(x => objOf(x, val)), mergeAllDeepRight)(key)
 )
 
-/// For quick nested selectors
+// / For quick nested selectors
 const nester = (k, v) => reduceRight(objOf, v, split('.', k))
 
 export const UnflattenObj = pipe(
@@ -190,12 +186,12 @@ export const splitSelectors = selectors => {
   if (isAtRule(selectors)) {
     return [selectors]
   }
-  let splitted = []
+  const splitted = []
   let parens = 0
   let brackets = 0
   let current = ''
-  for (var i = 0, len = selectors.length; i < len; i++) {
-    var char = selectors[i]
+  for (let i = 0, len = selectors.length; i < len; i++) {
+    const char = selectors[i]
     if (char === '(') {
       parens += 1
     } else if (char === ')') {

@@ -13,9 +13,8 @@ import {
   prop,
   flow,
   toArray,
-  isObject, pathOr,
-  complement,
-  when
+  isObject,
+  pathOr,
 } from '@roseys/futils'
 
 import stylerCx from './stylerCx'
@@ -28,8 +27,10 @@ import {
   isAtRule,
   logger,
   evalTemplate,
-  isTemplate, isTruthy, isMQ,
-  pxToEm
+  isTemplate,
+  isTruthy,
+  isMQ,
+
 } from './utils'
 import getDefaultUnit from './defaultUnits'
 
@@ -49,15 +50,15 @@ export const isNestable = selector =>
 
 const reduceRule = (rules, result) =>
   reduce(
-    (style, rule, ruleid) => {
+    (style, rule) => {
       if (isNil(rule.value)) {
         return style
       }
       if (rule.value === '' && rule.property !== 'content') {
         rule.value = undefined
       }
-      /// For Nested selectors
-      var location = rule.location.concat(rule.selectors.join(', '))
+      // / For Nested selectors
+      const location = rule.location.concat(rule.selectors.join(', '))
       location.reduce((style, selector, i, arr) => {
         selector = selector.trim()
         if (!selector) {
@@ -84,31 +85,145 @@ const reduceRule = (rules, result) =>
     rules
   )
 
-const formatOutput = grouped => {
-  return reduce(
-    (result, rules, parentSelector) => {
-      return reduceRule(rules, result)
-    },
-    {},
-    grouped
-  )
+const formatOutput = grouped => reduce(
+  (result, rules) => reduceRule(rules, result),
+  {},
+  grouped
+)
+
+
+const isPatternBlock = key => key === '__match'
+
+const isInlinePattern = (value, selector, location) =>
+  isObject(value) &&
+  !isEmpty(value) &&
+  !containsSpecial(selector) &&
+  !isEmpty(selector) &&
+  !isNestable(last(location) || []) &&
+  !isPatternBlock(selector)
+
+const parseRules = (
+  parseNested,
+  selector,
+  value,
+  parents,
+  location,
+  props,
+  options
+) => {
+  selector = selector.replace(/__.$/, '')
+  let next = selector
+  value = flow(value, whenFunctionCallWith(props), falseToNull)
+
+  if (parents.length) {
+    next = next.replace(PSUEDO_WITHOUT_SELECTOR, '$1&$2$3')
+    if (hasReference(next)) {
+      next = next.replace(REFERENCE_SELECTOR, parents.pop())
+    }
+  }
+  if (selector === '@font-face') {
+    return { location: [], selector: '', property: selector, value }
+  }
+
+  if (isMQ(selector)) {
+    const bp = selector.replace(/^MQ_|mq_+/, '')
+    selector = flow(
+      pathOr(
+        bp,
+        ['theme', 'breakpoints', selector.replace(/^MQ_|mq_+/, '')],
+        props
+      ), toMq)
+  }
+
+  if (isPatternBlock(selector)) {
+    const res = flow(
+      value,
+      reduce((accumulated, rulesForProp, propName) => flow(
+        props,
+        ifElse(
+          x => isTruthy(prop(propName, x)),
+          pipe(
+            always(rulesForProp),
+            whenFunctionCallWith(props[propName], props),
+            whenFunctionCallWith(props),
+            mergeDeepRight(accumulated)
+          ),
+          always(accumulated)
+        )
+      ), {})
+    )
+
+    return parseNested(res, parents, location)
+  }
+  const log = logger(props.debug)
+  log('isInlinePattern', options)
+  if (isInlinePattern(value, selector, parents)) {
+    value = parseInlinePattern({
+      props,
+      value,
+      key: selector,
+      globalOptions: options
+    })
+    // return parseNested(value, parents, location);
+    if (isObject(value)) {
+      return parseNested(value, parents, location)
+    }
+  }
+
+  if (isObject(value)) {
+    const nestable = isNestable(selector)
+    if (nestable) {
+      location = location.concat(selector)
+    } else if (isAtRule(selector)) {
+      parents = [next]
+      location = []
+    } else if (
+      location.length &&
+      isNestable(location[location.length - 1]) &&
+      location[location.length - 1].indexOf(' ') === -1
+    ) {
+      location[location.length - 1] += ` ${  selector}`
+    } else {
+      parents = parents.concat(next)
+    }
+
+    return parseNested(value, parents, location)
+  }
+  // value = computeGetter({ val: value, options, selector, props });
+  if (typeof value === 'number' && value !== 0) {
+    const unit = getDefaultUnit(selector)
+    if (unit) {
+      value += unit
+    }
+  }
+
+  if (isTemplate(value)) {
+    value = evalTemplate(value, props)
+  }
+  return {
+    location,
+    selector: parents.join(' '),
+    property: selector,
+    value
+  }
 }
 
-const groupRules = (rules, group = true) => {
+
+const groupRules = ( group = true) => (rules)=>{
   const idFn = (property, selector, value, i) => {
     if (group) {
       return (
         property +
         (selector === '' ? 'root' : '') +
-        (typeof value !== 'object' ? value : '__' + i)
+        (typeof value !== 'object' ? value : `__${  i}`)
       )
     }
-    return selector + property + (typeof value !== 'object' ? value : '__' + i)
+    return selector + property + (typeof value !== 'object' ? value : `__${  i}`)
   }
 
   return reduce(
     (grouped, rule, i) => {
-      var id = idFn(rule.property, rule.selector, rule.value, i)
+      const id = idFn(rule.property, rule.selector, rule.value, i)
 
       if (!grouped[rule.location]) {
         grouped[rule.location] = {}
@@ -131,27 +246,6 @@ const groupRules = (rules, group = true) => {
   )
 }
 
-const getRules_ = ({ obj, props }) => {
-  const log = logger(props.debug)
-  const { options, ...rules } = obj
-  let newProps = { ...props }
-
-  if (options) {
-    const { cx, ...opt } = options
-    if (cx) {
-      newProps = stylerCx(cx, props)
-    }
-    log('options', opt)
-    //  log('newProps', {obj,newProps})
-    return getRules({
-      obj: { ...rules, options: opt },
-      props: { ...newProps, ...props }
-    })
-  }
-  // log('getRules_')
-  return getRules({ obj, props })
-}
-
 const getRules = ({
   obj,
   parents = [],
@@ -169,7 +263,7 @@ const getRules = ({
       obj: givenObj,
       parents: givenParents,
       location: givenLocation,
-      options: options,
+      options,
       props
     })
   const log = logger(props.debug)
@@ -199,139 +293,40 @@ const getRules = ({
   )(obj)
 }
 
-const isPatternBlock = key => key === '__match'
-
-const isInlinePattern = (value, selector, location) =>
-  isObject(value) &&
-  !isEmpty(value) &&
-  !containsSpecial(selector) &&
-  !isEmpty(selector) &&
-  !isNestable(last(location) || []) &&
-  !isPatternBlock(selector)
-
-const parseRules = (
-  parseNested,
-  selector,
-  value,
-  parents,
-  location,
-  props,
-  options
-) => {
-  selector = selector.replace(/__.$/, '')
-  var next = selector
-  value = flow(value, whenFunctionCallWith(props), falseToNull)
-
-  if (parents.length) {
-    next = next.replace(PSUEDO_WITHOUT_SELECTOR, '$1&$2$3')
-    if (hasReference(next)) {
-      next = next.replace(REFERENCE_SELECTOR, parents.pop())
-    }
-  }
-  if (selector === '@font-face') {
-    return { location: [], selector: '', property: selector, value: value }
-  }
-
-  if (isMQ(selector)) {
-    const bp = selector.replace(/^MQ_|mq_+/, '')
-    selector = flow(
-      pathOr(
-        bp,
-        ['theme', 'breakpoints', selector.replace(/^MQ_|mq_+/, '')],
-        props
-      ), toMq)
-  }
-
-  if (isPatternBlock(selector)) {
-    const res = flow(
-      value,
-      reduce((accumulated, rulesForProp, propName) => {
-        return flow(
-          props,
-          ifElse(
-            x => isTruthy(prop(propName, x)),
-            pipe(
-              always(rulesForProp),
-              whenFunctionCallWith(props[propName], props),
-              whenFunctionCallWith(props),
-              mergeDeepRight(accumulated)
-            ),
-            always(accumulated)
-          )
-        )
-      }, {})
-    )
-
-    return parseNested(res, parents, location)
-  }
+const getRules_ = ({ obj, props }) => {
   const log = logger(props.debug)
-  log('isInlinePattern', options)
-  if (isInlinePattern(value, selector, parents)) {
-    value = parseInlinePattern({
-      props,
-      value,
-      key: selector,
-      globalOptions: options
+  const { options, ...rules } = obj
+  let newProps = { ...props }
+
+  if (options) {
+    const { cx, ...opt } = options
+    if (cx) {
+      newProps = stylerCx(cx, props)
+    }
+    log('options', opt)
+    //  log('newProps', {obj,newProps})
+    return getRules({
+      obj: { ...rules, options: opt },
+      props: { ...newProps, ...props }
     })
-    // return parseNested(value, parents, location);
-    if (isObject(value)) {
-      return parseNested(value, parents, location)
-    }
   }
-
-  if (isObject(value)) {
-    var nestable = isNestable(selector)
-    if (nestable) {
-      location = location.concat(selector)
-    } else if (isAtRule(selector)) {
-      parents = [next]
-      location = []
-    } else if (
-      location.length &&
-      isNestable(location[location.length - 1]) &&
-      location[location.length - 1].indexOf(' ') === -1
-    ) {
-      location[location.length - 1] += ' ' + selector
-    } else {
-      parents = parents.concat(next)
-    }
-
-    return parseNested(value, parents, location)
-  }
-  // value = computeGetter({ val: value, options, selector, props });
-  if (typeof value === 'number' && value !== 0) {
-    const unit = getDefaultUnit(selector)
-    if (unit) {
-      value = value + unit
-    }
-  }
-
-  if (isTemplate(value)) {
-    value = evalTemplate(value, props)
-  }
-  return {
-    location: location,
-    selector: parents.join(' '),
-    property: selector,
-    value: value
-  }
+  // log('getRules_')
+  return getRules({ obj, props })
 }
 
-const styler = (obj, groupSelectors = false) => props => {
-  var rules
+const styler = (obj, groupSelectors = true) => props => {
+  let rules
   if (is('Function')(obj)) {
     return styler(obj(props))(props)
   }
   if (Array.isArray(obj)) {
-    rules = obj.reduce((r, o) => {
-      return r.concat(getRules({ obj: o, props }))
-    }, [])
+    rules = obj.reduce((r, o) => r.concat(getRules({ obj: o, props })), [])
   } else {
     // return obj
     rules = getRules_({ obj, props })
   }
 
-  return flow(rules, groupRules, formatOutput)
+  return flow(rules, groupRules(groupSelectors), formatOutput)
 }
 
 export default styler

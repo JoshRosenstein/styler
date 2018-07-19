@@ -54,37 +54,39 @@ describe('SpaceProp', () => {
       '@media screen and (min-width:desktop)': { notSwitchedCssProp: '1rem' },
       '@media screen and (min-width:tablet)': { notSwitchedCssProp: '1rem' }
     })
-  }),
-    it('SpaceProp Allows CSS prop to be nested by Dot Notation" ', () => {
-      const a = spaceProp('>:first-child.>*.margin')({
-        desktop: 'md',
-        tablet: 'md',
-        theme
-      })
+  })
 
-      //{">*": {"margin": 1}, ">:first-child": {}}
-      expect(a).toEqual({
-        '@media screen and (min-width:desktop)': {
-          '>:first-child >*': { margin: '1rem' }
-        },
-        '@media screen and (min-width:tablet)': {
-          '>:first-child >*': { margin: '1rem' }
-        }
-      })
-    }),
-    it('SpaceProp Allows CSS prop to be nested by Dot Notation in Arrays" ', () => {
-      const a = spaceProp([
-        '>:first-child.>*.cssProp1',
-        '>:first-child.>*.cssProp2'
-      ])({
-        tablet: '2rem',
-        theme
-      })
-
-      expect(a).toEqual({
-        '@media screen and (min-width:tablet)': {
-          '>:first-child >*': { cssProp1: '2rem', cssProp2: '2rem' }
-        }
-      })
+  it('SpaceProp Allows CSS prop to be nested by Dot Notation" ', () => {
+    const a = spaceProp('>:first-child.>*.margin')({
+      desktop: 'md',
+      tablet: 'md',
+      theme
     })
+
+    // {">*": {"margin": 1}, ">:first-child": {}}
+    expect(a).toEqual({
+      '@media screen and (min-width:desktop)': {
+        '>:first-child >*': { margin: '1rem' }
+      },
+      '@media screen and (min-width:tablet)': {
+        '>:first-child >*': { margin: '1rem' }
+      }
+    })
+  })
+  
+  it('SpaceProp Allows CSS prop to be nested by Dot Notation in Arrays" ', () => {
+    const a = spaceProp([
+      '>:first-child.>*.cssProp1',
+      '>:first-child.>*.cssProp2'
+    ])({
+      tablet: '2rem',
+      theme
+    })
+
+    expect(a).toEqual({
+      '@media screen and (min-width:tablet)': {
+        '>:first-child >*': { cssProp1: '2rem', cssProp2: '2rem' }
+      }
+    })
+  })
 })

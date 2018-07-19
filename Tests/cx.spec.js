@@ -18,12 +18,7 @@ describe('stylerCx', () => {
     )
     const b = stylerCx([['variant', 'primary', 'minimal']], p_)
 
-    // expect(a).toEqual({
-    //   primaryMinimal: true,
-    //   regularPrimary: true,
-    //   sizeSmall: true,
-    //   variantRegular: true
-    // })
+
     expect(a).toEqual({
       primaryMinimal: true,
       regularPrimary: true,
@@ -99,7 +94,6 @@ describe('stylerCx', () => {
         outlined: false,
         primary: false
       }
-      const variant = ['warning', 'success', 'regular']
       const a = stylerWithTheme(stylesBlock)(defaultProps)
       expect(a).toEqual({ color: 'variantColor' })
       const b = stylerWithTheme(stylesBlock)({
@@ -164,15 +158,7 @@ describe('stylerCx', () => {
         margin: '0.063rem'
       })
 
-      const stylesBlock2 = {
-        color: {
-          outlinedPrimary: 'outlinedPrimaryColor'
-        },
-        margin: {
-          variantRegular: { mobile: '1px', tablet: '2px' }
-        },
-        options
-      }
+
       const b = stylerWithTheme(stylesBlock)(defaultProps)
       expect(b).toEqual({
         '@media screen and (min-width:tablet)': { margin: '0.125rem' },

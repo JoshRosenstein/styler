@@ -16,7 +16,6 @@ import {
   both,
   mergeDeepLeft,
   reduceWhile,
-  not
 } from '@roseys/futils'
 import stylerWithTheme from './utils/stylerWithTheme'
 import {
@@ -40,7 +39,7 @@ import {
 const any = curryN(2, (handlerFn, list) =>
   reduceWhile(
     acc => acc === false,
-    (acc, value, key) => handlerFn(value),
+    (acc, value) => handlerFn(value),
     false,
     list
   )
@@ -186,9 +185,9 @@ export const flexStyles = {
     flow: 'returnAsIs'
   },
   alignContent,
-  ///FlexGap
+  // /FlexGap
   ...flexGapStyles,
-  ///
+  // /
   alignItems: {
     alignItems: 'returnAsIs',
     center: (v, p) => isFlexCol(p) && 'center',
@@ -240,14 +239,14 @@ const flexItemStyles = [
       basis: returnAsIs,
       options: {
         key: 'space',
-        getter: n => (!Util.isNumber(n) || n > 1 ? pxToRem(n) : n * 100 + '%')
+        getter: n => (!Util.isNumber(n) || n > 1 ? pxToRem(n) : `${n * 100  }%`)
       }
     },
     flex,
     zIndex,
     order,
     alignSelf,
-    ///align Item
+    // /align Item
     marginLeft: {
       center: 'auto',
       right: 'auto',
@@ -311,18 +310,7 @@ describe('FlexContainer', () => {
     })
     it('should add correct styles for gapType="padding" usage', () => {
       const a = FlexContainer({ gapType: 'padding' })
-      const result = {
-        '>:first-child': {
-          display: 'flex',
-          height: 'inherit',
-          maxHeight: 'inherit',
-          maxWidth: 'inherit',
-          minHeight: 'inherit',
-          minWidth: 'inherit',
-          width: 'inherit'
-        },
-        '>:first-child>*': { boxSizing: 'border-box' }
-      }
+
       expect(a).toEqual(
         WithDefaults({ '>:first-child >*': { boxSizing: 'border-box' } })
       )
@@ -345,41 +333,7 @@ describe('FlexContainer', () => {
     })
     it('should add correct styles for <Flex wrap gapType="padding" gap={spacing}> ', () => {
       const a = FlexContainer({ wrap: true, gapType: 'padding', gap: spacing })
-      const result = {
-        '>:first-child': {
-          display: 'flex',
-          flexWrap: 'wrap',
-          height: 'inherit',
-          maxHeight: 'inherit',
-          maxWidth: 'inherit',
-          minHeight: 'inherit',
-          minWidth: 'inherit',
-          ruleValue: {
-            '@media screen and (min-width:mobileMd)': {
-              marginLeft: '-1rem',
-              marginTop: '-1rem'
-            },
-            '@media screen and (min-width:mobileSm)': {
-              marginLeft: '-0.5rem',
-              marginTop: '-0.5rem'
-            }
-          },
-          width: 'inherit'
-        },
-        '>:first-child >*': {
-          boxSizing: 'border-box',
-          ruleValue: {
-            '@media screen and (min-width:mobileMd)': {
-              paddingLeft: '1rem',
-              paddingTop: '1rem'
-            },
-            '@media screen and (min-width:mobileSm)': {
-              paddingLeft: '0.5rem',
-              paddingTop: '0.5rem'
-            }
-          }
-        }
-      }
+
       expect(a).toEqual({
         '>:first-child': {
           display: 'flex',
@@ -410,21 +364,7 @@ describe('FlexContainer', () => {
         right: true,
         height: 200
       })
-      const result = {
-        '>:first-child': {
-          alignItems: 'flex-end',
-          display: 'flex',
-          flexDirection: 'column',
-          height: 'inherit',
-          justifyContent: 'center',
-          maxHeight: 'inherit',
-          maxWidth: 'inherit',
-          minHeight: 'inherit',
-          minWidth: 'inherit',
-          width: 'inherit'
-        },
-        height: '12.5rem'
-      }
+
       expect(a).toEqual({
         '>:first-child': {
           alignItems: 'flex-end',
@@ -522,14 +462,6 @@ describe('FlexContainer', () => {
         ])({
           ...spacing
         })
-        const needtoBe = {
-          '@media screen and (min-width:mobileMd)': {
-            '>*': { marginLeft: '1rem', marginTop: '1rem' }
-          },
-          '@media screen and (min-width:mobileSm)': {
-            '>*': { marginLeft: '0.5rem', marginTop: '0.5rem' }
-          }
-        }
 
         expect(a).toEqual({
           '@media screen and (min-width:mobileMd)': {

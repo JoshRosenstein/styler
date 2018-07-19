@@ -25,7 +25,6 @@ import {
   getThemeAttr,
   isBool,
   isTrueBool,
-  pxToEm,
   isArray,
   isString,
   iterateUntilResult,
@@ -73,8 +72,8 @@ export default ({ value, props, globalOptions, key }) => {
     return computedValue
   }
   const matchedProp = prop(matchedPropName, props)
-  let nonResponisiveComputedValue = computedValue
-  let isResponsiveBoolean =
+  const nonResponisiveComputedValue = computedValue
+  const isResponsiveBoolean =
     (isString(computedValue) && is('Array', matchedProp)) ||
     is('Object', matchedProp)
 
@@ -100,7 +99,7 @@ export default ({ value, props, globalOptions, key }) => {
       }
     }
 
-    let getBp = x => prop(x, themeBPs)
+    const getBp = x => prop(x, themeBPs)
 
     breakpoints = Object.keys(breakpoints)
       .sort((a, b) => getBp(a) - getBp(b))

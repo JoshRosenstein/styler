@@ -19,6 +19,7 @@ import {
   prop
 } from '@roseys/futils'
 import { pxToEm, isAtRule } from './utils'
+
 const propOr = (d, name, keyedFunctor) => defaultTo(d, prop(name, keyedFunctor))
 const dasherize = original =>
   original
@@ -41,22 +42,20 @@ const replaceShorthandKeys = mapKeys(x =>
 )
 
 const objParser = obj => {
-  const fn = ([feature, value]) => {
-    return flow(
-      value,
-      when(both(always(isDimension(dasherize(feature))), is('Number')), pxToEm),
-      cond([
-        [equals(true), always(dasherize(feature))],
-        [equals(false), always('not ' + dasherize(feature))],
-        [T, temp => '(' + dasherize(feature) + ':' + temp + ')']
-      ])
-    )
-  }
+  const fn = ([feature, value]) => flow(
+    value,
+    when(both(always(isDimension(dasherize(feature))), is('Number')), pxToEm),
+    cond([
+      [equals(true), always(dasherize(feature))],
+      [equals(false), always(`not ${  dasherize(feature)}`)],
+      [T, temp => `(${  dasherize(feature)  }:${  temp  })`]
+    ])
+  )
 
   return flow(obj, replaceShorthandKeys, toPairs, map(fn), join(' and '))
 }
 
-export const toMq = pipe(
+const toMq = pipe(
   cond([
     [both(is('String'), isAtRule), identity],
     [is(Array), pipe(map(objParser), join(', '))],
@@ -66,7 +65,7 @@ export const toMq = pipe(
     ],
     [T, objParser]
   ]),
-  x => '@media ' + x
+  x => `@media ${  x}`
 )
 
 export default toMq

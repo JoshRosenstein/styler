@@ -9,10 +9,7 @@ describe('mapObjOf', () => {
   it('Should merge nested dotPaths', () => {
     const v = { default: { tablet: '2rem' } }
     const keys = ['>:first-child.>*.cssProp1', '>:first-child.>*.cssProp2']
-    const res = {
-      '>:first-child.>*.cssProp1': { default: { tablet: '2rem' } },
-      '>:first-child.>*.cssProp2': { default: { tablet: '2rem' } }
-    }
+
     const resb = {
       '>:first-child': {
         '>*': {
@@ -75,7 +72,7 @@ describe('Basic Utils Tests', () => {
     it('should return true', () => {
       expect(Utils.isString('[]')).toBe(true)
       expect(Utils.isString('')).toBe(true)
-      expect(Utils.isString(``)).toBe(true)
+      expect(Utils.isString('')).toBe(true)
     })
     it('should return false', () => {
       expect(Utils.isString({})).toBe(false)
@@ -186,13 +183,13 @@ describe('Basic Utils Tests', () => {
   describe('getThemeAttr', () => {
     it('Should Return Fallback Theme', () => {
       expect(Utils.getThemeAttr('breakpoints')({})).toEqual(
-        defaultTheme['breakpoints']
+        defaultTheme.breakpoints
       )
     })
 
     it('Should Return Theme from Props', () => {
       expect(Utils.getThemeAttr('breakpoints')({ theme })).toEqual(
-        theme['breakpoints']
+        theme.breakpoints
       )
     })
 

@@ -96,7 +96,6 @@ describe('Styler', () => {
       expect(testStyler({})).toEqual({ testCSSProp: 'white' })
     })
     it('Should not depend on prop order', () => {
-      const topSelector = '#meow'
       const props1 = { mode: 'dark', nextOne: 'hello' }
       const props2 = { nextOne: 'hello', mode: 'dark' }
       const rules1 = {
@@ -166,7 +165,6 @@ describe('Styler', () => {
           }
         }
       })
-      const result = testBlock({ isActive: true })
       expect(testBlock({ isActive: true })).toEqual({
         color: 'purple',
         fontWeight: 'bold'

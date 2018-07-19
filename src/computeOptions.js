@@ -13,10 +13,13 @@ import lookupDefaultOptions from './lookupDefaultOptions'
 
 export default ({ val, options, selector, props }) => {
   let {
-    defaultLookup: doDefaultLookup = true,
-    defaultTransform: doDefaultTransform = true,
     key: themeKey,
     getter,
+  } = options
+
+  const {
+    defaultLookup: doDefaultLookup = true,
+    defaultTransform: doDefaultTransform = true,
     postFn,
     preFn,
     path
@@ -42,7 +45,7 @@ export default ({ val, options, selector, props }) => {
     themeKey = themeKey || path || defaultLookup || ''
 
     if (isDefined(themeKey) && isString(val)) {
-      /// Check Strip Negative Before lookingUp
+      // / Check Strip Negative Before lookingUp
       const isNeg = /^-.+/.test(val)
       val = isNeg ? val.slice(1) : val
       const themeProp = isDefined(path)
@@ -50,7 +53,7 @@ export default ({ val, options, selector, props }) => {
         : `theme.${themeKey}.${val}`
       val = get(themeProp, val)(props)
 
-      val = isNeg ? (isNumber(val) ? val * -1 : '-' + val) : val
+      val = isNeg ? (isNumber(val) ? val * -1 : `-${  val}`) : val
     }
 
     getter = getter || postFn || defaultGetter

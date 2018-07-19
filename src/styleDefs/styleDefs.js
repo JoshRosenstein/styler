@@ -3,10 +3,10 @@
 import { pxToRem, px, isNumber } from '../utils'
 
 export const getters = {
-  getWidth: n => (!isNumber(n) || n > 1 ? pxToRem(n) : n * 100 + '%'),
-  getBorder: n => (isNumber(n) && n > 0 ? n + 'px solid' : n),
-  backgroundImage: (val, rawValue, p) => `url(${rawValue})`,
-  ratio: n => n * 100 + '%'
+  getWidth: n => (!isNumber(n) || n > 1 ? pxToRem(n) : `${n * 100  }%`),
+  getBorder: n => (isNumber(n) && n > 0 ? `${n  }px solid` : n),
+  backgroundImage: (val) => `url(${val})`,
+  ratio: n => `${n * 100  }%`
 }
 
 export const width = {
@@ -151,7 +151,7 @@ export const ratio_c = {
   paddingBottom: {
     ratio: 'returnAsIs',
     options: {
-      postFn: n => n * 100 + '%'
+      postFn: n => `${n * 100  }%`
     }
   }
 }

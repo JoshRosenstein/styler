@@ -13,9 +13,10 @@ import {
   justifyItems,
   alignItems
 } from '../src'
+
 const endsWith = curryN(2, (str, list) => startsWith(str, reverse(list)))
 
-const supportsModernGrid = `@supports (grid-row-gap:0)`
+const supportsModernGrid = '@supports (grid-row-gap:0)'
 const gridAutoFlowGetter = (v, p) => {
   let { dense } = p
   if (!is(String)(v) && dense) return 'dense'

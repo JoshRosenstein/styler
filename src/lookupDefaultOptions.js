@@ -1,7 +1,4 @@
-import { pxToEm, pxToRem, pxToPct, px, isString, ms, pct } from './utils'
-
 import {
-  when,
   concat,
   path,
   pathOr,
@@ -9,6 +6,7 @@ import {
   curryN,
   identity
 } from '@roseys/futils'
+import { pxToEm, pxToRem, pxToPct, px, isString, ms, pct } from './utils'
 
 const defaultLookups = {
   keys: {
@@ -54,15 +52,15 @@ const defaultLookups = {
   },
   functions: {
     returnAsIs: identity,
-    identity: identity,
+    identity,
     propValue: identity,
     self: identity,
-    pxToRem: pxToRem,
-    pxToEm: pxToEm,
-    pxToPct: pxToPct,
-    px: px,
-    ms: ms,
-    pct: pct,
+    pxToRem,
+    pxToEm,
+    pxToPct,
+    px,
+    ms,
+    pct,
     '%': pct
   }
 }
@@ -91,9 +89,9 @@ const lookupDefaultOptions = curryN(
   (props, dictionary, value) =>
     isString(value)
       ? getAttrFB(
-          `${dictionary}.${value}`,
-          dictionary === 'getter' ? null : value
-        )(props)
+        `${dictionary}.${value}`,
+        dictionary === 'getter' ? null : value
+      )(props)
       : value
 )
 
