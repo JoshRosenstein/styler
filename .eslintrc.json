@@ -4,10 +4,12 @@
     "expect":true,
     "describe":true,
     "test":true,
-    "it":true
+    "it":true,
+    "jest":true
   },
   "rules":{
     "quotes": ["warn", "single", { "avoidEscape": true }],
+    "linebreak-style":0,
     "semi": ["warn", "never"],
     "no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 1 }],
     "indent": ["error", 2],

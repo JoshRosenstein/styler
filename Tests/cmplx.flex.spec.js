@@ -87,10 +87,6 @@ const isTrueBool = both(isBool, isTruthy)
 
 const equalsColumn = flip(contains)(['column', 'column-reverse'])
 
-const isFlexCol = either(
-  pipe(props(['direction', 'flexDirection', 'fxdirection']), any(equalsColumn)),
-  pipe(props(['column', 'columnReverse']), any(isTrueBool))
-)
 
 export const flexWrapperStyles = {
   display: {
@@ -150,6 +146,12 @@ const flexGapStyles = {
   }
 }
 
+const isFlexCol = either(
+  pipe(props(['direction', 'flexDirection', 'fxdirection']), any(equalsColumn)),
+  pipe(props(['column', 'columnReverse']), any(isTrueBool))
+)
+
+
 export const flexStyles = {
   minWidth: 'inherit',
   width: 'inherit',
@@ -187,25 +189,35 @@ export const flexStyles = {
   alignContent,
   // /FlexGap
   ...flexGapStyles,
-  // /
-  alignItems: {
-    alignItems: 'returnAsIs',
-    center: (v, p) => isFlexCol(p) && 'center',
-    middle: (v, p) => !isFlexCol(p) && 'center',
-    top: (v, p) => !isFlexCol(p) && 'flex-start',
-    right: (v, p) => isFlexCol(p) && 'flex-end',
-    bottom: (v, p) => !isFlexCol(p) && 'flex-end',
-    left: (v, p) => isFlexCol(p) && 'flex-start'
-  },
-  justifyContent: {
-    justifyContent: 'returnAsIs',
-    center: (v, p) => !isFlexCol(p) && 'center',
-    middle: (v, p) => isFlexCol(p) && 'center',
-    top: (v, p) => isFlexCol(p) && 'flex-start',
-    right: (v, p) => !isFlexCol(p) && 'flex-end',
-    bottom: (v, p) => isFlexCol(p) && 'flex-end',
-    left: (v, p) => !isFlexCol(p) && 'flex-start'
-  }
+  ' ':({column,direction})=>(
+    column || direction==='column'?
+      {
+        alignItems: {
+          alignItems: 'returnAsIs',
+          center: 'center',
+          right:'flex-end',
+          left:'flex-start'
+        },
+        justifyContent: {
+          justifyContent: 'returnAsIs',
+          middle: 'center',
+          bottom:'flex-end',
+          top:'flex-start',
+        }}:{
+        justifyContent: {
+          justifyContent: 'returnAsIs',
+          center: 'center',
+          right:'flex-end',
+          left:'flex-start'
+        },
+        alignItems: {
+          alignItems: 'returnAsIs',
+          middle: 'center',
+          bottom:'flex-end',
+          top:'flex-start',
+        }}
+
+  )
 }
 
 export const flexContainerStyles = {

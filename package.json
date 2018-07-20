@@ -31,13 +31,14 @@
   "browser": "dist/styler.umd.js",
   "moduleName": "roseyStyler",
   "dependencies": {
-    "@roseys/futils": "^0.0.15"
+    "@roseys/futils": "^0.0.17"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.3",
     "babel-loader": "^7.1.4",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",

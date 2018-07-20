@@ -17,7 +17,7 @@ import {
   pathOr,
 } from '@roseys/futils'
 
-import stylerCx from './stylerCx'
+import cx from './cx'
 import toMq from './toMq'
 import parseInlinePattern from './parseInlinePattern'
 import {
@@ -299,9 +299,9 @@ const getRules_ = ({ obj, props }) => {
   let newProps = { ...props }
 
   if (options) {
-    const { cx, ...opt } = options
-    if (cx) {
-      newProps = stylerCx(cx, props)
+    const { cx:cxopt, ...opt } = options
+    if (cxopt) {
+      newProps = cx(cxopt, props)
     }
     log('options', opt)
     //  log('newProps', {obj,newProps})

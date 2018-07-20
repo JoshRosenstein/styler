@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import stylerCx from '../src/stylerCx'
+import stylerCx from '../src/cx'
 import stylerWithTheme from './utils/stylerWithTheme'
 
 describe('stylerCx', () => {

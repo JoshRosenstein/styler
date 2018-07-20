@@ -1,5 +1,3 @@
-import * as F from '@roseys/futils'
-
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import resolve from 'rollup-plugin-node-resolve'
@@ -11,6 +9,7 @@ import filesize from 'rollup-plugin-filesize'
 // import getNamedExports from './scripts/getNamedExports'
 import pkg from './package.json'
 
+const dyno= process.env.NODE_ENV ==='production'? [uglify(),filesize()]:[filesize()]
 const plugins = [
   resolve({
     jsnext: true,
@@ -18,8 +17,7 @@ const plugins = [
     browser: true
   }),
   commonjs({
-    include: 'node_modules/**',
-    extensions: ['.js']
+    include: 'node_modules/**'
     // namedExports: { '@roseys/futils/lib/isNil': ['isNil'] }
     // getNamedExports(['@roseys/futils/curry'])
   }),
@@ -38,7 +36,8 @@ const plugins = [
       'stage-0'
     ],
     exclude: 'node_modules/**',
-    runtimeHelpers: true
+    runtimeHelpers: true,
+    plugins:['external-helpers']
   }),
   replace({
     exclude: 'node_modules/**',
@@ -47,18 +46,29 @@ const plugins = [
   uglify(),
   filesize()
 ]
-const external = F.keys(pkg.dependencies)
+const external = Object.keys(pkg.dependencies)
 
 const configBase = {
   input: 'src/index.js',
-  external,
-  treeshake: true,
+  treeshake:true,
+
   output: [
-    { file: pkg.module, format: 'es', sourcemap: false },
-    { file: pkg.main, format: 'cjs', sourcemap: false },
-    { file: pkg.browser, format: 'umd', name: pkg.moduleName, sourcemap: false }
+    { file: pkg.main, format: 'cjs', sourcemap: false ,exports:'named'},
+    { file: pkg.browser, format: 'umd', name: pkg.moduleName, sourcemap: false ,exports:'named'}
   ],
   plugins
 }
 
-export default configBase
+const configES = {
+  input: 'src/index.js',
+  treeshake:true,
+  external,
+  output: [
+    { file: pkg.module, format: 'es', sourcemap: false ,exports:'named'},
+
+  ],
+  plugins
+}
+
+
+export default [configBase,configES]

@@ -1,6 +1,8 @@
-export { default as styler } from './styler' 
-export { default as cx } from './stylerCx'
-export { toMq } from './toMq'
+import styler from './styler'
+
+export { default as styler } from './styler'
+export { default as cx } from './cx'
+export  { default as toMq }  from './toMq'
 export {
   getThemeAttr,
   pxTo,
@@ -98,3 +100,5 @@ export {
   width,
   zIndex
 } from './styleDefs'
+
+export default styler
