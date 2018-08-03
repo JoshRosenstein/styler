@@ -1,6 +1,6 @@
 {
   "name": "@roseys/styler",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "WIP- My css-in-js Utility functions",
   "keywords": [],
   "author": "Joshua Rosenstein",
@@ -13,7 +13,7 @@
   "scripts": {
     "prepack": "yarn run build:prod",
     "clean": "rimraf node_modules && rimraf dist",
-    "build": " yarn run transform && yarn run rollup",
+    "build": " yarn run transform && yarn run rollup && yarn run clean:temp",
     "rollup": " SET NODE_ENV=production && rollup -c",
     "transform": "cross-env NODE_ENV=transform babel  src --out-dir temp --ignore *.spec.js,*.test.js ",
     "build:dev": "rollup -c",

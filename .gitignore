@@ -1,6 +1,6 @@
 /coverage
 /demo/dist
-
+/temp/
 
 node_modules/
 *.log
