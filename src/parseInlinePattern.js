@@ -16,7 +16,9 @@ import {
   defaultTo,
   when,
   flow,
-  isObject
+  isObject,
+  isArray,
+  isString,
 } from '@roseys/futils'
 
 import {
@@ -25,8 +27,6 @@ import {
   getThemeAttr,
   isBool,
   isTrueBool,
-  isArray,
-  isString,
   iterateUntilResult,
   arrToObj
 } from './utils'

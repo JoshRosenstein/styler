@@ -1,9 +1,8 @@
-import { flow, isDefined } from '@roseys/futils'
+import { flow, isDefined ,isString} from '@roseys/futils'
 
 import {
   whenFunctionCallWith,
   isNumber,
-  isString,
   get,
   isTemplate,
   evalTemplate

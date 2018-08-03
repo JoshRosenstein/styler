@@ -4,7 +4,7 @@ import {
   is,
   when,
   reduce,
-  mapValues as map,
+  mapValues,
   join,
   always,
   merge,
@@ -12,38 +12,23 @@ import {
   curryN,
   isNil,
   contains,
-  ifElse
+  ifElse,
+  toCamelCase
 } from '@roseys/futils'
 
-const camelCase = str =>
-  str
-    .split(
-      /[\s\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]+/
-    )
-    .reduce((res, word, i) => word === ''
-      ? res
-      : res.concat(
-        i > 0 ? word[0].toUpperCase() : word[0].toLowerCase(),
-        word.slice(1)
-      ), '')
 
 const stylerCx = (prefix, props_) => {
   const isBool = is('Boolean')
-  const collectObjProps = {}
-  const checkPropType = name =>
+  const checkPropType =
     when(
-      x => is('Array', x) || is('Object', x),
-      x => {
-        collectObjProps[name] = x
+      x => is('Array', x) || is('Object', x),always('skip')
 
-        return 'skip'
-      }
     )
 
   const keyOrValue = name =>
     pipe(
       prop(name),
-      checkPropType(name),
+      checkPropType,
       when(isNil, always('skip')),
       when(isBool, x => (x ? name : 'skip'))
     )(props_)
@@ -51,7 +36,7 @@ const stylerCx = (prefix, props_) => {
   const alwaysKey = name =>
     pipe(
       prop(name),
-      checkPropType(name),
+      checkPropType,
       ifElse(isNil, always('skip'), x => (x ? name : 'skip'))
     )(props_)
 
@@ -59,11 +44,11 @@ const stylerCx = (prefix, props_) => {
     pipe(
       prop(name),
       when(isNil, always('skip')),
-      checkPropType(name),
+      checkPropType,
       ifElse(isBool, x => (x ? name : 'skip'), x => [name, x])
     )(props_)
 
-  const noSkip = pipe(join(' '), camelCase, x => ({ [x]: true }))
+  const noSkip = pipe(join(' '), toCamelCase, x => ({ [x]: true }))
   const skipCond = contains('skip')
   const Skip = always({})
 
@@ -79,12 +64,12 @@ const stylerCx = (prefix, props_) => {
       if (is('Array', v)) {
         const withValues = pipe(
           toArray,
-          map(keyOrValue),
+          mapValues(keyOrValue),
           ifElse(skipCond, Skip, noSkip)
         )(v)
         const withKeys = pipe(
           toArray,
-          map(alwaysKey),
+          mapValues(alwaysKey),
           ifElse(skipCond, Skip, noSkip),
           merge(withValues)
         )(v)

@@ -56,31 +56,7 @@ describe('mergeDeepStyles', () => {
 })
 
 describe('Basic Utils Tests', () => {
-  describe('isArray', () => {
-    it('should return true', () => {
-      expect(Utils.isArray([])).toBe(true)
-      expect(Utils.isArray([1])).toBe(true)
-      expect(Utils.isArray([[2]])).toBe(true)
-    })
-    it('should return false', () => {
-      expect(Utils.isArray({})).toBe(false)
-      expect(Utils.isArray(undefined)).toBe(false)
-      expect(Utils.isArray(1)).toBe(false)
-    })
-  })
-  describe('isString', () => {
-    it('should return true', () => {
-      expect(Utils.isString('[]')).toBe(true)
-      expect(Utils.isString('')).toBe(true)
-      expect(Utils.isString('')).toBe(true)
-    })
-    it('should return false', () => {
-      expect(Utils.isString({})).toBe(false)
-      expect(Utils.isString(undefined)).toBe(false)
-      expect(Utils.isString(1)).toBe(false)
-      expect(Utils.isString([1])).toBe(false)
-    })
-  })
+
 
   describe('isNumber', () => {
     it('should return true', () => {

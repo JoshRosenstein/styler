@@ -5,10 +5,17 @@
   "keywords": [],
   "author": "Joshua Rosenstein",
   "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "browser": "dist/styler.min.js",
+  "unpkg": "dist/styler.min.js",
+  "jsdelivr": "dist/styler.min.js",
   "scripts": {
     "prepack": "yarn run build:prod",
     "clean": "rimraf node_modules && rimraf dist",
-    "build:prod": "SET NODE_ENV=production && rollup -c",
+    "build": " yarn run transform && yarn run rollup",
+    "rollup": " SET NODE_ENV=production && rollup -c",
+    "transform": "cross-env NODE_ENV=transform babel  src --out-dir temp --ignore *.spec.js,*.test.js ",
     "build:dev": "rollup -c",
     "watch": "rollup -c --watch",
     "size": "bundlesize",
@@ -17,42 +24,34 @@
     "test:quick": "jest --onlyChanged --runInBand",
     "test:coverage": "jest --coverage",
     "reinstall": "yarn run clean && yarn",
-    "lint": "standard src/*.js",
-    "docs": "x0 docs",
-    "namedExports": "node scripts/getNamedExports.js"
+    "lint": "npx eslint .",
+    "clean:temp": "rimraf temp"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JoshRosenstein/styler.git"
   },
-  "main": "dist/styler.common.js",
-  "module": "dist/styler.es.js",
-  "jsnext:main": "dist/styler.es.js",
-  "browser": "dist/styler.umd.js",
-  "moduleName": "roseyStyler",
   "dependencies": {
-    "@roseys/futils": "^0.0.17"
+    "@roseys/futils": "^0.0.19"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.3",
-    "babel-loader": "^7.1.4",
     "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-imports": "^1.5.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "bundlesize": "^0.17.0",
     "codecov": "^3.0.0",
+    "cross-env": "^5.2.0",
     "eslint-config-react-tools": "^1.1.6",
-    "fs": "^0.0.1-security",
     "jest": "^22.4.3",
     "jest-cli": "^22.4.3",
     "lint-staged": "^7.2.0",
-    "mkdirp": "^0.5.1",
-    "node-eval": "^2.0.0",
-    "path": "^0.12.7",
     "rimraf": "^2.6.1",
     "rollup": "0.59.2",
     "rollup-plugin-babel": "3.0.4",
@@ -61,57 +60,16 @@
     "rollup-plugin-filesize": "^2.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-uglify": "3.0.0",
-    "standard": "^11.0.1"
+    "rollup-plugin-terser": "^1.0.1",
+    "rollup-plugin-uglify": "3.0.0"
   },
-  "bundlesize": [
-    {
-      "path": "dist/*.js"
-    }
-  ],
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "modules": false
-        }
-      ],
-      "stage-0",
-      "react"
-    ],
-    "env": {
-      "test": {
-        "presets": [
-          [
-            "env"
-          ],
-          "react",
-          "stage-0"
-        ],
-        "plugins": [
-          "transform-runtime"
-        ]
-      }
-    }
-  },
-  "standard": {
-    "globals": [
-      "describe",
-      "test",
-      "expect"
-    ]
-  },
+  "bundlesize": [{
+    "path": "dist/styler.min.js"
+  }],
   "lint-staged": {
     "*.js": [
       "prettier --no-semi --single-quote --write",
       "git add"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "standard",
-      "standard-jsx"
     ]
   }
 }

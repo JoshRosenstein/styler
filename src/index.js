@@ -99,6 +99,6 @@ export {
   top,
   width,
   zIndex
-} from './styleDefs'
+} from './styleDefs/index'
 
 export default styler

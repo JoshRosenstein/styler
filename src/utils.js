@@ -10,15 +10,15 @@ import {
   curryN,
   simplyEquals,
   reduce,
-  split,
+
   reduceWhile,
   either,
   concat,
-  toPairs,
+
   divide,
   isEmpty,
   is,
-  reduceRight,
+
   when,
   toArray,
   both,
@@ -27,10 +27,13 @@ import {
   defaultTo,
   attach,
   round,
-  mergeAllDeepLeft,
-  mergeAllDeepRight, mapKeys,
+
+  mergeAllDeepRight,
+  mapKeys,
   not,
-  merge
+
+  merge,
+  isFunction,
 } from '@roseys/futils'
 
 import defaultTheme from './defaultTheme'
@@ -66,9 +69,7 @@ export const arrToObj = arr => reduce(
   arr
 )
 
-export const isArray = is('Array')
-export const isString = is('String')
-export const isFunction = is('Function')
+
 export const isNumber = is('Number')
 export const isBool = is('Boolean')
 export const isTruthy = either(Boolean, simplyEquals(0))
@@ -124,7 +125,7 @@ export const ms = appendUnit('ms')
 export const isNilOrEmpty = either(isNil, isEmpty)
 export const isNotNilOrEmpty = complement(isNilOrEmpty)
 
-export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
+// export const isNilOrEmptyOrFalse = either(isNilOrEmpty, simplyEquals(false))
 // TODO : remove unessary Split
 const getThemeFallback = fallBackObj => (attr, fallback) =>
   pathOr(fallback)(attr)(fallBackObj)
@@ -138,30 +139,31 @@ export const pathWithFallback = fallBackObj => (attr = '', defaultTo = '') =>
 export const getThemeAttr = getThemeAttrFB(defaultTheme)
 export const get = pathWithFallback({ theme: defaultTheme })
 
-export const isNegative = test(/^-.+/)
+// export const isNegative = test(/^-.+/)
 
-export const lookUpValue = curryN(3, (themeKey, val, props) => {
-  // / Check Strip Negative Before lookingUp
-  if (!isString(val)) return val
-  const isNeg = /^-.+/.test(val)
-  const absN = isNeg ? val.slice(1) : val
+// export const lookUpValue = curryN(3, (themeKey, val, props) => {
+//   // / Check Strip Negative Before lookingUp
+//   if (!isString(val)) return val
+//   const isNeg = /^-.+/.test(val)
+//   const absN = isNeg ? val.slice(1) : val
+//
+//   val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
+//   return isNeg ? (isNumber(val) ? val * -1 : `-${  val}`) : val
+// })
 
-  val = getThemeAttr(`${themeKey}.${absN}`, val)(props)
-  return isNeg ? (isNumber(val) ? val * -1 : `-${  val}`) : val
-})
 
 export const mapObjOf = curryN(2, (key, val) =>
   pipe(toArray, map(x => objOf(x, val)), mergeAllDeepRight)(key)
 )
 
 // / For quick nested selectors
-const nester = (k, v) => reduceRight(objOf, v, split('.', k))
+// const nester = (k, v) => reduceRight(objOf, v, split('.', k))
 
-export const UnflattenObj = pipe(
-  toPairs,
-  map(([k_, v_]) => nester(k_, v_)),
-  mergeAllDeepLeft
-)
+// export const UnflattenObj = pipe(
+//   toPairs,
+//   map(([k_, v_]) => nester(k_, v_)),
+//   mergeAllDeepLeft
+// )
 
 export const reduceWhileFalsy = curryN(2, (handlerFn, list) =>
   reduceWhile(not, handlerFn, false, list)
@@ -178,7 +180,7 @@ export const iterateUntilResult = computeFn => obj =>
   reduceWhile(isUndefinedOrFalse, computeFn, false, obj)
 
 export const whenFunctionCallWith = (...argsToGive) =>
-  when(is('Function'), fnItem => fnItem(...argsToGive))
+  when(isFunction, fnItem => fnItem(...argsToGive))
 
 export const isAtRule = selector => selector.indexOf('@') === 0
 export const isMQ = selector => /^(MQ|mq)+/.test(selector)
